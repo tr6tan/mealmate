@@ -70,25 +70,16 @@ export default function BottomNav() {
           <button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className={cn(
-              'flex flex-col items-center gap-0.5 pt-2 pb-3 px-4 flex-1 border-none bg-transparent cursor-pointer transition-all duration-200',
-            )}
+            className="flex flex-col items-center gap-1 pt-2 pb-3 px-4 flex-1 border-none bg-transparent cursor-pointer"
           >
             <span
               className={cn(
-                'w-6 h-6 [&>svg]:w-6 [&>svg]:h-6 [&>svg]:stroke-current transition-colors duration-200',
-                active ? 'text-terra' : 'text-muted',
+                'flex items-center justify-center w-12 h-7 rounded-full [&>svg]:w-5 [&>svg]:h-5 [&>svg]:stroke-current transition-all duration-200',
+                active ? 'bg-terra-light text-terra' : 'text-muted bg-transparent',
               )}
             >
               {item.icon}
             </span>
-            {/* dot */}
-            <span
-              className={cn(
-                'w-1 h-1 rounded-full transition-all duration-200',
-                active ? 'bg-terra opacity-100' : 'opacity-0',
-              )}
-            />
             <span
               className={cn(
                 'text-[10px] font-bold tracking-wide transition-colors duration-200',
