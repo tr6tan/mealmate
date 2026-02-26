@@ -26,6 +26,9 @@ function buildInitialWeek(): WeekPlan {
   return plan
 }
 
+// Référence stable pour une semaine vide (évite les re-renders infinis)
+const EMPTY_WEEK: WeekPlan = buildInitialWeek()
+
 // ── Store interface ───────────────────────────────────────────────────────────
 
 interface AppState {
@@ -219,7 +222,7 @@ export const useAppStore = create<AppState>()(
 
 export const selectCurrentWeekPlan = (s: AppState): WeekPlan => {
   const key = getWeekKey(getMondayByOffset(s.weekOffset))
-  return s.weekPlans[key] ?? buildInitialWeek()
+  return s.weekPlans[key] ?? EMPTY_WEEK
 }
 
 export const selectItemsByCategory = (category: ShoppingCategory) => (s: AppState) =>
