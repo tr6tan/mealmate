@@ -1,4 +1,4 @@
-import { useAppStore } from '@/store/useAppStore'
+import { useAppStore, selectCurrentWeekPlan } from '@/store/useAppStore'
 import type { Period, SlotKey } from '@/types'
 import MealCard from './MealCard'
 import MealAddSlot from './MealAddSlot'
@@ -25,7 +25,7 @@ interface Props {
 
 export default function DayView({ dayIdx }: Props) {
   const openSheet = useAppStore((s) => s.openSheet)
-  const plan = useAppStore((s) => s.weekPlan[dayIdx])
+  const plan = useAppStore((s) => selectCurrentWeekPlan(s)[dayIdx])
 
   if (!plan) return null
 

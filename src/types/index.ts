@@ -33,7 +33,8 @@ export interface DayPlan {
   soir_dessert: Meal | null
 }
 
-export type WeekPlan = Record<number, DayPlan> // 0=Lun … 6=Dim
+export type WeekPlan  = Record<number, DayPlan>   // 0=Lun … 6=Dim
+export type WeekPlans = Record<string, WeekPlan>  // weekKey (YYYY-MM-DD) → WeekPlan
 
 export interface Recipe {
   id: string
@@ -91,7 +92,7 @@ export interface SheetState {
 
 /** Données partagées dans Firestore (un doc par foyer) */
 export interface FoyerData {
-  weekPlan: WeekPlan
+  weekPlans: WeekPlans
   recipes: Recipe[]
   shoppingItems: ShoppingItem[]
   settings: AppSettings

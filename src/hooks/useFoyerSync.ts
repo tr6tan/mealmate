@@ -36,7 +36,7 @@ export function useFoyerSync() {
       if (!snap.exists()) {
         const state = useAppStore.getState()
         setDoc(ref, {
-          weekPlan:      state.weekPlan,
+          weekPlans:     state.weekPlans,
           recipes:       state.recipes,
           shoppingItems: state.shoppingItems,
           settings:      state.settings,
@@ -52,13 +52,13 @@ export function useFoyerSync() {
     const unsubStore = useAppStore.subscribe((state, prev) => {
       if (isRemoteUpdate.current) return
       if (
-        state.weekPlan      !== prev.weekPlan      ||
+        state.weekPlans     !== prev.weekPlans     ||
         state.recipes       !== prev.recipes       ||
         state.shoppingItems !== prev.shoppingItems ||
         state.settings      !== prev.settings
       ) {
         scheduleWrite(foyerId, {
-          weekPlan:      state.weekPlan,
+          weekPlans:     state.weekPlans,
           recipes:       state.recipes,
           shoppingItems: state.shoppingItems,
           settings:      state.settings,

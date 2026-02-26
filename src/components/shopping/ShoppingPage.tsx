@@ -2,7 +2,7 @@ import { useRef, useEffect } from 'react'
 import confetti from 'canvas-confetti'
 import { useAppStore } from '@/store/useAppStore'
 import type { ShoppingCategory } from '@/types'
-import { CAT_LABELS, MONTHS, getWeekMonday } from '@/lib/utils'
+import { CAT_LABELS, MONTHS, getMondayByOffset } from '@/lib/utils'
 import ShoppingCategorySection from './ShoppingCategorySection'
 import { showToast } from '@/components/ui/Toast'
 
@@ -31,7 +31,8 @@ export default function ShoppingPage() {
     prevPctRef.current = pct
   }, [pct, total])
 
-  const monday = getWeekMonday()
+  const weekOffset = useAppStore((s) => s.weekOffset)
+  const monday = getMondayByOffset(weekOffset)
   const weekLabel = `Semaine du ${monday.getDate()} ${MONTHS[monday.getMonth()]}`
 
   const handleGenerate = () => {

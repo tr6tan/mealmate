@@ -1,29 +1,38 @@
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react'
-import { useAppStore } from '@/store/useAppStore'
+import { useAppStore, selectCurrentWeekPlan } from '@/store/useAppStore'
 import {
   DAY_SHORT, DAY_LONG, MONTHS,
-  getWeekMonday, getDayFromMonday, getTodayIndex,
+  getMondayByOffset, getDayFromMonday, getTodayIndex,
   cn,
 } from '@/lib/utils'
 import DayChip from './DayChip'
 import DayView from './DayView'
 
 export default function PlanningPage() {
-  const currentDayIdx = useAppStore((s) => s.currentDayIdx)
+  const currentDayIdx  = useAppStore((s) => s.currentDayIdx)
   const setCurrentDayIdx = useAppStore((s) => s.setCurrentDayIdx)
-  const weekPlan = useAppStore((s) => s.weekPlan)
+  const weekOffset     = useAppStore((s) => s.weekOffset)
+  const setWeekOffset  = useAppStore((s) => s.setWeekOffset)
+  const weekPlan       = useAppStore(selectCurrentWeekPlan)
 
-  const monday = useMemo(() => getWeekMonday(), [])
-  const todayIdx = useMemo(() => getTodayIndex(monday), [monday])
+  const monday    = useMemo(() => getMondayByOffset(weekOffset), [weekOffset])
+  const todayIdx  = useMemo(() => getTodayIndex(monday), [monday])
 
   const [selectedIdx, setSelectedIdx] = useState(currentDayIdx >= 0 ? currentDayIdx : 0)
-  // 'left' | 'right' | null
   const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null)
   const [displayIdx, setDisplayIdx] = useState(selectedIdx)
 
+  // Sync depuis store (ouverture via PickDay, etc.)
   useEffect(() => {
     if (currentDayIdx >= 0) setSelectedIdx(currentDayIdx)
   }, [currentDayIdx])
+
+  // Reset le jour sélectionné quand on change de semaine
+  useEffect(() => {
+    const newIdx = todayIdx >= 0 ? todayIdx : 0
+    setSelectedIdx(newIdx)
+    setDisplayIdx(newIdx)
+  }, [weekOffset, todayIdx])
 
   const goToDay = useCallback((idx: number) => {
     if (idx === selectedIdx) return
@@ -64,7 +73,7 @@ export default function PlanningPage() {
   const weekLabel = useMemo(() => {
     const start = monday
     const end = getDayFromMonday(monday, 6)
-    return `Semaine du ${start.getDate()} ${MONTHS[start.getMonth()]} — ${end.getDate()} ${MONTHS[end.getMonth()]}`
+    return `${start.getDate()} ${MONTHS[start.getMonth()]} — ${end.getDate()} ${MONTHS[end.getMonth()]}`
   }, [monday])
 
   const planCount = useMemo(() =>
@@ -77,19 +86,58 @@ export default function PlanningPage() {
     return `${DAY_LONG[selectedIdx]} ${d.getDate()} ${MONTHS[d.getMonth()]}`
   }, [monday, selectedIdx])
 
+  const weekTitle = useMemo(() => {
+    if (weekOffset === 0) return 'Cette semaine'
+    if (weekOffset === 1) return 'Semaine prochaine'
+    if (weekOffset === -1) return 'Semaine dernière'
+    return weekOffset > 0 ? `Dans ${weekOffset} semaines` : `Il y a ${Math.abs(weekOffset)} semaines`
+  }, [weekOffset])
+
   return (
     <div>
       {/* Header */}
       <div className="px-5 pt-4 pb-3">
         <h1 className="text-2xl font-black text-text1">Planning</h1>
-        <p className="text-[13px] text-muted font-semibold mt-0.5">
-          {weekLabel}
-          {planCount > 0 && (
-            <span className="ml-2 text-[11px] font-bold text-terra bg-terra-light px-2 py-0.5 rounded-full">
-              {planCount}/21
-            </span>
+
+        {/* Navigation semaines */}
+        <div className="flex items-center gap-2 mt-1">
+          <button
+            onClick={() => setWeekOffset(weekOffset - 1)}
+            className="w-7 h-7 flex items-center justify-center rounded-full bg-bg2 text-text1 text-base font-bold leading-none active:scale-90 transition-transform"
+            aria-label="Semaine précédente"
+          >
+            ‹
+          </button>
+
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-extrabold text-terra truncate">{weekTitle}</p>
+            <p className="text-[12px] text-muted font-semibold">
+              {weekLabel}
+              {planCount > 0 && (
+                <span className="ml-2 text-[11px] font-bold text-terra bg-terra-light px-2 py-0.5 rounded-full">
+                  {planCount}/21
+                </span>
+              )}
+            </p>
+          </div>
+
+          <button
+            onClick={() => setWeekOffset(weekOffset + 1)}
+            className="w-7 h-7 flex items-center justify-center rounded-full bg-bg2 text-text1 text-base font-bold leading-none active:scale-90 transition-transform"
+            aria-label="Semaine suivante"
+          >
+            ›
+          </button>
+
+          {weekOffset !== 0 && (
+            <button
+              onClick={() => setWeekOffset(0)}
+              className="text-[11px] font-bold text-terra bg-terra-light px-2 py-1 rounded-full active:scale-90 transition-transform"
+            >
+              Auj.
+            </button>
           )}
-        </p>
+        </div>
       </div>
 
       {/* Day chips */}
@@ -132,3 +180,4 @@ export default function PlanningPage() {
     </div>
   )
 }
+

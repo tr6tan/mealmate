@@ -13,13 +13,28 @@ export const MONTHS    = ['jan', 'fév', 'mar', 'avr', 'mai', 'jun', 'jul', 'ao�
 export const PERIOD_LABEL = { pdej: 'Petit-dej', midi: 'Midi', soir: 'Soir' } as const
 export const PERIOD_LONG  = { pdej: 'Petit-déjeuner', midi: 'Déjeuner', soir: 'Dîner' } as const
 
-/** Lundi de la semaine courante */
+/** Lundi de la semaine courante (ou d'une date donnée) */
 export function getWeekMonday(from = new Date()): Date {
   const d = new Date(from)
   d.setHours(0, 0, 0, 0)
   const dow = d.getDay()
   d.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1))
   return d
+}
+
+/** Lundi de la semaine courante + offset (en semaines, peut être négatif) */
+export function getMondayByOffset(offset: number): Date {
+  const monday = getWeekMonday()
+  monday.setDate(monday.getDate() + offset * 7)
+  return monday
+}
+
+/** Clé unique pour une semaine (YYYY-MM-DD du lundi) */
+export function getWeekKey(monday: Date): string {
+  const y = monday.getFullYear()
+  const m = String(monday.getMonth() + 1).padStart(2, '0')
+  const d = String(monday.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
 }
 
 /** Date du Nième jour à partir du lundi */

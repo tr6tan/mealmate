@@ -12,9 +12,10 @@ import type {
   ShoppingItem,
   SlotKey,
   WeekPlan,
+  WeekPlans,
 } from '@/types'
 import { DEFAULT_RECIPES } from '@/data/defaultRecipes'
-import { emptyDay } from '@/lib/utils'
+import { emptyDay, getMondayByOffset, getWeekKey } from '@/lib/utils'
 import { nanoid } from '@/lib/nanoid'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -31,11 +32,12 @@ interface AppState {
   // UI
   activeTab: ActiveTab
   currentDayIdx: number
+  weekOffset: number           // 0 = semaine courante, -1 = passée, +1 = prochaine
   sheetState: SheetState
   syncStatus: 'connecting' | 'synced' | 'error'
 
   // Data
-  weekPlan: WeekPlan
+  weekPlans: WeekPlans
   recipes: Recipe[]
   shoppingItems: ShoppingItem[]
   settings: AppSettings
@@ -43,6 +45,7 @@ interface AppState {
   // Actions — UI
   setActiveTab: (tab: ActiveTab) => void
   setCurrentDayIdx: (idx: number) => void
+  setWeekOffset: (offset: number) => void
   openSheet: (state: SheetState) => void
   closeSheet: () => void
   setSyncStatus: (status: 'connecting' | 'synced' | 'error') => void
@@ -78,10 +81,11 @@ export const useAppStore = create<AppState>()(
       // ── Initial state ──
       activeTab: 'planning',
       currentDayIdx: -1,
+      weekOffset: 0,
       sheetState: { sheet: null },
       syncStatus: 'connecting',
 
-      weekPlan: buildInitialWeek(),
+      weekPlans: {},
       recipes: DEFAULT_RECIPES,
       shoppingItems: [],
       settings: {
@@ -92,6 +96,7 @@ export const useAppStore = create<AppState>()(
       // ── UI ──
       setActiveTab: (tab) => set({ activeTab: tab }),
       setCurrentDayIdx: (idx) => set({ currentDayIdx: idx }),
+      setWeekOffset: (offset) => set({ weekOffset: offset }),
       openSheet: (state) => set({ sheetState: state }),
       closeSheet: () => set({ sheetState: { sheet: null } }),
       setSyncStatus: (status) => set({ syncStatus: status }),
@@ -99,19 +104,30 @@ export const useAppStore = create<AppState>()(
       // ── Planning ──
       setMeal: (dayIdx, slotKey, meal) =>
         set((s) => {
-          const day = { ...s.weekPlan[dayIdx], [slotKey]: meal } as DayPlan
-          return { weekPlan: { ...s.weekPlan, [dayIdx]: day } }
+          const key = getWeekKey(getMondayByOffset(s.weekOffset))
+          const currentWeek = s.weekPlans[key] ?? buildInitialWeek()
+          const day = { ...currentWeek[dayIdx], [slotKey]: meal } as DayPlan
+          return {
+            weekPlans: { ...s.weekPlans, [key]: { ...currentWeek, [dayIdx]: day } },
+          }
         }),
 
-      clearWeek: () => set({ weekPlan: buildInitialWeek() }),
+      clearWeek: () =>
+        set((s) => {
+          const key = getWeekKey(getMondayByOffset(s.weekOffset))
+          return { weekPlans: { ...s.weekPlans, [key]: buildInitialWeek() } }
+        }),
 
       generateShoppingFromPlan: () => {
-        const { weekPlan, recipes } = get()
+        const { weekPlans, weekOffset, recipes } = get()
+        const key = getWeekKey(getMondayByOffset(weekOffset))
+        const weekPlan = weekPlans[key] ?? buildInitialWeek()
         const recipeMap = new Map(recipes.map((r) => [r.name, r]))
         const items: ShoppingItem[] = []
 
         for (let day = 0; day < 7; day++) {
           const plan = weekPlan[day]
+          if (!plan) continue
           const slots: (Meal | null)[] = [
             plan.pdej,
             plan.midi,
@@ -178,17 +194,33 @@ export const useAppStore = create<AppState>()(
         set((s) => ({ settings: { ...s.settings, ...patch } })),
 
       // ── Hydratation Firestore ──
-      _hydrate: (data) =>
+      _hydrate: (data) => {
+        // Migration : anciens docs Firestore avaient weekPlan (flat), nouveaux ont weekPlans
+        let weekPlans = data.weekPlans ?? get().weekPlans
+        if (!weekPlans || Object.keys(weekPlans).length === 0) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const oldWeekPlan = (data as any).weekPlan
+          if (oldWeekPlan) {
+            const key = getWeekKey(getMondayByOffset(0))
+            weekPlans = { [key]: oldWeekPlan }
+          }
+        }
         set({
-          weekPlan:      data.weekPlan      ?? get().weekPlan,
+          weekPlans,
           recipes:       data.recipes       ?? get().recipes,
           shoppingItems: data.shoppingItems ?? get().shoppingItems,
           settings:      data.settings      ?? get().settings,
-        }),
+        })
+      },
     }),
 )
 
 // ── Selectors ─────────────────────────────────────────────────────────────────
+
+export const selectCurrentWeekPlan = (s: AppState): WeekPlan => {
+  const key = getWeekKey(getMondayByOffset(s.weekOffset))
+  return s.weekPlans[key] ?? buildInitialWeek()
+}
 
 export const selectItemsByCategory = (category: ShoppingCategory) => (s: AppState) =>
   s.shoppingItems.filter((i) => i.category === category)
@@ -198,3 +230,6 @@ export const selectShoppingProgress = (s: AppState) => {
   const checked = s.shoppingItems.filter((i) => i.checked).length
   return { total, checked, pct: total ? Math.round((checked / total) * 100) : 0 }
 }
+
+// Re-export Period to avoid unused-import warnings
+export type { Period }
