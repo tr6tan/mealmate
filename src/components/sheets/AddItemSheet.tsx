@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import type { ShoppingCategory } from '@/types'
@@ -141,11 +141,23 @@ function guessCategory(input: string): ShoppingCategory | null {
 export default function AddItemSheet() {
   const addShoppingItem = useAppStore((s) => s.addShoppingItem)
   const closeSheet = useAppStore((s) => s.closeSheet)
+  const sheetState = useAppStore((s) => s.sheetState)
 
   const [name, setName] = useState('')
   const [qty, setQty] = useState('')
   const [category, setCategory] = useState<ShoppingCategory>('epicerie')
   const [autoDetected, setAutoDetected] = useState(false)
+
+  // Reset à chaque ouverture
+  const isOpen = sheetState.sheet === 'add-item'
+  useEffect(() => {
+    if (isOpen) {
+      setName('')
+      setQty('')
+      setCategory('epicerie')
+      setAutoDetected(false)
+    }
+  }, [isOpen])
 
   const handleAdd = () => {
     if (!name.trim()) return

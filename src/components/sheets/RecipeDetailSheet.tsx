@@ -3,20 +3,36 @@ import { useAppStore } from '@/store/useAppStore'
 import { showToast } from '@/components/ui/Toast'
 
 export default function RecipeDetailSheet() {
-  const sheetState  = useAppStore((s) => s.sheetState)
-  const toggleFav   = useAppStore((s) => s.toggleFav)
-  const deleteRecipe = useAppStore((s) => s.deleteRecipe)
-  const openSheet   = useAppStore((s) => s.openSheet)
-  const closeSheet  = useAppStore((s) => s.closeSheet)
+  const sheetState     = useAppStore((s) => s.sheetState)
+  const toggleFav      = useAppStore((s) => s.toggleFav)
+  const deleteRecipe   = useAppStore((s) => s.deleteRecipe)
+  const duplicateRecipe = useAppStore((s) => s.duplicateRecipe)
+  const addShoppingItem = useAppStore((s) => s.addShoppingItem)
+  const openSheet      = useAppStore((s) => s.openSheet)
+  const closeSheet     = useAppStore((s) => s.closeSheet)
 
   const recipe = sheetState.recipeContext
   if (!recipe) return <BottomSheet name="recipe-detail"><div /></BottomSheet>
 
   const handleDelete = () => {
-    if (!window.confirm(`Supprimer « ${recipe.name} » ?`)) return
+    if (!window.confirm(`Supprimer « ${recipe.name} » ?`)) return
     deleteRecipe(recipe.id)
     closeSheet()
     showToast('Recette supprimée')
+  }
+
+  const handleDuplicate = () => {
+    duplicateRecipe(recipe.id)
+    closeSheet()
+    showToast(`« ${recipe.name} » dupliquée !`)
+  }
+
+  const handleAddToCourses = () => {
+    if (!recipe.ingredients?.length) return
+    recipe.ingredients.forEach((ing) => {
+      addShoppingItem({ name: ing.name, qty: ing.qty, category: ing.category, checked: false })
+    })
+    showToast(`${recipe.ingredients.length} ingrédient${recipe.ingredients.length > 1 ? 's' : ''} ajouté${recipe.ingredients.length > 1 ? 's' : ''} aux courses !`)
   }
 
   return (
@@ -54,7 +70,7 @@ export default function RecipeDetailSheet() {
       </div>
 
       {/* Actions principale */}
-      <div className="flex gap-2 mb-5">
+      <div className="flex gap-2 mb-3">
         <button
           onClick={() => toggleFav(recipe.id)}
           className={`flex-1 py-2.5 rounded-xl text-xs font-extrabold transition-all active:scale-[0.97] ${
@@ -68,6 +84,24 @@ export default function RecipeDetailSheet() {
           className="flex-1 py-2.5 rounded-xl bg-terra-light text-terra text-xs font-extrabold active:scale-[0.97] transition-all"
         >
           + Ajouter au planning
+        </button>
+      </div>
+
+      {/* Actions secondaires */}
+      <div className="flex gap-2 mb-5">
+        {recipe.ingredients && recipe.ingredients.length > 0 && (
+          <button
+            onClick={handleAddToCourses}
+            className="flex-1 py-2.5 rounded-xl bg-[#E8F5E9] text-[#2E7D32] text-xs font-extrabold active:scale-[0.97] transition-all"
+          >
+            🛒 Ajouter aux courses
+          </button>
+        )}
+        <button
+          onClick={handleDuplicate}
+          className="flex-1 py-2.5 rounded-xl bg-sep text-text2 text-xs font-extrabold active:scale-[0.97] transition-all"
+        >
+          🗂 Dupliquer
         </button>
       </div>
 

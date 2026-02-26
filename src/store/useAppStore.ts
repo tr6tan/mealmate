@@ -62,6 +62,7 @@ interface AppState {
   // Actions — Recipes
   addRecipe: (recipe: Omit<Recipe, 'id'>) => void
   deleteRecipe: (id: string) => void
+  duplicateRecipe: (id: string) => void
   toggleFav: (id: string) => void
   resetRecipes: () => void
 
@@ -179,6 +180,17 @@ export const useAppStore = create<AppState>()(
 
       deleteRecipe: (id) =>
         set((s) => ({ recipes: s.recipes.filter((r) => r.id !== id) })),
+
+      duplicateRecipe: (id) =>
+        set((s) => {
+          const src = s.recipes.find((r) => r.id === id)
+          if (!src) return {}
+          const copy = { ...src, id: nanoid(), name: `${src.name} (copie)` }
+          const idx = s.recipes.findIndex((r) => r.id === id)
+          const next = [...s.recipes]
+          next.splice(idx + 1, 0, copy)
+          return { recipes: next }
+        }),
 
       toggleFav: (id) =>
         set((s) => ({
