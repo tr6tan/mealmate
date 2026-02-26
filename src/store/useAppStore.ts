@@ -1,0 +1,197 @@
+import { create } from 'zustand'
+import type {
+  ActiveTab,
+  AppSettings,
+  DayPlan,
+  FoyerData,
+  Meal,
+  Period,
+  Recipe,
+  SheetState,
+  ShoppingCategory,
+  ShoppingItem,
+  SlotKey,
+  WeekPlan,
+} from '@/types'
+import { DEFAULT_RECIPES } from '@/data/defaultRecipes'
+import { emptyDay } from '@/lib/utils'
+import { nanoid } from '@/lib/nanoid'
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function buildInitialWeek(): WeekPlan {
+  const plan: WeekPlan = {}
+  for (let i = 0; i < 7; i++) plan[i] = emptyDay()
+  return plan
+}
+
+// ── Store interface ───────────────────────────────────────────────────────────
+
+interface AppState {
+  // UI
+  activeTab: ActiveTab
+  currentDayIdx: number
+  sheetState: SheetState
+
+  // Data
+  weekPlan: WeekPlan
+  recipes: Recipe[]
+  shoppingItems: ShoppingItem[]
+  settings: AppSettings
+
+  // Actions — UI
+  setActiveTab: (tab: ActiveTab) => void
+  setCurrentDayIdx: (idx: number) => void
+  openSheet: (state: SheetState) => void
+  closeSheet: () => void
+
+  // Actions — Planning
+  setMeal: (dayIdx: number, slotKey: SlotKey, meal: Meal | null) => void
+  clearWeek: () => void
+  generateShoppingFromPlan: () => void
+
+  // Actions — Recipes
+  addRecipe: (recipe: Omit<Recipe, 'id'>) => void
+  deleteRecipe: (id: string) => void
+  toggleFav: (id: string) => void
+  resetRecipes: () => void
+
+  // Actions — Shopping
+  addShoppingItem: (item: Omit<ShoppingItem, 'id'>) => void
+  toggleShoppingItem: (id: string) => void
+  removeShoppingItem: (id: string) => void
+  clearCheckedItems: () => void
+
+  // Actions — Settings
+  updateSettings: (patch: Partial<AppSettings>) => void
+
+  // Action interne — hydratation depuis Firestore
+  _hydrate: (data: FoyerData) => void
+}
+
+// ── Store ─────────────────────────────────────────────────────────────────────
+
+export const useAppStore = create<AppState>()(
+    (set, get) => ({
+      // ── Initial state ──
+      activeTab: 'planning',
+      currentDayIdx: -1,
+      sheetState: { sheet: null },
+
+      weekPlan: buildInitialWeek(),
+      recipes: DEFAULT_RECIPES,
+      shoppingItems: [],
+      settings: {
+        personnes: 2,
+        nomFoyer: 'Mon foyer',
+      },
+
+      // ── UI ──
+      setActiveTab: (tab) => set({ activeTab: tab }),
+      setCurrentDayIdx: (idx) => set({ currentDayIdx: idx }),
+
+      openSheet: (state) => set({ sheetState: state }),
+      closeSheet: () => set({ sheetState: { sheet: null } }),
+
+      // ── Planning ──
+      setMeal: (dayIdx, slotKey, meal) =>
+        set((s) => {
+          const day = { ...s.weekPlan[dayIdx], [slotKey]: meal } as DayPlan
+          return { weekPlan: { ...s.weekPlan, [dayIdx]: day } }
+        }),
+
+      clearWeek: () => set({ weekPlan: buildInitialWeek() }),
+
+      generateShoppingFromPlan: () => {
+        const { weekPlan, recipes } = get()
+        const recipeMap = new Map(recipes.map((r) => [r.name, r]))
+        const items: ShoppingItem[] = []
+
+        for (let day = 0; day < 7; day++) {
+          const plan = weekPlan[day]
+          const slots: (Meal | null)[] = [
+            plan.pdej,
+            plan.midi,
+            plan.midi_entree,
+            plan.midi_dessert,
+            plan.soir,
+            plan.soir_entree,
+            plan.soir_dessert,
+          ]
+          slots.forEach((meal) => {
+            if (!meal) return
+            const recipe = recipeMap.get(meal.name)
+            recipe?.ingredients?.forEach((ing) => {
+              items.push({
+                id: nanoid(),
+                name: ing.name,
+                qty: ing.qty,
+                category: ing.category,
+                checked: false,
+              })
+            })
+          })
+        }
+        set({ shoppingItems: items })
+      },
+
+      // ── Recipes ──
+      addRecipe: (recipe) =>
+        set((s) => ({
+          recipes: [{ ...recipe, id: nanoid() }, ...s.recipes],
+        })),
+
+      deleteRecipe: (id) =>
+        set((s) => ({ recipes: s.recipes.filter((r) => r.id !== id) })),
+
+      toggleFav: (id) =>
+        set((s) => ({
+          recipes: s.recipes.map((r) => (r.id === id ? { ...r, fav: !r.fav } : r)),
+        })),
+
+      resetRecipes: () => set({ recipes: DEFAULT_RECIPES }),
+
+      // ── Shopping ──
+      addShoppingItem: (item) =>
+        set((s) => ({
+          shoppingItems: [{ ...item, id: nanoid() }, ...s.shoppingItems],
+        })),
+
+      toggleShoppingItem: (id) =>
+        set((s) => ({
+          shoppingItems: s.shoppingItems.map((i) =>
+            i.id === id ? { ...i, checked: !i.checked } : i,
+          ),
+        })),
+
+      removeShoppingItem: (id) =>
+        set((s) => ({ shoppingItems: s.shoppingItems.filter((i) => i.id !== id) })),
+
+      clearCheckedItems: () =>
+        set((s) => ({ shoppingItems: s.shoppingItems.filter((i) => !i.checked) })),
+
+      // ── Settings ──
+      updateSettings: (patch) =>
+        set((s) => ({ settings: { ...s.settings, ...patch } })),
+
+      // ── Hydratation Firestore ──
+      _hydrate: (data) =>
+        set({
+          weekPlan:      data.weekPlan      ?? get().weekPlan,
+          recipes:       data.recipes       ?? get().recipes,
+          shoppingItems: data.shoppingItems ?? get().shoppingItems,
+          settings:      data.settings      ?? get().settings,
+        }),
+    }),
+)
+
+// ── Selectors ─────────────────────────────────────────────────────────────────
+
+export const selectItemsByCategory = (category: ShoppingCategory) => (s: AppState) =>
+  s.shoppingItems.filter((i) => i.category === category)
+
+export const selectShoppingProgress = (s: AppState) => {
+  const total = s.shoppingItems.length
+  const checked = s.shoppingItems.filter((i) => i.checked).length
+  return { total, checked, pct: total ? Math.round((checked / total) * 100) : 0 }
+}

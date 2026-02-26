@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>MealMate 🍽️</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #FAFAF7;
+      --card: #FFFFFF;
+      --terra: #E07B54;
+      --terra-light: #FDF0EB;
+      --terra-dark: #C4623C;
+      --sage: #6B9E78;
+      --sage-light: #EEF5F0;
+      --text: #1C1C1E;
+      --text2: #8E8E93;
+      --sep: #F2F2F0;
+      --border: #E8E8E5;
+      --lidl-bg: #FFFBEB;
+      --monop: #0057A8;
+      --monop-bg: #EEF4FB;
+      --superu-bg: #EEF7EE;
+      --kazoo: #E91E63;
+      --kazoo-bg: #FDE8F0;
+      --marche-bg: #F2F8E9;
+      --shadow: 0 2px 16px rgba(0,0,0,0.07);
+      --r: 18px;
+      --r-sm: 12px;
+    }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #D4C9B8;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 30px 20px;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+
+    .phone-frame {
+      width: 390px;
+      height: 844px;
+      background: var(--bg);
+      border-radius: 48px;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.4), 0 0 0 10px #1a1a1a, 0 0 0 12px #444;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .status-bar {
+      background: var(--bg);
+      padding: 14px 28px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+    .status-icons { display: flex; gap: 6px; align-items: center; font-size: 12px; }
+    .notch {
+      width: 120px; height: 34px;
+      background: #1a1a1a;
+      border-radius: 0 0 22px 22px;
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .screen { flex: 1; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
+    .screen::-webkit-scrollbar { display: none; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .bottom-nav {
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--sep);
+      padding: 10px 0 20px;
+      display: flex;
+      justify-content: space-around;
+      flex-shrink: 0;
+    }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 6px 0; border: none; background: none; transition: all 0.2s; flex: 1; }
+    .nav-item svg { width: 24px; height: 24px; stroke: var(--text2); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: stroke 0.2s; }
+    .nav-item.active svg { stroke: var(--terra); }
+    .nav-item .nav-label { font-size: 10px; font-weight: 700; color: var(--text2); transition: color 0.2s; letter-spacing: 0.02em; }
+    .nav-item.active .nav-label { color: var(--terra); }
+    .nav-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--terra); margin-top: -2px; opacity: 0; transition: opacity 0.2s; }
+    .nav-item.active .nav-dot { opacity: 1; }
+
+    .page-header { padding: 16px 20px 12px; display: flex; justify-content: space-between; align-items: center; }
+    .page-title { font-size: 24px; font-weight: 900; color: var(--text); }
+    .page-subtitle { font-size: 13px; color: var(--text2); font-weight: 600; margin-top: 2px; }
+    .header-action { width: 40px; height: 40px; border-radius: 50%; background: var(--terra); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; box-shadow: 0 4px 12px rgba(224,123,84,0.4); transition: transform 0.15s; font-family: 'Nunito', sans-serif; }
+    .header-action:active { transform: scale(0.92); }
+
+    .badge { display: none; }
+    .badge-rapide-time { font-size: 11px; font-weight: 700; color: var(--text2); }
+    .badge-fav { font-size: 14px; }
+
+    /* ════ PLANNING ════ */
+    .days-scroll { padding: 4px 20px 16px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; }
+    .days-scroll::-webkit-scrollbar { display: none; }
+    .day-chip { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; padding: 10px 14px; border-radius: 16px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; background: var(--card); }
+    .day-chip .day-name { font-size: 10px; font-weight: 700; color: var(--text2); letter-spacing: 0.04em; text-transform: uppercase; }
+    .day-chip .day-num { font-size: 20px; font-weight: 900; color: var(--text); margin-top: 2px; }
+    /* Aujourd'hui : bordure + texte terracotta, fond blanc */
+    .day-chip.today { background: white; border-color: var(--terra); box-shadow: 0 0 0 1px var(--terra); }
+    .day-chip.today .day-name { color: var(--terra); }
+    .day-chip.today .day-num { color: var(--terra); font-weight: 900; }
+    /* Jour sélectionné (autre qu'aujourd'hui) */
+    .day-chip.selected:not(.today) { background: var(--terra-light); border-color: var(--terra); }
+    .day-chip.selected:not(.today) .day-num { color: var(--terra); }
+    /* Jours avec repas planifiés */
+    .day-chip.has-meals:not(.today):not(.selected) { border-color: var(--border); background: var(--card); }
+    .day-chip.today::after { content: ''; display: block; width: 4px; height: 4px; border-radius: 50%; background: var(--terra); margin-top: 2px; }
+
+    .day-meals-section { padding: 0 20px 16px; }
+    .selected-day-header { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 6px; padding-left: 10px; border-left: 3px solid var(--terra); }
+
+
+    .meal-section-header { font-size: 14px; font-weight: 800; color: var(--text); margin: 16px 0 10px; display: flex; align-items: center; gap: 8px; }
+    .period-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .period-dot.morning { background: #F5A623; }
+    .period-dot.noon { background: var(--terra); }
+    .period-dot.evening { background: #7C5CBF; }
+
+    .meal-slot { margin-bottom: 6px; }
+    .meal-slot-label { font-size: 10px; font-weight: 800; color: var(--text2); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; padding-left: 2px; }
+    .meal-slot-label.optional { color: #C8C8C8; }
+
+    .meal-card { background: var(--card); border-radius: var(--r); padding: 12px 14px; display: flex; align-items: center; gap: 10px; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.15s; border: 1.5px solid var(--border); }
+    .meal-card:active { transform: scale(0.98); }
+    .meal-card.multi-day { border-color: #BBDEFB; background: #F8FBFF; }
+    .meal-emoji { font-size: 28px; flex-shrink: 0; }
+    .meal-info { flex: 1; min-width: 0; }
+    .meal-name { font-size: 14px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .meal-badges { display: flex; gap: 5px; margin-top: 5px; flex-wrap: wrap; }
+
+    /* Slot plat principal vide */
+    .meal-add { background: var(--card); border-radius: var(--r); padding: 10px 14px; display: flex; align-items: center; gap: 10px; border: 2px dashed var(--border); cursor: pointer; transition: all 0.2s; }
+    .meal-add:hover, .meal-add:active { border-color: var(--terra); background: var(--terra-light); }
+    .meal-add-icon { width: 32px; height: 32px; border-radius: 9px; background: var(--sep); display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--text2); flex-shrink: 0; }
+    .meal-add span { font-size: 12px; font-weight: 600; color: var(--text2); }
+
+    /* Slots optionnels (entrée / dessert) ultra-discrets */
+    .optional-slot { display: flex; align-items: center; gap: 8px; padding: 5px 4px; cursor: pointer; border-radius: 9px; transition: background 0.15s; }
+    .optional-slot:hover { background: var(--sep); }
+    .optional-slot-icon { font-size: 13px; opacity: 0.4; }
+    .optional-slot-label { font-size: 11px; font-weight: 600; color: #BEBEBE; flex: 1; }
+    .optional-slot-plus { font-size: 14px; color: #BEBEBE; font-weight: 700; opacity: 0; transition: opacity 0.15s; }
+    .optional-slot:hover .optional-slot-plus { opacity: 1; }
+    .optional-slot.filled .optional-slot-label { color: var(--text2); font-weight: 700; }
+    .optional-slot.filled .optional-slot-icon { opacity: 1; }
+    .optional-slot.filled .optional-slot-plus { opacity: 1; color: var(--text2); font-size: 12px; }
+
+    /* Onglets contextuels dans la sheet */
+    .sheet-tabs { display: flex; background: var(--sep); border-radius: 12px; padding: 3px; margin-bottom: 14px; gap: 3px; }
+    .sheet-tab { flex: 1; padding: 7px 4px; text-align: center; font-size: 11px; font-weight: 800; color: var(--text2); border-radius: 9px; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .sheet-tab.active { background: white; color: var(--terra); box-shadow: 0 1px 6px rgba(0,0,0,0.1); }
+    .sheet-section { display: none; }
+    .sheet-section.active { display: block; }
+
+    .slot-divider { height: 1px; background: var(--sep); margin: 14px 0; }
+
+    .cta-generate { width: 100%; background: var(--terra); color: white; border: none; border-radius: 16px; padding: 15px; font-size: 15px; font-weight: 800; font-family: 'Nunito', sans-serif; cursor: pointer; box-shadow: 0 8px 24px rgba(224,123,84,0.45); display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform 0.15s; margin-top: 16px; margin-bottom: 16px; }
+    .cta-generate:active { transform: scale(0.97); }
+
+    /* ════ RECETTES ════ */
+    .search-bar { margin: 0 20px 14px; background: var(--card); border-radius: 14px; padding: 11px 14px; display: flex; align-items: center; gap: 10px; border: 1.5px solid var(--border); }
+    .search-bar input { border: none; background: none; font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--text); outline: none; flex: 1; font-weight: 600; }
+    .search-bar input::placeholder { color: var(--text2); }
+
+    .filter-pills { padding: 0 20px 14px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+    .filter-pills::-webkit-scrollbar { display: none; }
+    .pill { flex-shrink: 0; padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; cursor: pointer; border: 2px solid var(--border); background: var(--card); color: var(--text2); transition: all 0.2s; white-space: nowrap; }
+    .pill.active { background: var(--terra); border-color: var(--terra); color: white; }
+
+    .recipes-grid { padding: 0 20px 100px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .recipe-card { background: var(--card); border-radius: var(--r); cursor: pointer; box-shadow: var(--shadow); transition: transform 0.2s; border: 1.5px solid var(--border); overflow: hidden; }
+    .recipe-card:active { transform: scale(0.96); }
+    .recipe-card.add-card { background: var(--terra-light); border: 2px dashed var(--terra); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 160px; }
+    .recipe-photo { width: 100%; height: 90px; object-fit: cover; display: block; background: var(--sep); }
+    .recipe-photo-placeholder { width: 100%; height: 90px; background: linear-gradient(135deg, var(--terra-light), var(--sep)); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+    .recipe-body { padding: 10px 12px 12px; }
+    .recipe-name { font-size: 12px; font-weight: 800; color: var(--text); margin-bottom: 6px; line-height: 1.3; }
+    .recipe-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 3px; }
+    .recipe-time { font-size: 11px; color: var(--text2); font-weight: 600; }
+    .recipe-fav { font-size: 13px; }
+    .recipe-category { font-size: 9px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text2); margin-bottom: 4px; }
+
+    /* ════ COURSES ════ */
+    .progress-section { padding: 0 20px 14px; }
+    .progress-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .progress-text { font-size: 13px; font-weight: 700; color: var(--text2); }
+    .progress-count { font-size: 13px; font-weight: 800; color: var(--terra); }
+    .progress-bar-bg { background: var(--sep); border-radius: 10px; height: 8px; overflow: hidden; }
+    .progress-bar-fill { background: linear-gradient(90deg, var(--terra), #F4A67A); height: 100%; border-radius: 10px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+
+    .shopping-list { padding: 0 20px 120px; }
+    .list-section { margin-bottom: 22px; }
+    .list-section-header { font-size: 11px; font-weight: 800; color: var(--text2); letter-spacing: 0.07em; text-transform: uppercase; padding: 8px 2px 10px; display: flex; align-items: center; gap: 8px; border-bottom: 1.5px solid var(--border); margin-bottom: 8px; }
+    .list-section-header .sec-icon { font-size: 15px; }
+    .cat-empty-hint { font-size: 12px; color: #BEBEBE; font-weight: 600; padding: 10px 2px; font-style: italic; }
+    .item-row.new-item { animation: slideIn 0.22s ease-out; }
+    @keyframes slideIn { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
+
+    .item-row { background: var(--card); border-radius: var(--r-sm); padding: 11px 12px; display: flex; align-items: center; gap: 10px; margin-bottom: 7px; border: 1.5px solid var(--border); cursor: pointer; transition: all 0.2s; }
+    .item-row.checked { opacity: 0.45; }
+    .item-checkbox { width: 24px; height: 24px; border-radius: 7px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; font-size: 13px; }
+    .item-row.checked .item-checkbox { background: var(--sage); border-color: var(--sage); color: white; }
+    .item-name { flex: 1; font-size: 13px; font-weight: 700; color: var(--text); }
+    .item-row.checked .item-name { text-decoration: line-through; color: var(--text2); }
+    .item-qty { font-size: 11px; font-weight: 700; color: var(--text2); background: var(--sep); padding: 3px 8px; border-radius: 7px; white-space: nowrap; }
+
+    /* ════ SETTINGS ════ */
+    .settings-section { padding: 0 20px 16px; }
+    .settings-group { background: var(--card); border-radius: var(--r); overflow: hidden; margin-bottom: 20px; border: 1.5px solid var(--border); }
+    .settings-row { padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--sep); cursor: pointer; }
+    .settings-row:last-child { border-bottom: none; }
+    .settings-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .settings-label { flex: 1; }
+    .settings-label .label-main { font-size: 14px; font-weight: 700; color: var(--text); }
+    .settings-label .label-sub { font-size: 11px; color: var(--text2); font-weight: 500; margin-top: 1px; }
+    .settings-arrow { color: var(--text2); font-size: 14px; }
+    .section-title { font-size: 12px; font-weight: 800; color: var(--text2); letter-spacing: 0.08em; text-transform: uppercase; padding: 0 4px 10px; }
+    .store-pill-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .store-pill-item { background: var(--card); border-radius: 14px; padding: 11px 14px; display: flex; align-items: center; gap: 12px; border: 1.5px solid var(--border); }
+    .store-pill-icon { font-size: 20px; }
+    .store-pill-name { flex: 1; font-size: 13px; font-weight: 700; color: var(--text); }
+    .toggle { width: 44px; height: 26px; border-radius: 13px; background: var(--sage); position: relative; cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+    .toggle::after { content: ''; position: absolute; width: 22px; height: 22px; border-radius: 50%; background: white; top: 2px; right: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.2); transition: right 0.2s; }
+    .toggle.off { background: var(--border); }
+    .toggle.off::after { right: 20px; }
+
+    /* ════ SHEETS ════ */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .overlay.open { opacity: 1; pointer-events: all; }
+    .bottom-sheet { position: fixed; bottom: -110%; left: 50%; transform: translateX(-50%); width: 390px; background: var(--card); border-radius: 28px 28px 0 0; z-index: 101; padding: 12px 20px 40px; transition: bottom 0.4s cubic-bezier(0.32,0.72,0,1); max-height: 84%; overflow-y: auto; scrollbar-width: none; }
+    .bottom-sheet::-webkit-scrollbar { display: none; }
+    .bottom-sheet.open { bottom: 0; }
+    .sheet-handle { width: 40px; height: 4px; border-radius: 2px; background: var(--border); margin: 0 auto 16px; }
+    .sheet-title { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 14px; }
+    .sheet-subtitle { font-size: 10px; font-weight: 800; color: var(--text2); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 7px; margin-top: 14px; }
+
+    .suggestion-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 13px; cursor: pointer; transition: background 0.15s; margin-bottom: 3px; }
+    .suggestion-item:hover, .suggestion-item:active { background: var(--sep); }
+    .suggestion-emoji { font-size: 22px; flex-shrink: 0; }
+    .suggestion-info { flex: 1; min-width: 0; }
+    .suggestion-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .suggestion-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
+
+    .cat-divider { font-size: 10px; font-weight: 800; color: var(--text2); letter-spacing: 0.1em; text-transform: uppercase; padding: 10px 2px 6px; border-top: 1px solid var(--sep); margin-top: 4px; }
+    .cat-divider:first-of-type { border-top: none; padding-top: 4px; }
+
+    .free-meal-btn { display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--terra-light); border-radius: 14px; cursor: pointer; margin-bottom: 4px; border: 2px dashed var(--terra); }
+    .free-meal-btn span { font-size: 13px; font-weight: 700; color: var(--terra); }
+
+    .detail-item { display: flex; align-items: center; padding: 9px 12px; border-radius: 11px; margin-bottom: 5px; background: var(--card); border: 1.5px solid var(--border); gap: 10px; }
+    .detail-item .d-name { flex: 1; font-size: 13px; font-weight: 700; color: var(--text); }
+    .detail-item .d-qty { font-size: 11px; font-weight: 700; color: var(--text2); background: var(--sep); padding: 3px 8px; border-radius: 7px; }
+
+    /* ════ ACTION SHEET ════ */
+    .action-meal-header { display: flex; align-items: center; gap: 14px; padding: 4px 0 18px; border-bottom: 1px solid var(--sep); margin-bottom: 16px; }
+    .action-meal-emoji-big { font-size: 42px; flex-shrink: 0; }
+    .action-meal-title-block { flex: 1; min-width: 0; }
+    .action-meal-title-name { font-size: 16px; font-weight: 800; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .action-meal-title-period { font-size: 12px; color: var(--text2); font-weight: 600; margin-top: 3px; }
+    .action-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .action-row { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--sep); border-radius: 14px; border: none; width: 100%; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); text-align: left; transition: opacity 0.15s; }
+    .action-row:active { opacity: 0.7; }
+    .action-row-icon { font-size: 20px; flex-shrink: 0; }
+    .action-row-label { flex: 1; }
+    .action-row-chevron { color: var(--text2); font-size: 18px; font-weight: 400; }
+    .action-row-danger { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; background: #FDE8F0; border-radius: 14px; border: none; width: 100%; cursor: pointer; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; color: #C0304A; transition: opacity 0.15s; }
+    .action-row-danger:active { opacity: 0.7; }
+
+    /* ════ TOAST ════ */
+    .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(16px); background: #1C1C1E; color: white; padding: 11px 18px; border-radius: 14px; font-size: 13px; font-weight: 700; opacity: 0; transition: all 0.3s; z-index: 200; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @keyframes fall { 0% { transform: translateY(-10px) rotate(0deg); opacity: 1; } 100% { transform: translateY(70px) rotate(360deg); opacity: 0; } }
+    .confetti-el { position: fixed; pointer-events: none; font-size: 18px; z-index: 300; animation: fall 1s ease-in forwards; }
+  </style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="notch"></div>
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons"><span>●●●</span><span>WiFi</span><span>🔋</span></div>
+  </div>
+
+  <div class="screen">
+
+    <!-- ══════════ PLANNING ══════════ -->
+    <div class="tab-panel active" id="tab-planning">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Planning 📅</div>
+          <div class="page-subtitle">Semaine du 24 fév — 2 mar</div>
+        </div>
+        <button class="header-action" onclick="openSheet('sheet-add-meal','pdej')">+</button>
+      </div>
+
+      <div class="days-scroll" id="days-scroll-container"></div>
+
+      <div class="day-meals-section" id="day-meals-section"></div>
+    </div>
+
+    <div class="tab-panel" id="tab-recettes">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Recettes</div>
+          <div class="page-subtitle" id="recipes-count">24 recettes</div>
+        </div>
+        <button class="header-action" onclick="openSheet('sheet-new-recipe','')">+</button>
+      </div>
+      <div class="search-bar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" placeholder="Chercher une recette…" id="recipe-search" oninput="filterRecipes(this.value)"/></div>
+      <div class="filter-pills">
+        <div class="pill active" onclick="filterByPill(this,'all')">Tout</div>
+        <div class="pill" onclick="filterByPill(this,'pdej')">Petit-dej</div>
+        <div class="pill" onclick="filterByPill(this,'midi')">Midi</div>
+        <div class="pill" onclick="filterByPill(this,'soir')">Soir</div>
+        <div class="pill" onclick="filterByPill(this,'fav')">Favoris</div>
+        <div class="pill" onclick="filterByPill(this,'rapide')">Rapide</div>
+      </div>
+      <div class="recipes-grid" id="recipes-grid">
+        <!-- généré par JS -->
+      </div>
+    </div>
+
+    <!-- ══════════ COURSES ══════════ -->
+    <div class="tab-panel" id="tab-courses">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Courses 🛒</div>
+          <div class="page-subtitle">Semaine du 24 fév</div>
+        </div>
+        <button class="header-action" onclick="openSheet('sheet-add-item','')">+</button>
+      </div>
+      <div class="progress-section">
+        <div class="progress-info">
+          <span class="progress-text">Progression</span>
+          <span class="progress-count" id="progress-count">0 / 0 articles</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="shopping-list">
+        <!-- Fruits & Légumes -->
+        <div class="list-section">
+          <div class="list-section-header"><span class="sec-icon">🥦</span>Fruits &amp; Légumes</div>
+          <div id="cat-legumes"></div>
+        </div>
+        <!-- Viandes -->
+        <div class="list-section">
+          <div class="list-section-header"><span class="sec-icon">🥩</span>Viandes</div>
+          <div id="cat-viandes"></div>
+        </div>
+        <!-- Crèmerie -->
+        <div class="list-section">
+          <div class="list-section-header"><span class="sec-icon">🧀</span>Crèmerie</div>
+          <div id="cat-cremerie"></div>
+        </div>
+        <!-- Épicerie -->
+        <div class="list-section">
+          <div class="list-section-header"><span class="sec-icon">🛒</span>Épicerie</div>
+          <div id="cat-epicerie"></div>
+        </div>
+        <!-- Maison & Hygiène -->
+        <div class="list-section">
+          <div class="list-section-header"><span class="sec-icon">🧴</span>Maison &amp; Hygiène</div>
+          <div id="cat-maison"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════ RÉGLAGES ══════════ -->
+    <div class="tab-panel" id="tab-settings">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Réglages</div>
+          <div class="page-subtitle">Préférences</div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="section-title">Planning</div>
+        <div class="settings-group">
+          <div class="settings-row" onclick="promptPersonnes()">
+            <div class="settings-icon" style="background:#FFF3EE">👤</div>
+            <div class="settings-label">
+              <div class="label-main">Nombre de personnes</div>
+              <div class="label-sub" id="lbl-personnes">2 personnes</div>
+            </div>
+            <div class="settings-arrow">›</div>
+          </div>
+          <div class="settings-row" onclick="promptNom()">
+            <div class="settings-icon" style="background:#EEF6F0">✏️</div>
+            <div class="settings-label">
+              <div class="label-main">Nom du foyer</div>
+              <div class="label-sub" id="lbl-nom">Tristan &amp; sa copine</div>
+            </div>
+            <div class="settings-arrow">›</div>
+          </div>
+        </div>
+        <div class="section-title">Données</div>
+        <div class="settings-group">
+          <div class="settings-row" onclick="if(confirm('Effacer toute la semaine ?')) clearWeek()">
+            <div class="settings-icon" style="background:#FDE8F0">🗑️</div>
+            <div class="settings-label">
+              <div class="label-main" style="color:#C0304A">Effacer la semaine</div>
+              <div class="label-sub">Remet tous les repas à zéro</div>
+            </div>
+            <div class="settings-arrow">›</div>
+          </div>
+          <div class="settings-row" onclick="if(confirm('Réinitialiser toutes les recettes ?')) resetRecipes()">
+            <div class="settings-icon" style="background:#FDE8F0">🔄</div>
+            <div class="settings-label">
+              <div class="label-main" style="color:#C0304A">Réinitialiser les recettes</div>
+              <div class="label-sub">Supprime vos recettes personnalisées</div>
+            </div>
+            <div class="settings-arrow">›</div>
+          </div>
+        </div>
+        <div style="text-align:center;padding:20px 0;color:var(--text2);font-size:12px;font-weight:600">
+          MealMate v1.0 — Fait avec ❤️<br><span id="lbl-footer">Tristan &amp; sa copine 🫶</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /screen -->
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="switchTab('planning',this)">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <div class="nav-dot"></div><div class="nav-label">Semaine</div>
+    </button>
+    <button class="nav-item" onclick="switchTab('recettes',this)">
+      <svg viewBox="0 0 24 24"><path d="M3 11l19-9-9 19-2-8-8-2z"/></svg>
+      <div class="nav-dot"></div><div class="nav-label">Recettes</div>
+    </button>
+    <button class="nav-item" onclick="switchTab('courses',this)">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <div class="nav-dot"></div><div class="nav-label">Courses</div>
+    </button>
+    <button class="nav-item" onclick="switchTab('settings',this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <div class="nav-dot"></div><div class="nav-label">Réglages</div>
+    </button>
+  </nav>
+</div><!-- /phone-frame -->
+
+<!-- OVERLAYS -->
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+
+<!-- Sheet: Add Meal (contextuelle) -->
+<div class="bottom-sheet" id="sheet-add-meal">
+  <div class="sheet-handle"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <div class="sheet-title" id="sheet-add-meal-title" style="margin-bottom:0">Ajouter un repas</div>
+    <div class="free-meal-btn" style="margin:0;padding:7px 10px;border-radius:10px" onclick="toggleFreeMeal()">
+      <span style="font-size:12px" id="free-meal-toggle-label">✏️ Libre</span>
+    </div>
+  </div>
+  <!-- Formulaire repas libre (caché par défaut) -->
+  <div id="free-meal-form" style="display:none;margin-bottom:14px;background:var(--terra-light);border-radius:14px;padding:12px;border:2px dashed var(--terra)">
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <div class="search-bar" style="margin:0;width:58px;flex-shrink:0;justify-content:center;padding:8px">
+        <input type="text" id="free-emoji" value="🍽️" style="width:32px;text-align:center;font-size:20px;border:none;background:none;outline:none"/>
+      </div>
+      <div class="search-bar" style="margin:0;flex:1">
+        <input type="text" placeholder="Nom du repas…" id="free-name" autocomplete="off" style="font-size:13px"/>
+      </div>
+    </div>
+    <button onclick="addFreeMeal()" style="width:100%;padding:10px;background:var(--terra);color:white;border:none;border-radius:10px;font-family:Nunito,sans-serif;font-size:13px;font-weight:800;cursor:pointer">➕ Ajouter ce repas</button>
+  </div>
+
+  <!-- Onglets contextuels -->
+  <div class="sheet-tabs" id="sheet-meal-tabs">
+    <div class="sheet-tab" id="stab-pdej" onclick="switchMealTab('pdej')">🌅 Petit-dej</div>
+    <div class="sheet-tab" id="stab-midi" onclick="switchMealTab('midi')">☀️ Midi</div>
+    <div class="sheet-tab" id="stab-soir" onclick="switchMealTab('soir')">🌙 Soir</div>
+  </div>
+
+  <!-- Section Petit-dej -->
+  <div class="sheet-section" id="ssec-pdej">
+    <div class="suggestion-item" onclick="addMeal('Fromage blanc power bowl','🫙')"><div class="suggestion-emoji">🫙</div><div class="suggestion-info"><div class="suggestion-name">Fromage blanc power bowl</div><div class="suggestion-badges"><span class="badge badge-monop">🔵 Monop</span><span class="badge badge-vege">🥦</span><span class="badge badge-rapide">⚡ 5 min</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Gaufres maison','🧇')"><div class="suggestion-emoji">🧇</div><div class="suggestion-info"><div class="suggestion-name">Gaufres maison</div><div class="suggestion-badges"><span class="badge badge-lidl">🟡 Lidl</span><span class="badge badge-favori">❤️</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Crêpes','🥞')"><div class="suggestion-emoji">🥞</div><div class="suggestion-info"><div class="suggestion-name">Crêpes</div><div class="suggestion-badges"><span class="badge badge-lidl">🟡 Lidl</span><span class="badge badge-favori">❤️</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Banane + Yaourt grec','🍌')"><div class="suggestion-emoji">🍌</div><div class="suggestion-info"><div class="suggestion-name">Banane + Yaourt grec</div><div class="suggestion-badges"><span class="badge badge-monop">🔵 Monop</span><span class="badge badge-vege">🥦</span><span class="badge badge-rapide">⚡ 2 min</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Céréales + Lait','🥣')"><div class="suggestion-emoji">🥣</div><div class="suggestion-info"><div class="suggestion-name">Céréales + Lait</div><div class="suggestion-badges"><span class="badge badge-lidl">🟡 Lidl</span><span class="badge badge-rapide">⚡ 2 min</span></div></div></div>
+  </div>
+
+  <!-- Section Midi -->
+  <div class="sheet-section" id="ssec-midi">
+    <div class="suggestion-item" onclick="addMeal('Pâtes carbonara','🍝')"><div class="suggestion-emoji">🍝</div><div class="suggestion-info"><div class="suggestion-name">Pâtes carbonara</div><div class="suggestion-badges"><span class="badge badge-lidl">🟡 Lidl</span><span class="badge badge-rapide">⚡</span><span class="badge badge-favori">❤️</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Saucisse purée','🌭')"><div class="suggestion-emoji">🌭</div><div class="suggestion-info"><div class="suggestion-name">Saucisse purée</div><div class="suggestion-badges"><span class="badge badge-lidl">🟡 Lidl</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Lasagnes maison','🫕')"><div class="suggestion-emoji">🫕</div><div class="suggestion-info"><div class="suggestion-name">Lasagnes maison</div><div class="suggestion-badges"><span class="badge badge-lidl">🟡 Lidl</span><span class="badge badge-multi">📅 multi-jours</span><span class="badge badge-favori">❤️</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Hachis Parmentier','🥘')"><div class="suggestion-emoji">🥘</div><div class="suggestion-info"><div class="suggestion-name">Hachis Parmentier</div><div class="suggestion-badges"><span class="badge badge-lidl">🟡 Lidl</span><span class="badge badge-multi">📅 multi-jours</span><span class="badge badge-favori">❤️</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Pâtes poireaux mascarpone','🍝')"><div class="suggestion-emoji">🍝</div><div class="suggestion-info"><div class="suggestion-name">Pâtes poireaux mascarpone</div><div class="suggestion-badges"><span class="badge badge-monop">🔵 Monop</span><span class="badge badge-vege">🥦</span><span class="badge badge-favori">❤️</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Nouilles sautées poulet','🥡')"><div class="suggestion-emoji">🥡</div><div class="suggestion-info"><div class="suggestion-name">Nouilles sautées poulet</div><div class="suggestion-badges"><span class="badge badge-lidl">🟡 Lidl</span><span class="badge badge-rapide">⚡</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Poulet rôti + Riz','🍗')"><div class="suggestion-emoji">🍗</div><div class="suggestion-info"><div class="suggestion-name">Poulet rôti + Riz</div><div class="suggestion-badges"><span class="badge badge-superu">🟢 Super U</span></div></div></div>
+  </div>
+
+  <!-- Section Soir -->
+  <div class="sheet-section" id="ssec-soir">
+    <div class="cat-divider" style="border-top:none;padding-top:0">🎌 Japonais</div>
+    <div class="suggestion-item" onclick="addMeal('Ramen maison','🍜')"><div class="suggestion-emoji">🍜</div><div class="suggestion-info"><div class="suggestion-name">Ramen maison</div><div class="suggestion-badges"><span class="badge badge-kazoo">🎌 Kazoo</span><span class="badge badge-favori">❤️</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Sashimis saumon & thon','🐟')"><div class="suggestion-emoji">🐟</div><div class="suggestion-info"><div class="suggestion-name">Sashimis saumon & thon</div><div class="suggestion-badges"><span class="badge badge-kazoo">🎌 Kazoo</span><span class="badge badge-favori">❤️</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Gyoza + Soupe miso','🥟')"><div class="suggestion-emoji">🥟</div><div class="suggestion-info"><div class="suggestion-name">Gyoza + Soupe miso</div><div class="suggestion-badges"><span class="badge badge-kazoo">🎌 Kazoo</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Brochettes bœuf fromage','🍢')"><div class="suggestion-emoji">🍢</div><div class="suggestion-info"><div class="suggestion-name">Brochettes bœuf fromage</div><div class="suggestion-badges"><span class="badge badge-kazoo">🎌 Kazoo</span><span class="badge badge-favori">❤️</span></div></div></div>
+    <div class="cat-divider">🍽️ Classiques</div>
+    <div class="suggestion-item" onclick="addMeal('Burger maison','🍔')"><div class="suggestion-emoji">🍔</div><div class="suggestion-info"><div class="suggestion-name">Burger maison</div><div class="suggestion-badges"><span class="badge badge-lidl">🟡 Lidl</span><span class="badge badge-favori">❤️</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Raclette / Fondue','🧀')"><div class="suggestion-emoji">🧀</div><div class="suggestion-info"><div class="suggestion-name">Raclette / Fondue</div><div class="suggestion-badges"><span class="badge badge-monop">🔵 Monop</span><span class="badge badge-favori">❤️</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Tartiflette','🥔')"><div class="suggestion-emoji">🥔</div><div class="suggestion-info"><div class="suggestion-name">Tartiflette</div><div class="suggestion-badges"><span class="badge badge-monop">🔵 Monop</span><span class="badge badge-favori">❤️</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Fajitas poulet','🫔')"><div class="suggestion-emoji">🫔</div><div class="suggestion-info"><div class="suggestion-name">Fajitas poulet</div><div class="suggestion-badges"><span class="badge badge-superu">🟢 Super U</span><span class="badge badge-favori">❤️</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Galettes sarrasin','🥙')"><div class="suggestion-emoji">🥙</div><div class="suggestion-info"><div class="suggestion-name">Galettes sarrasin</div><div class="suggestion-badges"><span class="badge badge-lidl">🟡 Lidl</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Croque-monsieur','🥪')"><div class="suggestion-emoji">🥪</div><div class="suggestion-info"><div class="suggestion-name">Croque-monsieur</div><div class="suggestion-badges"><span class="badge badge-monop">🔵 Monop</span><span class="badge badge-rapide">⚡</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Cordon bleu + frites','🍗')"><div class="suggestion-emoji">🍗</div><div class="suggestion-info"><div class="suggestion-name">Cordon bleu + frites</div><div class="suggestion-badges"><span class="badge badge-lidl">🟡 Lidl</span></div></div></div>
+    <div class="suggestion-item" onclick="addMeal('Saucisse purée','🌭')"><div class="suggestion-emoji">🌭</div><div class="suggestion-info"><div class="suggestion-name">Saucisse purée</div><div class="suggestion-badges"><span class="badge badge-lidl">🟡 Lidl</span></div></div></div>
+  </div>
+</div>
+
+<!-- Sheet: Fiche recette universelle -->
+<div class="bottom-sheet" id="sheet-recipe-detail" style="max-height:85vh;overflow-y:auto">
+  <div class="sheet-handle"></div>
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+    <div id="det-emoji" style="font-size:42px;line-height:1">🍽️</div>
+    <div style="flex:1">
+      <div class="sheet-title" id="det-name" style="margin-bottom:6px">Recette</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge" id="det-time" style="background:#FFF3E0;color:#E65100">⏱ ?</span>
+        <span class="badge" id="det-fav" style="background:#FFF0F0;color:#E91E63;display:none">❤️ Favori</span>
+        <span class="badge" id="det-rapide" style="background:#E8F5E9;color:#2E7D32;display:none">⚡ Rapide</span>
+      </div>
+    </div>
+  </div>
+  <div class="sheet-subtitle" id="det-ings-title">Ingrédients</div>
+  <div id="det-ingredients" style="display:flex;flex-direction:column;gap:6px;margin-bottom:20px"></div>
+  <div class="sheet-subtitle" id="det-steps-title" style="display:none">Préparation</div>
+  <div id="det-steps" style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px"></div>
+</div>
+
+<!-- Sheet: Pick Day for Recipe -->
+<div class="bottom-sheet" id="sheet-pick-day">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title" id="pick-day-title" style="margin-bottom:14px">📅 Ajouter au planning</div>
+  <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px">Quel jour ?</div>
+  <div id="pick-day-chips" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px"></div>
+  <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px">Quelle période ?</div>
+  <div id="pick-period-group" style="display:flex;gap:8px;margin-bottom:22px">
+    <div class="pill active" id="pick-pdej" onclick="pickPeriodSelect(this,'pdej')">🌅 Petit-dej</div>
+    <div class="pill" id="pick-midi" onclick="pickPeriodSelect(this,'midi')">☀️ Midi</div>
+    <div class="pill" id="pick-soir" onclick="pickPeriodSelect(this,'soir')">🌙 Soir</div>
+  </div>
+  <button onclick="confirmPickDay()" style="width:100%;padding:14px;background:var(--terra);color:white;border:none;border-radius:14px;font-family:Nunito,sans-serif;font-size:14px;font-weight:800;cursor:pointer">✅ Ajouter au planning</button>
+</div>
+
+<!-- Sheet: Add Item -->
+<div class="bottom-sheet" id="sheet-add-item">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">Ajouter un article</div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+    <div class="search-bar" style="margin:0">
+      <input type="text" placeholder="Nom de l'article…" id="new-item-name" autocomplete="off"/>
+    </div>
+    <div class="search-bar" style="margin:0">
+      <input type="text" placeholder="Quantité (ex : 500g, 2 pièces…)" id="new-item-qty" autocomplete="off"/>
+    </div>
+    <div class="sheet-subtitle" style="margin:4px 0 0">Catégorie</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap" id="cat-pill-group">
+      <div class="pill" onclick="selectCatPill(this,'cat-legumes')">🥦 Fruits &amp; Légumes</div>
+      <div class="pill" onclick="selectCatPill(this,'cat-viandes')">🥩 Viandes</div>
+      <div class="pill" onclick="selectCatPill(this,'cat-cremerie')">🧀 Crèmerie</div>
+      <div class="pill" onclick="selectCatPill(this,'cat-epicerie')">🛒 Épicerie</div>
+      <div class="pill active" onclick="selectCatPill(this,'cat-maison')">🧴 Maison</div>
+    </div>
+  </div>
+  <button onclick="addItem()" style="width:100%;padding:14px;background:var(--terra);color:white;border:none;border-radius:14px;font-family:Nunito,sans-serif;font-size:14px;font-weight:800;cursor:pointer">➕ Ajouter à la liste</button>
+</div>
+
+<!-- Sheet: Meal Actions -->
+<div class="bottom-sheet" id="sheet-meal-actions">
+  <div class="sheet-handle"></div>
+  <div class="action-meal-header">
+    <div class="action-meal-emoji-big" id="action-meal-emoji">🫙</div>
+    <div class="action-meal-title-block">
+      <div class="action-meal-title-name" id="action-meal-name">Fromage blanc power bowl</div>
+      <div class="action-meal-title-period" id="action-meal-period">🌅 Petit-déjeuner</div>
+    </div>
+  </div>
+  <div class="action-rows">
+    <button class="action-row" id="action-see-detail" onclick="actionSeeDetail()" style="display:none">
+      <span class="action-row-icon">📖</span>
+      <span class="action-row-label">Voir la recette</span>
+      <span class="action-row-chevron">›</span>
+    </button>
+    <button class="action-row" onclick="actionChange()">
+      <span class="action-row-icon">🔄</span>
+      <span class="action-row-label">Changer de repas</span>
+      <span class="action-row-chevron">›</span>
+    </button>
+  </div>
+  <button class="action-row-danger" onclick="actionRemove()">
+    <span>🗑️</span>
+    <span>Retirer du planning</span>
+  </button>
+</div>
+
+<!-- Sheet: Nouvelle recette -->
+<div class="bottom-sheet" id="sheet-new-recipe">
+  <div class="sheet-handle"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <div class="sheet-title" style="margin:0">Nouvelle recette</div>
+    <button onclick="closeSheet()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text2)">&#x2715;</button>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+    <div class="search-bar" style="margin:0"><input type="text" placeholder="Nom de la recette…" id="new-recipe-name" autocomplete="off"/></div>
+    <div class="search-bar" style="margin:0"><input type="text" placeholder="Temps de préparation (ex : 20 min)" id="new-recipe-time" autocomplete="off"/></div>
+    <div class="sheet-subtitle" style="margin:4px 0 0">Période</div>
+    <div style="display:flex;gap:6px" id="recipe-period-group">
+      <div class="pill active" onclick="selectRecipePeriod(this,'pdej')">Petit-dej</div>
+      <div class="pill" onclick="selectRecipePeriod(this,'midi')">Midi</div>
+      <div class="pill" onclick="selectRecipePeriod(this,'soir')">Soir</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <label style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" id="new-recipe-fav" style="width:16px;height:16px;accent-color:var(--terra)"/> Favori
+      </label>
+      <label style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;cursor:pointer;margin-left:16px">
+        <input type="checkbox" id="new-recipe-rapide" style="width:16px;height:16px;accent-color:var(--terra)"/> Rapide
+      </label>
+    </div>
+  </div>
+  <button onclick="saveNewRecipe()" style="width:100%;padding:14px;background:var(--terra);color:white;border:none;border-radius:14px;font-family:Nunito,sans-serif;font-size:14px;font-weight:800;cursor:pointer">Ajouter la recette</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // Photos Unsplash par recette (format 400x300)
+  const RECIPE_PHOTOS = {
+    'Fromage blanc power bowl': 'https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?w=400&q=80',
+    'Gaufres maison': 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&q=80',
+    'Crêpes': 'https://images.unsplash.com/photo-1519676867240-f03562e64548?w=400&q=80',
+    'Banane + Yaourt grec': 'https://images.unsplash.com/photo-1571167530149-c1105da4c2c1?w=400&q=80',
+    'Céréales + Lait': 'https://images.unsplash.com/photo-1521303080994-d8c3bbe7a888?w=400&q=80',
+    'Pâtes carbonara': 'https://images.unsplash.com/photo-1612874742237-6526221588e3?w=400&q=80',
+    'Saucisse purée': 'https://images.unsplash.com/photo-1544025162-d76538b5afe4?w=400&q=80',
+    'Lasagnes maison': 'https://images.unsplash.com/photo-1619895092538-128341789043?w=400&q=80',
+    'Hachis Parmentier': 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&q=80',
+    'Nouilles sautées poulet': 'https://images.unsplash.com/photo-1569058242272-30ae4a2b6b77?w=400&q=80',
+    'Poulet rôti + Riz': 'https://images.unsplash.com/photo-1598103442097-8b74394b95c7?w=400&q=80',
+    'Pâtes poireaux mascarpone': 'https://images.unsplash.com/photo-1556761223-4c4282c73f77?w=400&q=80',
+    'Ramen maison': 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&q=80',
+    'Sashimis saumon & thon': 'https://images.unsplash.com/photo-1617196034234-37d43416a3c9?w=400&q=80',
+    'Gyoza + Soupe miso': 'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=400&q=80',
+    'Brochettes bœuf fromage': 'https://images.unsplash.com/photo-1544025162-d76538b5afe4?w=400&q=80',
+    'Burger maison': 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80',
+    'Raclette / Fondue': 'https://images.unsplash.com/photo-1452195100486-9cc805987862?w=400&q=80',
+    'Tartiflette': 'https://images.unsplash.com/photo-1510130387422-82bed34b37e9?w=400&q=80',
+    'Fajitas poulet': 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&q=80',
+    'Galettes sarrasin': 'https://images.unsplash.com/photo-1519676867240-f03562e64548?w=400&q=80',
+    'Croque-monsieur': 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&q=80',
+    'Cordon bleu + frites': 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=400&q=80',
+  };
+
+  let allRecipes = [
+    { name: 'Fromage blanc power bowl', period: 'pdej', time: '5 min', fav: true,  rapide: true  },
+    { name: 'Gaufres maison',           period: 'pdej', time: '20 min', fav: true,  rapide: false },
+    { name: 'Crêpes',                   period: 'pdej', time: '25 min', fav: true,  rapide: false },
+    { name: 'Banane + Yaourt grec',     period: 'pdej', time: '2 min',  fav: false, rapide: true  },
+    { name: 'Céréales + Lait',          period: 'pdej', time: '2 min',  fav: false, rapide: true  },
+    { name: 'Pâtes carbonara',          period: 'midi', time: '20 min', fav: true,  rapide: true  },
+    { name: 'Saucisse purée',           period: 'midi', time: '25 min', fav: false, rapide: false },
+    { name: 'Lasagnes maison',          period: 'midi', time: '60 min', fav: true,  rapide: false },
+    { name: 'Hachis Parmentier',        period: 'midi', time: '50 min', fav: true,  rapide: false },
+    { name: 'Nouilles sautées poulet',  period: 'midi', time: '20 min', fav: false, rapide: true  },
+    { name: 'Poulet rôti + Riz',        period: 'midi', time: '35 min', fav: false, rapide: false },
+    { name: 'Pâtes poireaux mascarpone',period: 'midi', time: '25 min', fav: true,  rapide: false },
+    { name: 'Ramen maison',             period: 'soir', time: '45 min', fav: true,  rapide: false },
+    { name: 'Sashimis saumon & thon',   period: 'soir', time: '10 min', fav: true,  rapide: true  },
+    { name: 'Gyoza + Soupe miso',       period: 'soir', time: '20 min', fav: true,  rapide: false },
+    { name: 'Brochettes bœuf fromage', period: 'soir', time: '15 min', fav: true,  rapide: true  },
+    { name: 'Burger maison',            period: 'soir', time: '30 min', fav: true,  rapide: false },
+    { name: 'Raclette / Fondue',        period: 'soir', time: '15 min', fav: true,  rapide: false },
+    { name: 'Tartiflette',              period: 'soir', time: '50 min', fav: true,  rapide: false },
+    { name: 'Fajitas poulet',           period: 'soir', time: '25 min', fav: true,  rapide: false },
+    { name: 'Galettes sarrasin',        period: 'soir', time: '20 min', fav: false, rapide: false },
+    { name: 'Croque-monsieur',          period: 'soir', time: '10 min', fav: false, rapide: true  },
+    { name: 'Cordon bleu + frites',     period: 'soir', time: '25 min', fav: false, rapide: false },
+  ];
+
+  const RECIPE_EMOJI = {
+    'Fromage blanc power bowl': '🫙', 'Gaufres maison': '🧇', 'Crêpes': '🥞',
+    'Banane + Yaourt grec': '🍌', 'Céréales + Lait': '🥣',
+    'Pâtes carbonara': '🍝', 'Saucisse purée': '🌭', 'Lasagnes maison': '🫕',
+    'Hachis Parmentier': '🥘', 'Nouilles sautées poulet': '🥡', 'Poulet rôti + Riz': '🍗',
+    'Pâtes poireaux mascarpone': '🍝', 'Ramen maison': '🍜', 'Sashimis saumon & thon': '🐟',
+    'Gyoza + Soupe miso': '🥟', 'Brochettes bœuf fromage': '🍢', 'Burger maison': '🍔',
+    'Raclette / Fondue': '🧀', 'Tartiflette': '🥔', 'Fajitas poulet': '🫔',
+    'Galettes sarrasin': '🥙', 'Croque-monsieur': '🥪', 'Cordon bleu + frites': '🍗',
+  };
+
+  const periodLabel = { pdej: 'Petit-dej', midi: 'Midi', soir: 'Soir' };
+  let currentFilter = 'all';
+  let currentSearch = '';
+
+  function renderRecipes() {
+    const grid = document.getElementById('recipes-grid');
+    const filtered = allRecipes.filter(r => {
+      const matchFilter = currentFilter === 'all' || currentFilter === r.period
+        || (currentFilter === 'fav' && r.fav)
+        || (currentFilter === 'rapide' && r.rapide);
+      const matchSearch = r.name.toLowerCase().includes(currentSearch.toLowerCase());
+      return matchFilter && matchSearch;
+    });
+    grid.innerHTML = '';
+    filtered.forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'recipe-card';
+      const photo = RECIPE_PHOTOS[r.name];
+      const photoHtml = photo
+        ? `<img class="recipe-photo" src="${photo}" alt="${r.name}" loading="lazy" onerror="this.style.display='none'">`
+        : `<div class="recipe-photo-placeholder"></div>`;
+      card.innerHTML = `${photoHtml}<div class="recipe-body"><div class="recipe-category">${periodLabel[r.period]}</div><div class="recipe-name">${r.name}</div><div class="recipe-meta"><span class="recipe-time">${r.time}</span>${r.fav ? '<span class="recipe-fav">♥</span>' : ''}</div></div>`;
+      card.onclick = () => openRecipeDetail(r.name);
+      grid.appendChild(card);
+    });
+    // Carte ajout
+    const addCard = document.createElement('div');
+    addCard.className = 'recipe-card add-card';
+    addCard.innerHTML = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><div style="font-size:11px;font-weight:800;color:var(--terra);text-align:center">Nouvelle recette</div>`;
+    addCard.onclick = () => openSheet('sheet-new-recipe', '');
+    grid.appendChild(addCard);
+    document.getElementById('recipes-count').textContent = filtered.length + ' recette' + (filtered.length > 1 ? 's' : '');
+  }
+
+  function filterByPill(el, filter) {
+    document.querySelectorAll('.filter-pills .pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    currentFilter = filter;
+    renderRecipes();
+  }
+
+  function filterRecipes(val) {
+    currentSearch = val;
+    renderRecipes();
+  }
+
+  let newRecipePeriod = 'pdej';
+  function selectRecipePeriod(el, period) {
+    document.querySelectorAll('#recipe-period-group .pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    newRecipePeriod = period;
+  }
+
+  function addRecipeStep() {
+    const container = document.getElementById('new-recipe-steps');
+    const idx = container.children.length + 1;
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:flex-start;gap:8px';
+    row.innerHTML = `
+      <div style="min-width:24px;height:24px;border-radius:50%;background:var(--terra);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:8px">${idx}</div>
+      <textarea placeholder="Décris cette étape…" rows="2" style="flex:1;padding:9px 11px;border:1.5px solid var(--sep);border-radius:10px;font-family:Nunito,sans-serif;font-size:13px;resize:none;outline:none;color:var(--text1);background:var(--bg)"></textarea>
+      <button onclick="this.parentElement.remove();renumberSteps()" style="background:none;border:none;font-size:18px;cursor:pointer;color:#BDBDBD;margin-top:6px;flex-shrink:0">×</button>
+    `;
+    container.appendChild(row);
+    row.querySelector('textarea').focus();
+  }
+
+  function renumberSteps() {
+    const rows = document.querySelectorAll('#new-recipe-steps > div');
+    rows.forEach((row, i) => {
+      const num = row.querySelector('div');
+      if (num) num.textContent = i + 1;
+    });
+  }
+
+  function saveNewRecipe() {
+    const name = document.getElementById('new-recipe-name').value.trim();
+    const time = document.getElementById('new-recipe-time').value.trim() || '? min';
+    const fav = document.getElementById('new-recipe-fav').checked;
+    const rapide = document.getElementById('new-recipe-rapide').checked;
+    if (!name) { document.getElementById('new-recipe-name').focus(); return; }
+    // Récupérer les étapes
+    const stepTexts = [...document.querySelectorAll('#new-recipe-steps textarea')]
+      .map(t => t.value.trim()).filter(Boolean);
+    if (stepTexts.length) RECIPE_STEPS[name] = stepTexts;
+    allRecipes.unshift({ name, period: newRecipePeriod, time, fav, rapide });
+    // Reset
+    document.getElementById('new-recipe-name').value = '';
+    document.getElementById('new-recipe-time').value = '';
+    document.getElementById('new-recipe-fav').checked = false;
+    document.getElementById('new-recipe-rapide').checked = false;
+    document.getElementById('new-recipe-steps').innerHTML = '';
+    closeSheet();
+    saveState();
+    renderRecipes();
+    showToast('✅ ' + name + ' ajoutée !');
+    confetti();
+  }
+
+  // ── PICKER JOUR + PÉRIODE ──
+  let pendingRecipe = null;
+  let pickDayIdx = 0;
+  let pickPeriod = 'pdej';
+  const DAY_PICK_SHORT = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+  function openAddToPlanning(name, emoji, time, fav) {
+    pendingRecipe = { name, emoji: emoji || '🍽️', time: time || '?', fav: fav || false };
+    document.getElementById('pick-day-title').textContent = '📅 ' + name;
+    const chipsEl = document.getElementById('pick-day-chips');
+    chipsEl.innerHTML = '';
+    pickDayIdx = currentDayIdx;
+    DAY_PICK_SHORT.forEach((label, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'pill' + (i === pickDayIdx ? ' active' : '');
+      chip.textContent = label;
+      chip.onclick = () => {
+        chipsEl.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        chip.classList.add('active');
+        pickDayIdx = i;
+      };
+      chipsEl.appendChild(chip);
+    });
+    pickPeriod = 'pdej';
+    ['pick-pdej','pick-midi','pick-soir'].forEach(id => document.getElementById(id).classList.remove('active'));
+    document.getElementById('pick-pdej').classList.add('active');
+    closeSheet();
+    openSheet('sheet-pick-day', null);
+  }
+
+  function pickPeriodSelect(el, period) {
+    document.querySelectorAll('#pick-period-group .pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    pickPeriod = period;
+  }
+
+  function confirmPickDay() {
+    if (!pendingRecipe) return;
+    weekPlan[pickDayIdx][pickPeriod] = {
+      name: pendingRecipe.name, emoji: pendingRecipe.emoji,
+      time: pendingRecipe.time, fav: pendingRecipe.fav,
+    };
+    saveState();
+    currentDayIdx = pickDayIdx;
+    activePeriod = pickPeriod;
+    closeSheet();
+    switchTab('planning');
+    buildCalendar();
+    // buildCalendar sélectionne aujourd'hui par défaut, on force le bon jour
+    const chips = document.querySelectorAll('.day-chip');
+    if (chips[pickDayIdx]) selectDay(chips[pickDayIdx], pickDayIdx);
+    showToast('✅ ' + pendingRecipe.name + ' ajouté !');
+    confetti();
+    pendingRecipe = null;
+  }
+
+  // ── PERSISTANCE localStorage ──
+  function saveState() {
+    localStorage.setItem('mm_weekPlan',  JSON.stringify(weekPlan));
+    localStorage.setItem('mm_recipes',   JSON.stringify(allRecipes));
+  }
+  function loadState() {
+    try {
+      const wp = localStorage.getItem('mm_weekPlan');
+      if (wp) {
+        const parsed = JSON.parse(wp);
+        Object.keys(parsed).forEach(k => {
+          weekPlan[k] = Object.assign(EMPTY_DAY(), parsed[k]); // merge pour ajouter les nouveaux slots
+        });
+      }
+      const rc = localStorage.getItem('mm_recipes');
+      if (rc) allRecipes = JSON.parse(rc);
+    } catch(e) { console.warn('loadState error', e); }
+  }
+  function clearWeek() {
+    for (let i = 0; i < 7; i++) weekPlan[i] = EMPTY_DAY();
+    saveState(); buildCalendar(); showToast('🗑️ Semaine effacée');
+  }
+
+  // ── STATE GLOBAL ──
+  const DAY_SHORT = ['LUN','MAR','MER','JEU','VEN','SAM','DIM'];
+  const DAY_LONG  = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+  const MONTHS    = ['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'];
+
+  const weekPlan = {};
+  const EMPTY_DAY = () => ({ pdej: null, midi: null, midi_entree: null, midi_dessert: null, soir: null, soir_entree: null, soir_dessert: null });
+  for (let i = 0; i < 7; i++) weekPlan[i] = EMPTY_DAY();
+
+  let weekMonday    = null;
+  let currentDayIdx = -1;
+  let currentDayLabel = '';
+  let activePeriod  = 'pdej';
+  let isReplaceMode = false;
+  let activeDetailSheet = null; // conservé pour compatibilité
+
+  // ── CALENDRIER ──
+  function buildCalendar() {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const dow = today.getDay();
+    weekMonday = new Date(today);
+    weekMonday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+
+    const container = document.getElementById('days-scroll-container');
+    container.innerHTML = '';
+    let todayEl = null, todayIdx = -1;
+
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(weekMonday);
+      d.setDate(weekMonday.getDate() + i);
+      const isToday = d.getTime() === today.getTime();
+
+      const chip = document.createElement('div');
+      chip.className = 'day-chip' + (isToday ? ' today' : '');
+      chip.dataset.day = i;
+      chip.innerHTML = `
+        <div class="day-name">${DAY_SHORT[i]}</div>
+        <div class="day-num">${d.getDate()}</div>`;
+      chip.onclick = () => selectDay(chip, i);
+      container.appendChild(chip);
+      if (isToday) { todayEl = chip; todayIdx = i; }
+    }
+
+    const lastDay = new Date(weekMonday);
+    lastDay.setDate(weekMonday.getDate() + 6);
+    const sub = document.querySelector('#tab-planning .page-subtitle');
+    if (sub) sub.textContent = `Semaine du ${weekMonday.getDate()} ${MONTHS[weekMonday.getMonth()]} — ${lastDay.getDate()} ${MONTHS[lastDay.getMonth()]}`;
+
+    if (todayEl) selectDay(todayEl, todayIdx);
+  }
+
+  // ── VUE DU JOUR ──
+  function selectDay(el, dayIdx) {
+    document.querySelectorAll('.day-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    const d = new Date(weekMonday);
+    d.setDate(weekMonday.getDate() + dayIdx);
+    currentDayLabel = `${DAY_LONG[dayIdx]} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+    currentDayIdx = dayIdx;
+    renderDayView();
+  }
+
+  function renderDayView() {
+    const plan = weekPlan[currentDayIdx];
+    const section = document.getElementById('day-meals-section');
+
+    const mealCardHtml = (meal, period) => {
+      const safeN = meal.name.replace(/'/g, "\\'");
+      return `<div class="meal-card" onclick="openMealActions(${currentDayIdx},'${period}','${safeN}','${meal.emoji}')">
+        <div class="meal-emoji">${meal.emoji}</div>
+        <div class="meal-info">
+          <div class="meal-name">${meal.name}</div>
+          <div class="meal-badges">
+            <span class="badge" style="background:#FFF3E0;color:#E65100">⏱ ${meal.time}</span>
+            ${meal.fav ? '<span class="badge" style="background:#FFF0F0;color:#E91E63">❤️ Favori</span>' : ''}
+          </div>
+        </div>
+      </div>`;
+    };
+
+    const mealAddHtml = (period) => {
+      const labels = { pdej:'un petit-déjeuner', midi:'un déjeuner', soir:'un dîner' };
+      return `<div class="meal-add" onclick="openSheet('sheet-add-meal','${period}')">
+        <div class="meal-add-icon">+</div><span>Ajouter ${labels[period]}</span>
+      </div>`;
+    };
+
+    const addBtn = p => `<button onclick="openSheet('sheet-add-meal','${p}')" style="margin-left:auto;background:var(--terra-light);border:none;border-radius:8px;padding:3px 10px;font-size:11px;font-weight:800;color:var(--terra);cursor:pointer;font-family:Nunito,sans-serif">+ Ajouter</button>`;
+
+    const optSlot = (period, slotType) => {
+      const key = period + '_' + slotType;
+      const meal = plan[key];
+      const placeholder = slotType === 'entree' ? 'Ajouter une entrée…' : 'Ajouter un dessert…';
+      const labelText = slotType === 'entree' ? 'Entrée' : 'Dessert';
+      if (meal) {
+        const safeN = meal.name.replace(/'/g, "\\'");
+        return `<div style="margin-top:4px"><div class="meal-slot-label optional">${labelText}</div><div class="meal-card" onclick="openMealActions(${currentDayIdx},'${key}','${safeN}','${meal.emoji}')"><div class="meal-emoji">${meal.emoji}</div><div class="meal-info"><div class="meal-name">${meal.name}</div><div class="meal-badges"><span class="badge" style="background:#FFF3E0;color:#E65100">⏱ ${meal.time}</span>${meal.fav ? '<span class="badge" style="background:#FFF0F0;color:#E91E63">❤️ Favori</span>' : ''}</div></div></div></div>`;
+      }
+      return `<div class="optional-slot" onclick="openContextSheet('${period}','${slotType}')"><span class="optional-slot-label">${placeholder}</span><span class="optional-slot-plus">+</span></div>`;
+    };
+
+    section.innerHTML = `
+      <div class="selected-day-header">${currentDayLabel}</div>
+
+      <div class="meal-section-header"><span class="period-dot morning"></span> Petit-déjeuner</div>
+      <div class="meal-slot">${plan.pdej ? mealCardHtml(plan.pdej,'pdej') : mealAddHtml('pdej')}</div>
+
+      <div class="slot-divider"></div>
+
+      <div class="meal-section-header"><span class="period-dot noon"></span> Déjeuner ${addBtn('midi')}</div>
+      ${optSlot('midi','entree')}
+      <div class="meal-slot" style="margin-top:4px">
+        <div class="meal-slot-label">Plat principal ✱</div>
+        ${plan.midi ? mealCardHtml(plan.midi,'midi') : mealAddHtml('midi')}
+      </div>
+      ${optSlot('midi','dessert')}
+
+      <div class="slot-divider"></div>
+
+      <div class="meal-section-header"><span class="period-dot evening"></span> Dîner ${addBtn('soir')}</div>
+      ${optSlot('soir','entree')}
+      <div class="meal-slot" style="margin-top:4px">
+        <div class="meal-slot-label">Plat principal ✱</div>
+        ${plan.soir ? mealCardHtml(plan.soir,'soir') : mealAddHtml('soir')}
+      </div>
+      ${optSlot('soir','dessert')}
+
+      <button class="cta-generate" onclick="generateCourses()">Générer la liste de courses</button>
+    `;
+  }
+
+  // ── ACTIONS SUR UN REPAS ──
+  let activeMealName = '';
+
+  function openMealActions(dayIdx, period, name, emoji) {
+    activePeriod = period;
+    activeMealName = name;
+    document.getElementById('action-meal-emoji').textContent = emoji;
+    document.getElementById('action-meal-name').textContent = name;
+    const periodLabels = {
+      pdej:'🌅 Petit-déjeuner',
+      midi:'☀️ Déjeuner', midi_entree:'☀️ Déjeuner — Entrée', midi_dessert:'☀️ Déjeuner — Dessert',
+      soir:'🌙 Dîner', soir_entree:'🌙 Dîner — Entrée', soir_dessert:'🌙 Dîner — Dessert',
+    };
+    document.getElementById('action-meal-period').textContent = periodLabels[period] || '';
+    // Afficher "Voir la recette" si des infos existent pour ce repas
+    const hasDetail = !!(RECIPE_INGREDIENTS[name] || RECIPE_STEPS[name]);
+    document.getElementById('action-see-detail').style.display = hasDetail ? 'flex' : 'none';
+    openSheet('sheet-meal-actions', null);
+  }
+
+  function actionSeeDetail() {
+    closeSheet();
+    setTimeout(() => openRecipeDetail(activeMealName), 250);
+  }
+
+  function openRecipeDetail(name) {
+    const r = allRecipes.find(rec => rec.name === name) || {};
+    const emoji = RECIPE_EMOJI[name] || '🍽️';
+    document.getElementById('det-emoji').textContent = emoji;
+    document.getElementById('det-name').textContent = name;
+    document.getElementById('det-time').textContent = '⏱ ' + (r.time || '?');
+    document.getElementById('det-fav').style.display = r.fav ? 'inline-flex' : 'none';
+    document.getElementById('det-rapide').style.display = r.rapide ? 'inline-flex' : 'none';
+    // Ingrédients
+    const ings = RECIPE_INGREDIENTS[name] || [];
+    document.getElementById('det-ings-title').style.display = ings.length ? '' : 'none';
+    document.getElementById('det-ingredients').innerHTML = ings.length
+      ? ings.map(i => `<div class="detail-item"><div class="d-name">${i.name}</div><div class="d-qty">${i.qty}</div></div>`).join('')
+      : '';
+    // Étapes
+    const steps = RECIPE_STEPS[name] || [];
+    const stepsTitle = document.getElementById('det-steps-title');
+    const stepsEl = document.getElementById('det-steps');
+    if (steps.length) {
+      stepsTitle.style.display = '';
+      stepsEl.innerHTML = steps.map((s, i) =>
+        `<div style="display:flex;gap:10px;align-items:flex-start">
+          <div style="min-width:24px;height:24px;border-radius:50%;background:var(--terra);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px">${i+1}</div>
+          <div style="font-size:13px;line-height:1.6;color:var(--text1);padding-top:3px">${s}</div>
+        </div>`).join('');
+    } else {
+      stepsTitle.style.display = 'none';
+      stepsEl.innerHTML = '';
+    }
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('sheet-recipe-detail').classList.add('open');
+  }
+
+  function actionChange() {
+    isReplaceMode = true;
+    closeSheet();
+    setTimeout(() => {
+      const basePeriod = activePeriod.split('_')[0];
+      const slotSuffix = activePeriod.includes('_entree') ? ' — Entrée' : activePeriod.includes('_dessert') ? ' — Dessert' : '';
+      const baseTitles = { pdej:'🌅 Petit-déjeuner', midi:'☀️ Déjeuner', soir:'🌙 Dîner' };
+      document.getElementById('sheet-add-meal-title').textContent = '🔄 ' + (baseTitles[basePeriod] || 'Changer') + slotSuffix;
+      switchMealTab(basePeriod);
+      document.getElementById('overlay').classList.add('open');
+      document.getElementById('sheet-add-meal').classList.add('open');
+    }, 250);
+  }
+
+  function actionRemove() {
+    weekPlan[currentDayIdx][activePeriod] = null;
+    saveState();
+    renderDayView();
+    closeSheet();
+    showToast('🗑️ Repas retiré');
+  }
+
+  function switchTab(name, el) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    const navEl = el || document.querySelector(`.nav-item[onclick*="'${name}'"]`);
+    if (navEl) navEl.classList.add('active');
+    document.querySelector('.screen').scrollTo(0, 0);
+  }
+
+  function openSheet(id, ctx) {
+    if (id === 'sheet-add-meal') {
+      const period = ctx || 'pdej';
+      activePeriod = period;
+      isReplaceMode = false;
+      const titles = { pdej: '🌅 Petit-déjeuner', midi: '☀️ Déjeuner', soir: '🌙 Dîner' };
+      document.getElementById('sheet-add-meal-title').textContent = titles[period] || 'Ajouter un repas';
+      document.getElementById('sheet-meal-tabs').style.display = 'flex'; // montrer les onglets
+      switchMealTab(period);
+    }
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById(id).classList.add('open');
+  }
+  function openContextSheet(period, slotType) {
+    activePeriod = period + '_' + slotType; // ex: 'midi_entree', 'soir_dessert'
+    isReplaceMode = false;
+    const label = slotType === 'entree' ? 'Entrée' : 'Dessert';
+    const icons = { midi: '☀️ Déjeuner', soir: '🌙 Dîner' };
+    document.getElementById('sheet-add-meal-title').textContent = (icons[period] || '') + ' — ' + label;
+    document.getElementById('sheet-meal-tabs').style.display = 'none'; // cacher les onglets (slot fixe)
+    switchMealTab(period); // affiche les suggestions de la bonne période
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('sheet-add-meal').classList.add('open');
+  }
+  function switchMealTab(tab) {
+    ['pdej','midi','soir'].forEach(t => {
+      document.getElementById('stab-' + t).classList.toggle('active', t === tab);
+      document.getElementById('ssec-' + t).classList.toggle('active', t === tab);
+    });
+  }
+  function closeSheet() {
+    document.getElementById('overlay').classList.remove('open');
+    document.querySelectorAll('.bottom-sheet').forEach(s => s.classList.remove('open'));
+  }
+
+  function addMeal(name, emoji) {
+    const recipe = allRecipes.find(r => r.name === name);
+    weekPlan[currentDayIdx][activePeriod] = {
+      name, emoji,
+      time: recipe ? recipe.time : '?',
+      fav:  recipe ? recipe.fav  : false,
+    };
+    isReplaceMode = false;
+    saveState();
+    renderDayView();
+    closeSheet();
+    showToast('✅ ' + name + ' ajouté !');
+    confetti();
+  }
+
+  function toggleFreeMeal() {
+    const form = document.getElementById('free-meal-form');
+    const lbl  = document.getElementById('free-meal-toggle-label');
+    const open = form.style.display === 'none';
+    form.style.display = open ? 'block' : 'none';
+    lbl.textContent = open ? '✕ Fermer' : '✏️ Libre';
+    if (open) document.getElementById('free-name').focus();
+  }
+
+  function addFreeMeal() {
+    const name  = document.getElementById('free-name').value.trim();
+    const emoji = document.getElementById('free-emoji').value.trim() || '🍽️';
+    if (!name) { document.getElementById('free-name').focus(); return; }
+    weekPlan[currentDayIdx][activePeriod] = { name, emoji, time: '?', fav: false };
+    document.getElementById('free-name').value = '';
+    document.getElementById('free-emoji').value = '🍽️';
+    document.getElementById('free-meal-form').style.display = 'none';
+    document.getElementById('free-meal-toggle-label').textContent = '✏️ Libre';
+    saveState();
+    renderDayView();
+    closeSheet();
+    showToast('✅ ' + name + ' ajouté !');
+    confetti();
+  }
+
+  let checkedCount = 3;
+  let totalItems = 25;
+  function toggleItem(el) {
+    el.classList.toggle('checked');
+    const cb = el.querySelector('.item-checkbox');
+    if (cb) cb.textContent = el.classList.contains('checked') ? '✓' : '';
+    checkedCount = document.querySelectorAll('.item-row.checked').length;
+    totalItems = document.querySelectorAll('.item-row').length;
+    document.getElementById('progress-count').textContent = checkedCount + ' / ' + totalItems + ' articles';
+    document.getElementById('progress-fill').style.width = (checkedCount / totalItems * 100).toFixed(1) + '%';
+    if (checkedCount === totalItems) { showToast('🎉 Toutes les courses faites !'); confetti(); }
+  }
+
+  // Ingrédients par recette → catégorie de course
+  const RECIPE_INGREDIENTS = {
+    'Fromage blanc power bowl': [
+      { name:'Fromage blanc 0%', qty:'300g', cat:'cat-cremerie' },
+      { name:'Flocons d\'avoine', qty:'50g', cat:'cat-epicerie' },
+      { name:'Banane', qty:'1', cat:'cat-legumes' },
+      { name:'Compote sans sucre', qty:'1 gourde', cat:'cat-epicerie' },
+    ],
+    'Gaufres maison': [
+      { name:'Farine', qty:'200g', cat:'cat-epicerie' },
+      { name:'Œufs', qty:'2', cat:'cat-cremerie' },
+      { name:'Lait', qty:'300 mL', cat:'cat-epicerie' },
+      { name:'Beurre', qty:'80g', cat:'cat-cremerie' },
+    ],
+    'Crêpes': [
+      { name:'Farine', qty:'250g', cat:'cat-epicerie' },
+      { name:'Œufs', qty:'3', cat:'cat-cremerie' },
+      { name:'Lait', qty:'500 mL', cat:'cat-epicerie' },
+    ],
+    'Banane + Yaourt grec': [
+      { name:'Banane', qty:'2', cat:'cat-legumes' },
+      { name:'Yaourt grec', qty:'2 × 150g', cat:'cat-cremerie' },
+    ],
+    'Céréales + Lait': [
+      { name:'Céréales', qty:'1 boîte', cat:'cat-epicerie' },
+      { name:'Lait', qty:'1 L', cat:'cat-epicerie' },
+    ],
+    'Pâtes carbonara': [
+      { name:'Spaghetti', qty:'250g', cat:'cat-epicerie' },
+      { name:'Lardons', qty:'200g', cat:'cat-viandes' },
+      { name:'Œufs', qty:'3', cat:'cat-cremerie' },
+      { name:'Parmesan', qty:'50g', cat:'cat-cremerie' },
+    ],
+    'Saucisse purée': [
+      { name:'Saucisses', qty:'4', cat:'cat-viandes' },
+      { name:'Pommes de terre', qty:'800g', cat:'cat-legumes' },
+      { name:'Beurre', qty:'30g', cat:'cat-cremerie' },
+      { name:'Lait', qty:'100 mL', cat:'cat-epicerie' },
+    ],
+    'Lasagnes maison': [
+      { name:'Feuilles de lasagne', qty:'250g', cat:'cat-epicerie' },
+      { name:'Viande hachée bœuf', qty:'600g', cat:'cat-viandes' },
+      { name:'Tomates concassées', qty:'2 boîtes', cat:'cat-epicerie' },
+      { name:'Gruyère râpé', qty:'150g', cat:'cat-cremerie' },
+      { name:'Oignons', qty:'2', cat:'cat-legumes' },
+      { name:'Lait', qty:'500 mL', cat:'cat-epicerie' },
+      { name:'Beurre', qty:'40g', cat:'cat-cremerie' },
+      { name:'Farine', qty:'40g', cat:'cat-epicerie' },
+    ],
+    'Hachis Parmentier': [
+      { name:'Viande hachée bœuf', qty:'500g', cat:'cat-viandes' },
+      { name:'Pommes de terre', qty:'1 kg', cat:'cat-legumes' },
+      { name:'Oignons', qty:'1', cat:'cat-legumes' },
+      { name:'Gruyère râpé', qty:'80g', cat:'cat-cremerie' },
+      { name:'Beurre', qty:'40g', cat:'cat-cremerie' },
+    ],
+    'Nouilles sautées poulet': [
+      { name:'Nouilles asiatiques', qty:'200g', cat:'cat-epicerie' },
+      { name:'Poulet (filets)', qty:'300g', cat:'cat-viandes' },
+      { name:'Sauce soja', qty:'3 cs', cat:'cat-epicerie' },
+      { name:'Huile de sésame', qty:'1 cs', cat:'cat-epicerie' },
+    ],
+    'Poulet rôti + Riz': [
+      { name:'Poulet entier', qty:'1', cat:'cat-viandes' },
+      { name:'Riz long grain', qty:'300g', cat:'cat-epicerie' },
+    ],
+    'Pâtes poireaux mascarpone': [
+      { name:'Pates', qty:'300g', cat:'cat-epicerie' },
+      { name:'Poireaux', qty:'2', cat:'cat-legumes' },
+      { name:'Mascarpone', qty:'100g', cat:'cat-cremerie' },
+      { name:'Parmesan', qty:'40g', cat:'cat-cremerie' },
+    ],
+    'Ramen maison': [
+      { name:'Nouilles ramen', qty:'200g', cat:'cat-epicerie' },
+      { name:'Pâte miso', qty:'2 cs', cat:'cat-epicerie' },
+      { name:'Sauce soja', qty:'2 cs', cat:'cat-epicerie' },
+      { name:'Œufs', qty:'2', cat:'cat-cremerie' },
+      { name:'Épinards frais', qty:'50g', cat:'cat-legumes' },
+    ],
+    'Sashimis saumon & thon': [
+      { name:'Saumon frais', qty:'200g', cat:'cat-viandes' },
+      { name:'Thon frais', qty:'150g', cat:'cat-viandes' },
+      { name:'Sauce soja', qty:'50 mL', cat:'cat-epicerie' },
+      { name:'Riz à sushi', qty:'200g', cat:'cat-epicerie' },
+    ],
+    'Gyoza + Soupe miso': [
+      { name:'Gyoza (surgelés)', qty:'16 pcs', cat:'cat-epicerie' },
+      { name:'Pâte miso', qty:'1 cs', cat:'cat-epicerie' },
+    ],
+    'Brochettes bœuf fromage': [
+      { name:'Bœuf à fondue', qty:'400g', cat:'cat-viandes' },
+      { name:'Fromage à raclette', qty:'150g', cat:'cat-cremerie' },
+    ],
+    'Burger maison': [
+      { name:'Pain burger', qty:'4', cat:'cat-epicerie' },
+      { name:'Stéak haché', qty:'4', cat:'cat-viandes' },
+      { name:'Cheddar', qty:'4 tranches', cat:'cat-cremerie' },
+      { name:'Tomates', qty:'2', cat:'cat-legumes' },
+      { name:'Salade', qty:'1 sachet', cat:'cat-legumes' },
+    ],
+    'Raclette / Fondue': [
+      { name:'Fromage à raclette', qty:'600g', cat:'cat-cremerie' },
+      { name:'Pommes de terre', qty:'1 kg', cat:'cat-legumes' },
+      { name:'Jambon blanc', qty:'200g', cat:'cat-viandes' },
+      { name:'Cornichons', qty:'1 pot', cat:'cat-epicerie' },
+    ],
+    'Tartiflette': [
+      { name:'Reblochon', qty:'1 fromage', cat:'cat-cremerie' },
+      { name:'Pommes de terre', qty:'1.2 kg', cat:'cat-legumes' },
+      { name:'Lardons', qty:'200g', cat:'cat-viandes' },
+      { name:'Crème fraîche', qty:'100 mL', cat:'cat-cremerie' },
+      { name:'Oignons', qty:'2', cat:'cat-legumes' },
+    ],
+    'Fajitas poulet': [
+      { name:'Poulet (filets)', qty:'400g', cat:'cat-viandes' },
+      { name:'Tortillas', qty:'8', cat:'cat-epicerie' },
+      { name:'Poivrons', qty:'3', cat:'cat-legumes' },
+      { name:'Crème fraîche', qty:'100 mL', cat:'cat-cremerie' },
+    ],
+    'Galettes sarrasin': [
+      { name:'Farine de sarrasin', qty:'250g', cat:'cat-epicerie' },
+      { name:'Œufs', qty:'3', cat:'cat-cremerie' },
+      { name:'Lait', qty:'400 mL', cat:'cat-epicerie' },
+    ],
+    'Croque-monsieur': [
+      { name:'Pain de mie', qty:'8 tranches', cat:'cat-epicerie' },
+      { name:'Jambon blanc', qty:'4 tranches', cat:'cat-viandes' },
+      { name:'Emmental râpé', qty:'100g', cat:'cat-cremerie' },
+      { name:'Béchamel', qty:'100 mL', cat:'cat-epicerie' },
+    ],
+    'Cordon bleu + frites': [
+      { name:'Cordons bleus', qty:'4', cat:'cat-viandes' },
+      { name:'Frites surgelées', qty:'600g', cat:'cat-epicerie' },
+    ],
+  };
+
+  const RECIPE_STEPS = {
+    'Fromage blanc power bowl': [
+      'Mélanger le fromage blanc avec la whey et la vanille ou cannelle.',
+      'Ajouter les flocons d\'avoine et bien mélanger.',
+      'Garnir avec la banane coupée en rondelles et la compote.',
+      'Finir avec le chocolat noir fondu en filet.',
+    ],
+    'Gaufres maison': [
+      'Mélanger farine, œufs, lait et beurre fondu jusqu\'à obtenir une pâte lisse.',
+      'Laisser reposer 30 min.',
+      'Cuire dans le gaufrier huilé environ 4-5 min par gaufre.',
+    ],
+    'Crêpes': [
+      'Mélanger farine, œufs et lait jusqu\'à consistance lisse. Laisser reposer 30 min.',
+      'Huiler légèrement une poêle à feu moyen.',
+      'Cuire chaque crêpe 1-2 min de chaque côté.',
+    ],
+    'Banane + Yaourt grec': [
+      'Couper la banane en rondelles.',
+      'Disposer dans un bol avec le yaourt grec.',
+      'Ajouter miel ou granola selon le goût.',
+    ],
+    'Céréales + Lait': [
+      'Verser les céréales dans un bol.',
+      'Ajouter le lait froid et déguster immédiatement.',
+    ],
+    'Pâtes carbonara': [
+      'Cuire les pâtes al dente dans une grande casserole salée.',
+      'Faire revenir les lardons à sec jusqu\'à dorure.',
+      'Mélanger les œufs et le parmesan râpé dans un bol.',
+      'Égoutter les pâtes en réservant un peu d\'eau de cuisson. Hors du feu, mélanger pâtes + lardons + mélange œuf/parmesan. Ajouter un peu d\'eau de cuisson si trop épais.',
+    ],
+    'Saucisse purée': [
+      'Cuire les saucisses à la poêle ou à l\'eau bouillante 15 min.',
+      'Cuire les pommes de terre à l\'eau, les écraser avec beurre et lait chaud.',
+      'Assaisonner la purée. Servir avec les saucisses.',
+    ],
+    'Lasagnes maison': [
+      'Faire revenir les oignons émincés, ajouter la viande hachée. Saler, poivrer.',
+      'Ajouter les tomates concassées et cuire 15 min à feu doux.',
+      'Préparer la béchamel : faire fondre le beurre, ajouter la farine, puis le lait chaud en fouettant.',
+      'Dans un plat, alterner : couche de pâtes, bolognaise, béchamel. Répéter 3 fois.',
+      'Finir par du gruyère râpé. Cuire 40 min à 180 °C.',
+    ],
+    'Hachis Parmentier': [
+      'Cuire les pommes de terre à l\'eau, puis les écraser avec beurre. Saler.',
+      'Faire revenir l\'oignon haché avec la viande hachée. Assaisonner.',
+      'Étaler la viande dans un plat, couvrir de purée.',
+      'Parsemer de gruyère et gratiner 20 min à 200 °C.',
+    ],
+    'Nouilles sautées poulet': [
+      'Faire revenir les lamelles de poulet à feu vif dans un wok huilé.',
+      'Ajouter les nouilles précuites et sauter 2 min.',
+      'Assaisonner avec sauce soja et huile de sésame. Mélanger 1-2 min et servir.',
+    ],
+    'Poulet rôti + Riz': [
+      'Badigeonner le poulet d\'huile d\'olive, sel, poivre et herbes de Provence.',
+      'Cuire 1h30 à 180 °C en arrosant toutes les 30 min.',
+      'Cuire le riz à l\'eau salée selon les instructions. Servir ensemble.',
+    ],
+    'Pâtes poireaux mascarpone': [
+      'Faire fondre les poireaux émincés dans du beurre à feu doux pendant 10 min.',
+      'Cuire les pâtes al dente.',
+      'Égoutter les pâtes, mélanger avec les poireaux et le mascarpone.',
+      'Parsemer de parmesan et servir chaud.',
+    ],
+    'Ramen maison': [
+      'Porter l\'eau à frémissement avec dashi en poudre, pâte miso et sauce soja.',
+      'Cuire les nouilles 3 min dans le bouillon.',
+      'Faire cuire les œufs mollets 6 min 30 dans l\'eau bouillante, puis les peler.',
+      'Dresser : nouilles dans un bol, verser le bouillon chaud, ajouter épinards, œuf coupé en deux et viande.',
+    ],
+    'Sashimis saumon & thon': [
+      'S\'assurer que le poisson est très frais (qualité sashimi).',
+      'Trancher en fines lamelles avec un couteau bien aiguisé.',
+      'Disposer harmonieusement sur une assiette froide. Servir avec sauce soja, wasabi et riz à sushi.',
+    ],
+    'Gyoza + Soupe miso': [
+      'Chauffer un filet d\'huile dans une poêle, faire dorer les gyoza 2 min.',
+      'Ajouter un fond d\'eau, couvrir et cuire à la vapeur 3 min.',
+      'Dissoudre la pâte miso dans de l\'eau chaude (ne pas faire bouillir). Servir ensemble.',
+    ],
+    'Brochettes bœuf fromage': [
+      'Couper le bœuf en cubes de 3 cm.',
+      'Alterner bœuf et fromage sur des brochettes en bois.',
+      'Griller 2-3 min de chaque côté à feu vif. Saler et poivrer.',
+    ],
+    'Burger maison': [
+      'Cuire les steaks hachés à feu vif 2-3 min de chaque côté.',
+      'Toaster les pains coupés en deux.',
+      'Monter le burger : pain, sauce, salade, tomate, steak, cheddar, pain.',
+    ],
+    'Raclette / Fondue': [
+      'Cuire les pommes de terre à l\'eau avec la peau.',
+      'Disposer fromage, charcuterie et cornichons sur la table.',
+      'Faire fondre le fromage à l\'appareil à raclette et napper les pommes de terre.',
+    ],
+    'Tartiflette': [
+      'Cuire les pommes de terre à l\'eau, les couper en rondelles.',
+      'Faire revenir lardons et oignons à la poêle.',
+      'Alterner pommes de terre et lardons dans un plat beurré.',
+      'Ajouter la crème fraîche, poser le reblochon coupé en deux (croûte vers le haut).',
+      'Cuire 25 min à 200 °C jusqu\'à gratinage.',
+    ],
+    'Fajitas poulet': [
+      'Mariner les filets de poulet (citron, cumin, paprika, ail) 30 min.',
+      'Saisir le poulet en lamelles et les poivrons émincés à feu vif 8 min.',
+      'Réchauffer les tortillas, garnir de poulet, poivrons et crème fraîche. Rouler et servir.',
+    ],
+    'Galettes sarrasin': [
+      'Mélanger farine de sarrasin, œufs, lait et une pincée de sel. Laisser reposer 1h.',
+      'Cuire à la crêpière légèrement beurrée.',
+      'Garnir selon goût : jambon, œuf miroir, emmental râpé.',
+    ],
+    'Croque-monsieur': [
+      'Beurrer légèrement les tranches de pain de mie.',
+      'Étaler la béchamel, poser le jambon et l\'emmental. Fermer.',
+      'Remettre béchamel + emmental sur le dessus.',
+      'Gratiner au four 10 min à 200 °C ou passer au grill.',
+    ],
+    'Cordon bleu + frites': [
+      'Préchauffer le four à 200 °C.',
+      'Disposer les cordons bleus sur une plaque. Cuire 20 min en retournant à mi-cuisson.',
+      'Cuire les frites selon les instructions du paquet. Servir avec une salade verte.',
+    ],
+  };
+
+  function generateCourses() {
+    // Collecter tous les ingrédients de la semaine
+    const tally = {}; // key: name+cat → { name, qty, cat }
+    for (let i = 0; i < 7; i++) {
+      ['pdej','midi','soir'].forEach(p => {
+        const meal = weekPlan[i][p];
+        if (!meal) return;
+        const ings = RECIPE_INGREDIENTS[meal.name] || [];
+        ings.forEach(ing => {
+          const key = ing.name.toLowerCase();
+          if (!tally[key]) tally[key] = { ...ing };
+          // Si déjà présent, on cumule juste le nom (qty difficile à additionner)
+        });
+      });
+    }
+    const items = Object.values(tally);
+    if (items.length === 0) {
+      showToast('📖 Aucun repas planifié cette semaine');
+      return;
+    }
+    // Vider les catégories existantes
+    ['cat-legumes','cat-viandes','cat-cremerie','cat-epicerie','cat-maison'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = '';
+    });
+    // Injecter les ingrédients
+    items.forEach(ing => {
+      const catId = ing.cat || 'cat-epicerie';
+      const section = document.getElementById(catId);
+      if (!section) return;
+      const row = document.createElement('div');
+      row.className = 'item-row new-item';
+      row.innerHTML = `<div class="item-checkbox"></div><div class="item-name">${ing.name}</div>${ing.qty ? `<div class="item-qty">${ing.qty}</div>` : ''}`;
+      row.onclick = () => toggleItem(row);
+      section.appendChild(row);
+    });
+    // Recalculer la progression
+    checkedCount = 0;
+    totalItems = document.querySelectorAll('.item-row').length;
+    document.getElementById('progress-count').textContent = '0 / ' + totalItems + ' articles';
+    document.getElementById('progress-fill').style.width = '0%';
+    showToast('🛒 Liste générée : ' + items.length + ' articles !');
+    confetti();
+    setTimeout(() => switchTab('courses', document.querySelectorAll('.nav-item')[2]), 700);
+  }
+
+  let selectedCatId = 'cat-maison';
+  function selectCatPill(el, catId) {
+    document.querySelectorAll('#cat-pill-group .pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    selectedCatId = catId;
+  }
+
+  function addItem() {
+    const name = document.getElementById('new-item-name').value.trim();
+    const qty  = document.getElementById('new-item-qty').value.trim();
+    if (!name) { document.getElementById('new-item-name').focus(); return; }
+    const section = document.getElementById(selectedCatId);
+    const hint = section.querySelector('.cat-empty-hint');
+    if (hint) hint.remove();
+    const row = document.createElement('div');
+    row.className = 'item-row new-item';
+    row.innerHTML = `<div class="item-checkbox"></div><div class="item-name">${name}</div>${qty ? `<div class="item-qty">${qty}</div>` : ''}`;
+    row.onclick = () => toggleItem(row);
+    section.appendChild(row);
+    document.getElementById('new-item-name').value = '';
+    document.getElementById('new-item-qty').value = '';
+    closeSheet();
+    showToast('✅ ' + name + ' ajouté !');
+  }
+
+  let toastTimeout;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+
+  function confetti() {
+    const emojis = ['🎉','✨','🍜','🥗','🧇','⭐','🎊','🧡','🥟','🍔','🥞'];
+    const phone = document.querySelector('.phone-frame').getBoundingClientRect();
+    for (let i = 0; i < 10; i++) {
+      setTimeout(() => {
+        const el = document.createElement('div');
+        el.className = 'confetti-el';
+        el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+        el.style.left = (phone.left + 20 + Math.random() * (phone.width - 40)) + 'px';
+        el.style.top = (phone.top + phone.height / 3) + 'px';
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 1200);
+      }, i * 70);
+    }
+  }
+
+  document.querySelectorAll('.filter-pills .pill').forEach(p => {
+    p.addEventListener('click', function() {
+      document.querySelectorAll('.filter-pills .pill').forEach(x => x.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+  // ── RÉGLAGES ──
+  const DEFAULT_RECIPES = JSON.parse(JSON.stringify(allRecipes)); // snapshot initial
+
+  function loadSettings() {
+    const nom = localStorage.getItem('mm_nom') || 'Tristan & sa copine';
+    const nb  = localStorage.getItem('mm_personnes') || '2';
+    document.getElementById('lbl-nom').textContent = nom;
+    document.getElementById('lbl-personnes').textContent = nb + ' personne' + (parseInt(nb) > 1 ? 's' : '');
+    document.getElementById('lbl-footer').textContent = nom + ' 🫶';
+  }
+  function promptNom() {
+    const val = prompt('Nom du foyer :', localStorage.getItem('mm_nom') || 'Tristan & sa copine');
+    if (val === null) return;
+    localStorage.setItem('mm_nom', val.trim() || 'Mon foyer');
+    loadSettings();
+    showToast('✅ Nom mis à jour');
+  }
+  function promptPersonnes() {
+    const val = prompt('Nombre de personnes :', localStorage.getItem('mm_personnes') || '2');
+    if (val === null) return;
+    const n = parseInt(val);
+    if (isNaN(n) || n < 1) return;
+    localStorage.setItem('mm_personnes', n);
+    loadSettings();
+    showToast('✅ ' + n + ' personne' + (n > 1 ? 's' : ''));
+  }
+  function resetRecipes() {
+    allRecipes = JSON.parse(JSON.stringify(DEFAULT_RECIPES));
+    saveState();
+    renderRecipes();
+    showToast('🔄 Recettes réinitialisées');
+  }
+
+  // Init
+  loadState();
+  loadSettings();
+  switchMealTab('pdej');
+  buildCalendar();
+  renderRecipes();
+</script>
+</body>
+</html>
