@@ -8,6 +8,7 @@ import {
 import DayChip from './DayChip'
 import DayView from './DayView'
 import WeekOverview from './WeekOverview'
+import { showToast } from '@/components/ui/Toast'
 
 export default function PlanningPage() {
   const currentDayIdx    = useAppStore((s) => s.currentDayIdx)
@@ -115,6 +116,28 @@ export default function PlanningPage() {
     return weekOffset > 0 ? `Dans ${weekOffset} semaines` : `Il y a ${Math.abs(weekOffset)} semaines`
   }, [weekOffset])
 
+  const handleShare = useCallback(() => {
+    const DAY_NAMES = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+    const SLOT_LABELS: Record<string, string> = { pdej: '☀️ Matin', midi: '🍽 Midi', soir: '🌙 Soir' }
+    const lines: string[] = [`📅 ${weekTitle} (${weekLabel})`, '']
+    for (let i = 0; i < 7; i++) {
+      const day = weekPlan[i]
+      if (!day) continue
+      const slots = [
+        { key: 'pdej', meal: day.pdej },
+        { key: 'midi', meal: day.midi },
+        { key: 'soir', meal: day.soir },
+      ].filter((s) => s.meal)
+      if (!slots.length) continue
+      lines.push(`**${DAY_NAMES[i]}**`)
+      slots.forEach(({ key, meal }) => {
+        lines.push(`  ${SLOT_LABELS[key]} ${meal!.emoji} ${meal!.name}`)
+      })
+    }
+    if (lines.length <= 2) { showToast('Planning vide — rien à partager !'); return }
+    navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('📋 Planning copié !'))
+  }, [weekPlan, weekTitle, weekLabel])
+
   return (
     <div>
       {/* Header */}
@@ -140,8 +163,24 @@ export default function PlanningPage() {
                   {planCount}/21
                 </span>
               )}
+              {weekOffset < 0 && (
+                <span className="ml-2 text-[11px] font-bold text-muted bg-sep px-2 py-0.5 rounded-full">
+                  📖 Passé
+                </span>
+              )}
             </p>
           </div>
+
+          {planCount > 0 && (
+            <button
+              onClick={handleShare}
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-bg2 text-text1 text-base font-bold leading-none active:scale-90 transition-transform"
+              aria-label="Partager le planning"
+              title="Copier le planning"
+            >
+              ↑
+            </button>
+          )}
 
           <button
             onClick={() => changeWeek(1)}

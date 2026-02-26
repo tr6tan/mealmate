@@ -2,6 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Design tokens — Light ── */
+:root {
+  --c-bg:          250 250 247; /* #FAFAF7 */
+  --c-card:        255 255 255; /* #FFFFFF */
+  --c-sep:         242 242 240; /* #F2F2F0 */
+  --c-border:      232 232 229; /* #E8E8E5 */
+  --c-text1:        28  28  30; /* #1C1C1E */
+  --c-text2:        58  58  60; /* #3A3A3C */
+  --c-muted:       142 142 147; /* #8E8E93 */
+  --c-terra:       224 123  84; /* #E07B54 */
+  --c-terra-light: 253 240 235; /* #FDF0EB */
+  --c-terra-dark:  196  98  60; /* #C4623C */
+  --c-sage:        107 158 120; /* #6B9E78 */
+  --c-sage-light:  238 245 240; /* #EEF5F0 */
+  --c-morning:     245 166  35; /* #F5A623 */
+  --c-evening:     124  92 191; /* #7C5CBF */
+}
+
+/* ── Design tokens — Dark ── */
+.dark {
+  --c-bg:     28  28  30; /* #1C1C1E */
+  --c-card:   44  44  46; /* #2C2C2E */
+  --c-sep:    58  58  60; /* #3A3A3C */
+  --c-border: 72  72  74; /* #48484A */
+  --c-text1:  242 242 247; /* #F2F2F7 */
+  --c-text2:  199 199 204; /* #C7C7CC */
+  --c-muted:  142 142 147; /* #8E8E93 */
+}
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -17,8 +46,8 @@
 
   body {
     font-family: 'Nunito', system-ui, sans-serif;
-    background-color: #FAFAF7;
-    color: #1C1C1E;
+    background-color: rgb(var(--c-bg));
+    color: rgb(var(--c-text1));
     -webkit-font-smoothing: antialiased;
   }
 

@@ -16,10 +16,21 @@ const RecipeDetailSheet = lazy(() => import('@/components/sheets/RecipeDetailShe
 const PickDaySheet      = lazy(() => import('@/components/sheets/PickDaySheet'))
 const AddItemSheet      = lazy(() => import('@/components/sheets/AddItemSheet'))
 const NewRecipeSheet    = lazy(() => import('@/components/sheets/NewRecipeSheet'))
+const EditRecipeSheet   = lazy(() => import('@/components/sheets/EditRecipeSheet'))
 
 export default function App() {
   const activeTab = useAppStore((s) => s.activeTab)
   const setCurrentDayIdx = useAppStore((s) => s.setCurrentDayIdx)
+  const darkMode = useAppStore((s) => s.settings.darkMode)
+
+  // Appliquer/retirer la classe dark sur <html>
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [darkMode])
 
   // Synchronisation Firestore ↔ store
   useFoyerSync()
@@ -50,6 +61,7 @@ export default function App() {
         <PickDaySheet />
         <AddItemSheet />
         <NewRecipeSheet />
+        <EditRecipeSheet />
       </Suspense>
       {/* Toast */}
       <Toast />

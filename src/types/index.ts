@@ -68,6 +68,7 @@ export type ActiveTab = 'planning' | 'recettes' | 'courses' | 'settings'
 export interface AppSettings {
   personnes: number
   nomFoyer: string
+  darkMode?: boolean
 }
 
 // Sheets
@@ -78,6 +79,7 @@ export type SheetName =
   | 'pick-day'
   | 'add-item'
   | 'new-recipe'
+  | 'edit-recipe'
   | null
 
 export interface SheetState {

@@ -26,7 +26,9 @@ export default function RecipeDetailSheet() {
     closeSheet()
     showToast(`« ${recipe.name} » dupliquée !`)
   }
-
+  const handleEdit = () => {
+    openSheet({ sheet: 'edit-recipe', recipeContext: recipe })
+  }
   const handleAddToCourses = () => {
     if (!recipe.ingredients?.length) return
     recipe.ingredients.forEach((ing) => {
@@ -97,6 +99,12 @@ export default function RecipeDetailSheet() {
             🛒 Ajouter aux courses
           </button>
         )}
+        <button
+          onClick={handleEdit}
+          className="flex-1 py-2.5 rounded-xl bg-[#E8F0FE] text-[#3B5BDB] text-xs font-extrabold active:scale-[0.97] transition-all"
+        >
+          ✏️ Modifier
+        </button>
         <button
           onClick={handleDuplicate}
           className="flex-1 py-2.5 rounded-xl bg-sep text-text2 text-xs font-extrabold active:scale-[0.97] transition-all"

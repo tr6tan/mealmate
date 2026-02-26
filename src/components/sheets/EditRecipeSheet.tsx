@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import type { Period, ShoppingCategory, Ingredient } from '@/types'
@@ -7,12 +7,12 @@ import { showToast } from '@/components/ui/Toast'
 
 const PERIODS: Period[] = ['pdej', 'midi', 'soir']
 const TIME_OPTIONS = ['5 min', '10 min', '15 min', '20 min', '30 min', '45 min', '1h', '1h30']
-const CAT_OPTIONS: { id: ShoppingCategory; icon: string }[] = [
-  { id: 'legumes',  icon: '🥦' },
-  { id: 'viandes',  icon: '🥩' },
-  { id: 'cremerie', icon: '🧀' },
-  { id: 'epicerie', icon: '🛒' },
-  { id: 'maison',   icon: '🧴' },
+const CAT_OPTIONS: { id: ShoppingCategory; icon: string; label: string }[] = [
+  { id: 'legumes',  icon: '🥦', label: 'Légumes'  },
+  { id: 'viandes',  icon: '🥩', label: 'Viandes'  },
+  { id: 'cremerie', icon: '🧀', label: 'Crèmerie' },
+  { id: 'epicerie', icon: '🛒', label: 'Épicerie'  },
+  { id: 'maison',   icon: '🧴', label: 'Maison'   },
 ]
 
 function resizeToBase64(file: File, maxW = 800, quality = 0.72): Promise<string> {
@@ -36,21 +36,40 @@ function resizeToBase64(file: File, maxW = 800, quality = 0.72): Promise<string>
   })
 }
 
-export default function NewRecipeSheet() {
-  const addRecipe = useAppStore((s) => s.addRecipe)
-  const closeSheet = useAppStore((s) => s.closeSheet)
+export default function EditRecipeSheet() {
+  const updateRecipe = useAppStore((s) => s.updateRecipe)
+  const closeSheet   = useAppStore((s) => s.closeSheet)
+  const sheetState   = useAppStore((s) => s.sheetState)
 
-  const [name, setName] = useState('')
-  const [emoji, setEmoji] = useState('🍽️')
-  const [time, setTime] = useState('')
-  const [timeCustom, setTimeCustom] = useState(false)
-  const [period, setPeriod] = useState<Period>('midi')
-  const [fav, setFav] = useState(false)
-  const [rapide, setRapide] = useState(false)
-  const [steps, setSteps] = useState<string[]>([''])
-  const [photo, setPhoto] = useState<string | undefined>(undefined)
+  const recipe = sheetState.sheet === 'edit-recipe' ? sheetState.recipeContext : undefined
+
+  const [name,        setName]        = useState('')
+  const [emoji,       setEmoji]       = useState('🍽️')
+  const [time,        setTime]        = useState('')
+  const [timeCustom,  setTimeCustom]  = useState(false)
+  const [period,      setPeriod]      = useState<Period>('midi')
+  const [fav,         setFav]         = useState(false)
+  const [rapide,      setRapide]      = useState(false)
+  const [steps,       setSteps]       = useState<string[]>([''])
+  const [photo,       setPhoto]       = useState<string | undefined>(undefined)
   const [ingredients, setIngredients] = useState<Ingredient[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Pré-remplir les champs à chaque ouverture
+  useEffect(() => {
+    if (recipe) {
+      setName(recipe.name)
+      setEmoji(recipe.emoji)
+      setTime(recipe.time)
+      setTimeCustom(!TIME_OPTIONS.includes(recipe.time))
+      setPeriod(recipe.period)
+      setFav(recipe.fav)
+      setRapide(recipe.rapide)
+      setSteps(recipe.steps?.length ? recipe.steps : [''])
+      setPhoto(recipe.photo)
+      setIngredients(recipe.ingredients ?? [])
+    }
+  }, [recipe?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -63,15 +82,10 @@ export default function NewRecipeSheet() {
     }
   }
 
-  const updateStep = (idx: number, value: string) => {
+  const updateStep = (idx: number, value: string) =>
     setSteps((prev) => prev.map((s, i) => (i === idx ? value : s)))
-  }
-
-  const addStep = () => setSteps((prev) => [...prev, ''])
-
-  const removeStep = (idx: number) => {
-    setSteps((prev) => prev.filter((_, i) => i !== idx))
-  }
+  const addStep    = () => setSteps((prev) => [...prev, ''])
+  const removeStep = (idx: number) => setSteps((prev) => prev.filter((_, i) => i !== idx))
 
   const addIngredient = () =>
     setIngredients((prev) => [...prev, { name: '', qty: '', category: 'epicerie' }])
@@ -81,39 +95,30 @@ export default function NewRecipeSheet() {
     setIngredients((prev) => prev.filter((_, i) => i !== idx))
 
   const handleSave = () => {
-    if (!name.trim()) return
+    if (!name.trim() || !recipe) return
     const cleanSteps = steps.map((s) => s.trim()).filter(Boolean)
     const cleanIngredients = ingredients.filter((i) => i.name.trim())
-    addRecipe({
+    updateRecipe(recipe.id, {
       name: name.trim(),
       emoji,
       period,
       time: time.trim() || '? min',
       fav,
       rapide,
-      steps: cleanSteps.length ? cleanSteps : undefined,
+      steps:       cleanSteps.length       ? cleanSteps       : undefined,
       ingredients: cleanIngredients.length ? cleanIngredients : undefined,
       photo,
     })
-    // Reset
-    setName('')
-    setEmoji('🍽️')
-    setTime('')
-    setTimeCustom(false)
-    setPeriod('midi')
-    setFav(false)
-    setRapide(false)
-    setSteps([''])
-    setPhoto(undefined)
-    setIngredients([])
     closeSheet()
-    showToast(`${name.trim()} ajoutée !`)
+    showToast(`${name.trim()} modifiée !`)
   }
 
+  if (!recipe) return <BottomSheet name="edit-recipe"><div /></BottomSheet>
+
   return (
-    <BottomSheet name="new-recipe">
+    <BottomSheet name="edit-recipe" className="max-h-[92dvh]">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-[17px] font-extrabold text-text1">Nouvelle recette</h2>
+        <h2 className="text-[17px] font-extrabold text-text1">Modifier la recette</h2>
         <button onClick={closeSheet} className="text-muted text-xl">✕</button>
       </div>
 
@@ -317,7 +322,6 @@ export default function NewRecipeSheet() {
               <button
                 onClick={() => removeStep(idx)}
                 className="mt-2 text-muted hover:text-red-400 text-lg leading-none transition-colors"
-                aria-label="Supprimer l'étape"
               >
                 ×
               </button>
@@ -336,7 +340,7 @@ export default function NewRecipeSheet() {
         onClick={handleSave}
         className="w-full py-3.5 bg-terra text-white rounded-2xl text-sm font-extrabold shadow-terra active:scale-[0.97] transition-transform"
       >
-        Ajouter la recette
+        Enregistrer les modifications
       </button>
     </BottomSheet>
   )

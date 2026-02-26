@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import type { Period, Recipe } from '@/types'
@@ -20,6 +20,7 @@ export default function AddMealSheet() {
   const closeSheet = useAppStore((s) => s.closeSheet)
 
   const isOpen = sheetState.sheet === 'add-meal'
+  const weekPlans = useAppStore((s) => s.weekPlans)
   const [activeTab, setActiveTab] = useState<MealTab>('midi')
   const [freeName, setFreeName] = useState('')
   const [freeEmoji, setFreeEmoji] = useState('🍽️')
@@ -38,6 +39,35 @@ export default function AddMealSheet() {
   }, [isOpen, sheetState.addMealPeriod])
 
   const context = sheetState.mealContext
+
+  // Comptage des planifications par recette
+  const planCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const weekPlan of Object.values(weekPlans)) {
+      for (let day = 0; day < 7; day++) {
+        const plan = weekPlan[day]
+        if (!plan) continue
+        const slots = [plan.pdej, plan.midi, plan.midi_entree, plan.midi_dessert, plan.soir, plan.soir_entree, plan.soir_dessert]
+        slots.forEach((meal) => {
+          if (!meal) return
+          const r = recipes.find((rc) => rc.name === meal.name)
+          if (r) counts[r.id] = (counts[r.id] ?? 0) + 1
+        })
+      }
+    }
+    return counts
+  }, [weekPlans, recipes])
+
+  // Tri : popularité + favori en tête
+  const filtered = useMemo(() =>
+    recipes
+      .filter((r) => r.period === activeTab && r.name.toLowerCase().includes(search.toLowerCase()))
+      .sort((a, b) => {
+        const sA = (planCounts[a.id] ?? 0) * 2 + (a.fav ? 1 : 0)
+        const sB = (planCounts[b.id] ?? 0) * 2 + (b.fav ? 1 : 0)
+        return sB - sA
+      })
+  , [recipes, activeTab, search, planCounts])
 
   const handleSelect = (recipe: Recipe) => {
     if (!context) return
@@ -68,12 +98,6 @@ export default function AddMealSheet() {
     setShowFreeForm(false)
     showToast('Repas ajouté !')
   }
-
-  const filtered = recipes.filter(
-    (r) =>
-      r.period === activeTab &&
-      r.name.toLowerCase().includes(search.toLowerCase()),
-  )
 
   return (
     <BottomSheet name="add-meal">
@@ -157,10 +181,15 @@ export default function AddMealSheet() {
                 <span className="text-[22px] flex-shrink-0">{recipe.emoji}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-[13px] font-bold text-text1 truncate">{recipe.name}</p>
-                  <div className="flex gap-1 mt-0.5">
+                  <div className="flex gap-1.5 mt-0.5 flex-wrap">
                     <span className="text-[11px] text-muted font-semibold">{recipe.time}</span>
                     {recipe.fav && <span className="text-[11px] text-[#E91E63]">♥</span>}
                     {recipe.rapide && <span className="text-[11px] text-[#2E7D32] font-bold">⚡ Rapide</span>}
+                    {(planCounts[recipe.id] ?? 0) > 0 && (
+                      <span className="text-[10px] font-extrabold text-terra bg-terra-light px-1.5 py-0.5 rounded-[6px]">
+                        📅 {planCounts[recipe.id]}×
+                      </span>
+                    )}
                   </div>
                 </div>
               </button>

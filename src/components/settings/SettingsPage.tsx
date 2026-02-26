@@ -204,6 +204,13 @@ export default function SettingsPage() {
             value={`${settings.personnes} pers.`}
             onClick={() => setEditField('personnes')}
           />
+          <SettingsRow
+            icon="🌙"
+            iconBg="bg-[#EEF2FF]"
+            label="Mode sombre"
+            value={settings.darkMode ? 'Actif' : 'Désactivé'}
+            onClick={() => updateSettings({ darkMode: !settings.darkMode })}
+          />
         </div>
       </div>
 

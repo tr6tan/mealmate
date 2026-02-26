@@ -63,6 +63,7 @@ interface AppState {
   addRecipe: (recipe: Omit<Recipe, 'id'>) => void
   deleteRecipe: (id: string) => void
   duplicateRecipe: (id: string) => void
+  updateRecipe: (id: string, patch: Partial<Omit<Recipe, 'id'>>) => void
   toggleFav: (id: string) => void
   resetRecipes: () => void
 
@@ -97,6 +98,7 @@ export const useAppStore = create<AppState>()(
       settings: {
         personnes: 2,
         nomFoyer: 'Mon foyer',
+        darkMode: false,
       },
 
       // ── UI ──
@@ -191,6 +193,11 @@ export const useAppStore = create<AppState>()(
           next.splice(idx + 1, 0, copy)
           return { recipes: next }
         }),
+
+      updateRecipe: (id, patch) =>
+        set((s) => ({
+          recipes: s.recipes.map((r) => (r.id === id ? { ...r, ...patch } : r)),
+        })),
 
       toggleFav: (id) =>
         set((s) => ({
