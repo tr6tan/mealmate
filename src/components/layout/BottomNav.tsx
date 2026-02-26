@@ -60,7 +60,10 @@ export default function BottomNav() {
   const setActiveTab = useAppStore((s) => s.setActiveTab)
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-xl border-t border-sep flex justify-around items-stretch pb-safe">
+    <nav
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      className="fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-xl border-t border-sep flex justify-around items-stretch"
+    >
       {navItems.map((item) => {
         const active = activeTab === item.id
         return (
