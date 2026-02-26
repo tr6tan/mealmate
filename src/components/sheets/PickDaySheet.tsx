@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import type { Period, SlotKey } from '@/types'
@@ -22,6 +22,16 @@ export default function PickDaySheet() {
   const [pickedDay, setPickedDay] = useState(currentDayIdx >= 0 ? currentDayIdx : 0)
   const [pickedPeriod, setPickedPeriod] = useState<Period>('midi')
   const [localOffset, setLocalOffset] = useState(storeWeekOffset)
+
+  // Reset à chaque ouverture de la sheet
+  useEffect(() => {
+    if (sheetState.sheet === 'pick-day') {
+      setPickedDay(currentDayIdx >= 0 ? currentDayIdx : 0)
+      setPickedPeriod('midi')
+      setLocalOffset(storeWeekOffset)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sheetState.sheet])
 
   const recipe = sheetState.pickDayContext?.recipe
   if (!recipe) return <BottomSheet name="pick-day"><div /></BottomSheet>

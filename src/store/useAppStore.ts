@@ -56,6 +56,7 @@ interface AppState {
   // Actions — Planning
   setMeal: (dayIdx: number, slotKey: SlotKey, meal: Meal | null) => void
   clearWeek: () => void
+  copyWeekFromOffset: (fromOffset: number) => void
   generateShoppingFromPlan: () => void
 
   // Actions — Recipes
@@ -119,6 +120,18 @@ export const useAppStore = create<AppState>()(
         set((s) => {
           const key = getWeekKey(getMondayByOffset(s.weekOffset))
           return { weekPlans: { ...s.weekPlans, [key]: buildInitialWeek() } }
+        }),
+
+      copyWeekFromOffset: (fromOffset: number) =>
+        set((s) => {
+          const fromKey = getWeekKey(getMondayByOffset(fromOffset))
+          const toKey = getWeekKey(getMondayByOffset(s.weekOffset))
+          const source = s.weekPlans[fromKey]
+          if (!source) return {}
+          // Deep copy de chaque jour
+          const copy: WeekPlan = {}
+          for (let i = 0; i < 7; i++) copy[i] = source[i] ? { ...source[i] } : emptyDay()
+          return { weekPlans: { ...s.weekPlans, [toKey]: copy } }
         }),
 
       generateShoppingFromPlan: () => {
@@ -208,6 +221,13 @@ export const useAppStore = create<AppState>()(
             weekPlans = { [key]: oldWeekPlan }
           }
         }
+        // Purge des semaines > 4 semaines passées
+        const cutoff = new Date()
+        cutoff.setDate(cutoff.getDate() - 28)
+        cutoff.setHours(0, 0, 0, 0)
+        weekPlans = Object.fromEntries(
+          Object.entries(weekPlans).filter(([key]) => new Date(key) >= cutoff)
+        )
         set({
           weekPlans,
           recipes:       data.recipes       ?? get().recipes,

@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import { getTodayIndex, getWeekMonday } from '@/lib/utils'
 import { useFoyerSync } from '@/hooks/useFoyerSync'
@@ -55,6 +55,10 @@ export default function App() {
 }
 
 function TabPanel({ active, children }: { active: boolean; children: ReactNode }) {
+  // Monte le contenu seulement au premier affichage (lazy), le garde ensuite en DOM
+  const hasMountedRef = useRef(false)
+  if (active) hasMountedRef.current = true
+  if (!hasMountedRef.current) return null
   return (
     <div className={active ? 'block' : 'hidden'}>
       {children}
