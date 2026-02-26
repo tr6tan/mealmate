@@ -22,8 +22,9 @@ export default function Toast() {
 
   return (
     <div
+      style={{ bottom: 'calc(88px + env(safe-area-inset-bottom))' }}
       className={cn(
-        'fixed bottom-24 left-1/2 -translate-x-1/2 z-[200]',
+        'fixed left-1/2 -translate-x-1/2 z-[200]',
         'bg-text1 text-white px-4 py-3 rounded-2xl',
         'text-[13px] font-bold whitespace-nowrap pointer-events-none',
         'transition-all duration-300',
