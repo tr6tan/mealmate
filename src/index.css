@@ -53,6 +53,9 @@
   .mb-safe {
     margin-bottom: env(safe-area-inset-bottom);
   }
+  .pb-nav-safe {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+  }
 }
 
 /* Animations */
