@@ -12,7 +12,6 @@ import type { Period } from '@/types'
 export default function PlanningPage() {
   const currentDayIdx = useAppStore((s) => s.currentDayIdx)
   const setCurrentDayIdx = useAppStore((s) => s.setCurrentDayIdx)
-  const openSheet = useAppStore((s) => s.openSheet)
   const weekPlan = useAppStore((s) => s.weekPlan)
 
   const monday = useMemo(() => getWeekMonday(), [])
@@ -48,25 +47,16 @@ export default function PlanningPage() {
   return (
     <div>
       {/* Header */}
-      <div className="flex items-center justify-between px-5 pt-4 pb-3">
-        <div>
-          <h1 className="text-2xl font-black text-text1">Planning</h1>
-          <p className="text-[13px] text-muted font-semibold mt-0.5">
-            {weekLabel}
-            {planCount > 0 && (
-              <span className="ml-2 text-[11px] font-bold text-terra bg-terra-light px-2 py-0.5 rounded-full">
-                {planCount}/21
-              </span>
-            )}
-          </p>
-        </div>
-        <button
-          onClick={() => openSheet({ sheet: 'add-meal', addMealPeriod: 'midi', mealContext: { dayIdx: selectedIdx, slotKey: 'midi' } })}
-          className="w-10 h-10 rounded-full bg-terra text-white flex items-center justify-center text-xl font-bold shadow-terra-sm active:scale-95 transition-transform"
-          aria-label="Ajouter un repas"
-        >
-          +
-        </button>
+      <div className="px-5 pt-4 pb-3">
+        <h1 className="text-2xl font-black text-text1">Planning</h1>
+        <p className="text-[13px] text-muted font-semibold mt-0.5">
+          {weekLabel}
+          {planCount > 0 && (
+            <span className="ml-2 text-[11px] font-bold text-terra bg-terra-light px-2 py-0.5 rounded-full">
+              {planCount}/21
+            </span>
+          )}
+        </p>
       </div>
 
       {/* Day chips */}
