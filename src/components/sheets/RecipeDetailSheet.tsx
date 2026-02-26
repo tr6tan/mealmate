@@ -11,6 +11,16 @@ export default function RecipeDetailSheet() {
 
   return (
     <BottomSheet name="recipe-detail" className="max-h-[88dvh]">
+      {/* Photo hero */}
+      {recipe.photo && (
+        <div className="-mx-5 -mt-5 mb-4 h-[160px] overflow-hidden rounded-t-[28px]">
+          <img
+            src={recipe.photo}
+            alt={recipe.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-center gap-3.5 mb-4">
         <span className="text-[42px] leading-none">{recipe.emoji}</span>

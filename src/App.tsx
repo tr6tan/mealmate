@@ -1,20 +1,21 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, type ReactNode } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import { getTodayIndex, getWeekMonday } from '@/lib/utils'
 import { useFoyerSync } from '@/hooks/useFoyerSync'
 import AppShell from '@/components/layout/AppShell'
-import PlanningPage from '@/components/planning/PlanningPage'
-import RecipesPage from '@/components/recipes/RecipesPage'
-import ShoppingPage from '@/components/shopping/ShoppingPage'
-import SettingsPage from '@/components/settings/SettingsPage'
-// Sheets
-import AddMealSheet from '@/components/sheets/AddMealSheet'
-import MealActionsSheet from '@/components/sheets/MealActionsSheet'
-import RecipeDetailSheet from '@/components/sheets/RecipeDetailSheet'
-import PickDaySheet from '@/components/sheets/PickDaySheet'
-import AddItemSheet from '@/components/sheets/AddItemSheet'
-import NewRecipeSheet from '@/components/sheets/NewRecipeSheet'
 import Toast from '@/components/ui/Toast'
+import SyncBanner from '@/components/ui/SyncBanner'
+
+const PlanningPage      = lazy(() => import('@/components/planning/PlanningPage'))
+const RecipesPage       = lazy(() => import('@/components/recipes/RecipesPage'))
+const ShoppingPage      = lazy(() => import('@/components/shopping/ShoppingPage'))
+const SettingsPage      = lazy(() => import('@/components/settings/SettingsPage'))
+const AddMealSheet      = lazy(() => import('@/components/sheets/AddMealSheet'))
+const MealActionsSheet  = lazy(() => import('@/components/sheets/MealActionsSheet'))
+const RecipeDetailSheet = lazy(() => import('@/components/sheets/RecipeDetailSheet'))
+const PickDaySheet      = lazy(() => import('@/components/sheets/PickDaySheet'))
+const AddItemSheet      = lazy(() => import('@/components/sheets/AddItemSheet'))
+const NewRecipeSheet    = lazy(() => import('@/components/sheets/NewRecipeSheet'))
 
 export default function App() {
   const activeTab = useAppStore((s) => s.activeTab)
@@ -33,23 +34,26 @@ export default function App() {
   return (
     <AppShell
       nav={
-        <>
+        <Suspense fallback={null}>
           <TabPanel active={activeTab === 'planning'}><PlanningPage /></TabPanel>
           <TabPanel active={activeTab === 'recettes'}><RecipesPage /></TabPanel>
           <TabPanel active={activeTab === 'courses'}><ShoppingPage /></TabPanel>
           <TabPanel active={activeTab === 'settings'}><SettingsPage /></TabPanel>
-        </>
+        </Suspense>
       }
     >
       {/* Sheets */}
-      <AddMealSheet />
-      <MealActionsSheet />
-      <RecipeDetailSheet />
-      <PickDaySheet />
-      <AddItemSheet />
-      <NewRecipeSheet />
+      <Suspense fallback={null}>
+        <AddMealSheet />
+        <MealActionsSheet />
+        <RecipeDetailSheet />
+        <PickDaySheet />
+        <AddItemSheet />
+        <NewRecipeSheet />
+      </Suspense>
       {/* Toast */}
       <Toast />
+      <SyncBanner />
     </AppShell>
   )
 }

@@ -25,9 +25,15 @@ export default function MealActionsSheet() {
   const recipe = recipes.find((r) => r.name === meal.name)
 
   const handleRemove = () => {
+    const snapshot = meal
     setMeal(dayIdx, slotKey, null)
     closeSheet()
-    showToast('Repas retiré')
+    showToast('Repas retiré', {
+      action: {
+        label: 'Annuler',
+        onClick: () => setMeal(dayIdx, slotKey, snapshot),
+      },
+    })
   }
 
   const handleChange = () => {

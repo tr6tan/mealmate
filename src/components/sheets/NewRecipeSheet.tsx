@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import type { Period } from '@/types'
@@ -6,6 +6,27 @@ import { PERIOD_LABEL, cn } from '@/lib/utils'
 import { showToast } from '@/components/ui/Toast'
 
 const PERIODS: Period[] = ['pdej', 'midi', 'soir']
+
+function resizeToBase64(file: File, maxW = 800, quality = 0.72): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        const scale = Math.min(1, maxW / img.width)
+        const canvas = document.createElement('canvas')
+        canvas.width = img.width * scale
+        canvas.height = img.height * scale
+        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
+        resolve(canvas.toDataURL('image/jpeg', quality))
+      }
+      img.onerror = reject
+      img.src = e.target!.result as string
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
 
 export default function NewRecipeSheet() {
   const addRecipe = useAppStore((s) => s.addRecipe)
@@ -18,6 +39,19 @@ export default function NewRecipeSheet() {
   const [fav, setFav] = useState(false)
   const [rapide, setRapide] = useState(false)
   const [steps, setSteps] = useState<string[]>([''])
+  const [photo, setPhoto] = useState<string | undefined>(undefined)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    try {
+      const b64 = await resizeToBase64(file)
+      setPhoto(b64)
+    } catch {
+      showToast('Erreur lors du chargement de la photo')
+    }
+  }
 
   const updateStep = (idx: number, value: string) => {
     setSteps((prev) => prev.map((s, i) => (i === idx ? value : s)))
@@ -40,6 +74,7 @@ export default function NewRecipeSheet() {
       fav,
       rapide,
       steps: cleanSteps.length ? cleanSteps : undefined,
+      photo,
     })
     // Reset
     setName('')
@@ -49,6 +84,7 @@ export default function NewRecipeSheet() {
     setFav(false)
     setRapide(false)
     setSteps([''])
+    setPhoto(undefined)
     closeSheet()
     showToast(`${name.trim()} ajoutée !`)
   }
@@ -82,6 +118,42 @@ export default function NewRecipeSheet() {
           value={time}
           onChange={(e) => setTime(e.target.value)}
           className="w-full px-3.5 py-3 bg-card border-[1.5px] border-border rounded-2xl text-sm font-semibold text-text1 outline-none placeholder:text-muted focus:border-terra transition-colors"
+        />
+      </div>
+
+      {/* Photo */}
+      <div className="mb-4">
+        <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-2">Photo</p>
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="w-full h-[100px] rounded-2xl border-2 border-dashed border-border bg-card flex flex-col items-center justify-center gap-1.5 active:scale-[0.98] transition-transform overflow-hidden"
+        >
+          {photo ? (
+            <img src={photo} alt="aperçu" className="w-full h-full object-cover" />
+          ) : (
+            <>
+              <span className="text-2xl">📷</span>
+              <span className="text-[11px] font-bold text-muted">Ajouter une photo</span>
+            </>
+          )}
+        </button>
+        {photo && (
+          <button
+            type="button"
+            onClick={() => setPhoto(undefined)}
+            className="mt-1.5 text-[11px] font-bold text-muted/70 underline"
+          >
+            Supprimer la photo
+          </button>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handlePhotoChange}
         />
       </div>
 
