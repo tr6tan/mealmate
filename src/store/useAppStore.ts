@@ -70,6 +70,7 @@ interface AppState {
   toggleShoppingItem: (id: string) => void
   removeShoppingItem: (id: string) => void
   clearCheckedItems: () => void
+  clearAllItems: () => void
 
   // Actions — Settings
   updateSettings: (patch: Partial<AppSettings>) => void
@@ -204,6 +205,8 @@ export const useAppStore = create<AppState>()(
 
       clearCheckedItems: () =>
         set((s) => ({ shoppingItems: s.shoppingItems.filter((i) => !i.checked) })),
+
+      clearAllItems: () => set({ shoppingItems: [] }),
 
       // ── Settings ──
       updateSettings: (patch) =>
