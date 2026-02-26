@@ -1,41 +1,90 @@
+import { cn } from '@/lib/utils'
 import type { Recipe } from '@/types'
-import { PERIOD_LABEL } from '@/lib/utils'
+
+const PERIOD_COLOR: Record<string, string> = {
+  pdej: 'text-morning bg-[#FFF8EE]',
+  midi: 'text-terra bg-terra-light',
+  soir: 'text-evening bg-[#F4F0FA]',
+}
+const PERIOD_LABEL: Record<string, string> = { pdej: 'Petit-dej', midi: 'Midi', soir: 'Soir' }
 
 interface Props {
   recipe: Recipe
+  view: 'grid' | 'list'
   onClick: () => void
 }
 
-export default function RecipeCard({ recipe, onClick }: Props) {
+export default function RecipeCard({ recipe, view, onClick }: Props) {
+  if (view === 'list') {
+    return (
+      <button
+        onClick={onClick}
+        className="w-full bg-card rounded-2xl border-[1.5px] border-border flex items-center gap-3 px-3 py-2.5 text-left active:scale-[0.98] transition-transform"
+      >
+        {/* Thumbnail */}
+        <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-gradient-to-br from-terra-light to-sep flex items-center justify-center text-2xl">
+          {recipe.photo
+            ? <img src={recipe.photo} alt={recipe.name} className="w-full h-full object-cover" loading="lazy" />
+            : <span>{recipe.emoji}</span>
+          }
+        </div>
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <span className={cn('text-[9px] font-extrabold tracking-[0.07em] uppercase px-1.5 py-0.5 rounded-md', PERIOD_COLOR[recipe.period])}>
+              {PERIOD_LABEL[recipe.period]}
+            </span>
+            {recipe.rapide && <span className="text-[10px]">&#x26A1;</span>}
+          </div>
+          <p className="text-[13px] font-extrabold text-text1 truncate">{recipe.name}</p>
+          <p className="text-[11px] text-muted font-semibold">{recipe.time}</p>
+        </div>
+        {/* Fav */}
+        {recipe.fav && <span className="text-[#E91E63] text-base flex-shrink-0">♥</span>}
+      </button>
+    )
+  }
+
   return (
     <button
       onClick={onClick}
-      className="bg-card rounded-xl shadow-card border-[1.5px] border-border overflow-hidden active:scale-[0.96] transition-transform text-left"
+      className="bg-card rounded-2xl border-[1.5px] border-border overflow-hidden active:scale-[0.96] transition-transform text-left flex flex-col"
     >
-      {/* Photo ou placeholder */}
-      {recipe.photo ? (
-        <img
-          src={recipe.photo}
-          alt={recipe.name}
-          loading="lazy"
-          className="w-full h-[90px] object-cover block bg-sep"
-          onError={(e) => (e.currentTarget.style.display = 'none')}
-        />
-      ) : (
-        <div className="w-full h-[90px] bg-gradient-to-br from-terra-light to-sep flex items-center justify-center text-3xl">
-          {recipe.emoji}
+      {/* Visuel */}
+      <div className="relative w-full h-[110px] bg-gradient-to-br from-terra-light to-sep flex-shrink-0">
+        {recipe.photo ? (
+          <img
+            src={recipe.photo}
+            alt={recipe.name}
+            loading="lazy"
+            className="w-full h-full object-cover"
+            onError={(e) => (e.currentTarget.style.display = 'none')}
+          />
+        ) : (
+          <span className="absolute inset-0 flex items-center justify-center text-4xl">{recipe.emoji}</span>
+        )}
+        {/* Badges overlay */}
+        <div className="absolute top-1.5 left-1.5 flex gap-1">
+          {recipe.fav && (
+            <span className="w-5 h-5 rounded-full bg-white/90 flex items-center justify-center text-[11px] shadow-sm">♥</span>
+          )}
+          {recipe.rapide && (
+            <span className="w-5 h-5 rounded-full bg-white/90 flex items-center justify-center text-[11px] shadow-sm">&#x26A1;</span>
+          )}
         </div>
-      )}
-
-      <div className="p-2.5 pb-3">
-        <p className="text-[9px] font-extrabold tracking-[0.07em] uppercase text-muted mb-1">
+        {/* Period badge */}
+        <span className={cn(
+          'absolute bottom-1.5 right-1.5 text-[9px] font-extrabold tracking-wide uppercase px-1.5 py-0.5 rounded-md bg-white/90',
+          PERIOD_COLOR[recipe.period],
+        )}>
           {PERIOD_LABEL[recipe.period]}
-        </p>
-        <p className="text-xs font-extrabold text-text1 leading-snug mb-1.5">{recipe.name}</p>
-        <div className="flex items-center justify-between">
-          <span className="text-[11px] text-muted font-semibold">{recipe.time}</span>
-          {recipe.fav && <span className="text-[13px] text-[#E91E63]">♥</span>}
-        </div>
+        </span>
+      </div>
+
+      {/* Infos */}
+      <div className="p-2.5 flex-1 flex flex-col">
+        <p className="text-xs font-extrabold text-text1 leading-snug mb-auto">{recipe.name}</p>
+        <p className="text-[11px] text-muted font-semibold mt-1.5">{recipe.time}</p>
       </div>
     </button>
   )
