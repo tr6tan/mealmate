@@ -36,8 +36,8 @@ const KEYWORDS: Record<ShoppingCategory, string[]> = {
     'thon','cabillaud','crevette','bar','dorade','sardine','maquereau','truite',
     'moule','coquille','calmar','jambon','lardon','saucisse','saucisson',
     'merguez','chipolata','steak','filet','cote','escalope','gigot','boudin',
-    'pate','rillette','aiguillette','viande','poisson','charcuterie','bacon',
-    'chorizo','andouille','foie','roti',
+    'rillette','terrine','mousse','aiguillette','viande','poisson','charcuterie',
+    'bacon','chorizo','andouille','foie','roti','pate de campagne','pate de foie',
   ],
   cremerie: [
     'lait','yaourt','fromage','beurre','creme','oeuf','mozzarella','camembert',
@@ -46,7 +46,8 @@ const KEYWORDS: Record<ShoppingCategory, string[]> = {
     'creme fraiche','dessert lacte','creme dessert',
   ],
   epicerie: [
-    'farine','sucre','sel','pate','riz','huile','vinaigre','sauce','ketchup',
+    'farine','sucre','sel','pate','pasta','spaghetti','penne','tagliatelle',
+    'fusilli','rigatoni','macaroni','riz','huile','vinaigre','sauce','ketchup',
     'mayonnaise','moutarde','cornichon','conserve','cafe','the','chocolat',
     'confiture','miel','sirop','cereale','muesli','granola','pain','biscuit',
     'gateau','chips','crackers','eau','jus','soda','biere','vin','champagne',
