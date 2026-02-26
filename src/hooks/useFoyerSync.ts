@@ -5,14 +5,15 @@ import { getFoyerId } from '@/lib/foyer'
 import { useAppStore } from '@/store/useAppStore'
 import type { FoyerData } from '@/types'
 
-// Timeout pour le debounce des écritures
+// 'foyers_dev' sur la branche dev, 'foyers' en prod
+const COLLECTION = import.meta.env.VITE_APP_ENV === 'dev' ? 'foyers_dev' : 'foyers'
 let _writeTimeout: ReturnType<typeof setTimeout> | null = null
 
 function scheduleWrite(foyerId: string, data: FoyerData, onError: () => void) {
   if (_writeTimeout) clearTimeout(_writeTimeout)
   _writeTimeout = setTimeout(async () => {
     try {
-      await setDoc(doc(db, 'foyers', foyerId), data)
+      await setDoc(doc(db, COLLECTION, foyerId), data)
     } catch (e) {
       console.error('[MealMate] Erreur Firestore write:', e)
       onError()
@@ -27,7 +28,7 @@ export function useFoyerSync() {
   const isRemoteUpdate = useRef(false)
 
   useEffect(() => {
-    const ref = doc(db, 'foyers', foyerId)
+    const ref = doc(db, COLLECTION, foyerId)
 
     // ── Firestore → Store ────────────────────────────────────────────────────
     const unsubFirestore = onSnapshot(ref, (snap) => {
