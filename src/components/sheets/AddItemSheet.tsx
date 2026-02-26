@@ -13,72 +13,129 @@ const CATEGORIES: { id: ShoppingCategory; icon: string }[] = [
   { id: 'maison',   icon: '🧴' },
 ]
 
-// ─── Dictionnaire de reconnaissance automatique ───────────────────────────────
+// ─── Moteur de reconnaissance ─────────────────────────────────────────────────
+
+/**
+ * Dictionnaire de mots-clés par catégorie.
+ * Le stemming + score gèrent pluriels, accents et fautes de frappe —
+ * pas besoin de lister toutes les variantes.
+ */
 const KEYWORDS: Record<ShoppingCategory, string[]> = {
   legumes: [
     'carotte','tomate','salade','courgette','brocoli','champignon','poivron',
-    'oignon','ail','pomme de terre','concombre','haricot','épinard','epinard',
-    'radis','fenouil','artichaut','asperge','patate','poireau','navet','betterave',
-    'chou','endive','laitue','maïs','mais','céleri','celeri','persil','basilic',
-    'coriandre','menthe','thym','romarin','avocat','pomme','poire','banane',
-    'orange','citron','fraise','framboise','raisin','cerise','mangue','ananas',
-    'melon','pastèque','pasteque','peche','pêche','abricot','kiwi','figue','prune',
-    'myrtille','grenade','noix','noisette','amande','pistache','légume','legume',
-    'fruit','herbe','saison',
+    'oignon','ail','pomme de terre','concombre','haricot','epinard','radis',
+    'fenouil','artichaut','asperge','patate','poireau','navet','betterave',
+    'chou','endive','laitue','mais','celeri','persil','basilic','coriandre',
+    'menthe','thym','romarin','avocat','pomme','poire','banane','orange',
+    'citron','fraise','framboise','raisin','cerise','mangue','ananas','melon',
+    'pasteque','peche','abricot','kiwi','figue','prune','myrtille','grenade',
+    'noix','noisette','amande','pistache','legume','fruit','herbe',
   ],
   viandes: [
-    'poulet','bœuf','boeuf','porc','agneau','dinde','canard','lapin','veau',
-    'saumon','thon','cabillaud','crevette','bar','dorade','sardine','maquereau',
-    'truite','moule','coquille','saint-jacques','calamars','jambon','lardons',
-    'lardon','saucisse','saucisson','merguez','chipolata','steak','filet','côte',
-    'cote','escalope','gigot','côtelette','cotelette','boudin','pâté','pate',
-    'rillette','blanc de poulet','aiguillette','viande','poisson','fruits de mer',
-    'charcuterie','bacon','chorizo',
+    'poulet','boeuf','porc','agneau','dinde','canard','lapin','veau','saumon',
+    'thon','cabillaud','crevette','bar','dorade','sardine','maquereau','truite',
+    'moule','coquille','calmar','jambon','lardon','saucisse','saucisson',
+    'merguez','chipolata','steak','filet','cote','escalope','gigot','boudin',
+    'pate','rillette','aiguillette','viande','poisson','charcuterie','bacon',
+    'chorizo','andouille','foie','roti',
   ],
   cremerie: [
-    'lait','yaourt','yogurt','fromage','beurre','crème','creme','oeuf','œuf','oeufs',
-    'mozzarella','camembert','brie','comté','comte','gruyère','gruyere','parmesan',
-    'ricotta','feta','gouda','edam','emmental','roquefort','coulommiers',
-    'fromage blanc','cottage','kéfir','kefir','crème fraîche','creme fraiche',
-    'mascarpone','crème épaisse','lait ribot','soja','avoine','amande','végétal',
-    'vegetal','dessert',
+    'lait','yaourt','fromage','beurre','creme','oeuf','mozzarella','camembert',
+    'brie','comte','gruyere','parmesan','ricotta','feta','gouda','edam',
+    'emmental','roquefort','coulommier','cottage','kefir','mascarpone',
+    'creme fraiche','dessert lacte','creme dessert',
   ],
   epicerie: [
-    'farine','sucre','sel','pâtes','pasta','riz','huile','vinaigre','sauce','ketchup',
-    'mayonnaise','moutarde','cornichon','conserve','boîte','boite','café','cafe',
-    'thé','the','chocolat','confiture','miel','sirop','céréales','cereales',
-    'müsli','muesli','granola','pain','biscuit','gâteau','gateau','chips','crackers',
-    'eau','jus','soda','bière','biere','vin','champagne','bouillon','cube',
-    'levure','maïzena','maizena','amidon','lentille','pois','pois chiche',
-    'haricot sec','flageolet','quinoa','boulgour','couscous','semoule','pizza',
-    'surgelé','surgele','épice','epice','curry','cumin','paprika','cannelle',
-    'vanille','poivre','noix de muscade','origan','huile d\'olive','huile de tournesol',
-    'vinaigre balsamique','sauce tomate','coulis','tomate pelée','tomate pelee',
-    'soupe','bouillon','compote','jus d\'orange','limonade','cacao','nutella',
+    'farine','sucre','sel','pate','riz','huile','vinaigre','sauce','ketchup',
+    'mayonnaise','moutarde','cornichon','conserve','cafe','the','chocolat',
+    'confiture','miel','sirop','cereale','muesli','granola','pain','biscuit',
+    'gateau','chips','crackers','eau','jus','soda','biere','vin','champagne',
+    'bouillon','cube','levure','maizena','lentille','pois','quinoa','boulgour',
+    'couscous','semoule','pizza','surgele','epice','curry','cumin','paprika',
+    'cannelle','vanille','poivre','muscade','origan','coulis','compote','cacao',
+    'fecule','amidon','flag','soja','tofu',
   ],
   maison: [
-    'savon','shampooing','shampoing','gel douche','gel','lessive','adoucissant',
-    'éponge','eponge','papier','essuie-tout','sopalin','sac','sac poubelle',
-    'nettoyant','liquide vaisselle','produit','désodorisant','deodorant','déodorant',
-    'dentifrice','brosse','rasoir','coton','serviette','mouchoir','kleenex',
-    'papier toilette','pq','protège-slip','tampon','soin','crème hydratante',
-    'lotion','démaquillant','demaquillant','mascara','rouge à lèvres','parfum',
-    'pansement','doliprane','ibuprofène','ibuprofen','paracétamol','paracetamol',
-    'vitamine','aspirine','lingette','aluminium','film étirable','film alimentaire',
-    'bougie','allumette','pile','ampoule','éco-responsable','recharge',
+    'savon','shampoing','gel douche','lessive','adoucissant','eponge','sopalin',
+    'sac poubelle','nettoyant','liquide vaisselle','deodorant','dentifrice',
+    'brosse','rasoir','coton','mouchoir','papier toilette','lotion','demaquillant',
+    'mascara','parfum','pansement','doliprane','ibuprofene','paracetamol',
+    'vitamine','aspirine','lingette','aluminium','film alimentaire','bougie',
+    'pile','ampoule','essuie',
   ],
 }
 
+
+/** Retire les accents et met en minuscules */
+function normalize(s: string): string {
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
+}
+
+/** Stemming léger français : retire pluriels / suffixes courants */
+function stem(w: string): string {
+  return w
+    .replace(/eaux$/, 'eau').replace(/ieux$/, 'ieu').replace(/aux$/, 'al')
+    .replace(/ettes?$/, 'et').replace(/ettes?$/, 'ette')
+    .replace(/ons$/, 'on').replace(/ées?$/, 'ee').replace(/ies?$/, 'ie')
+    .replace(/es$/, 'e').replace(/s$/, '')
+}
+
+/** Distance de Levenshtein (pour tolérer les fautes de frappe) */
+function lev(a: string, b: string): number {
+  if (Math.abs(a.length - b.length) > 3) return 99
+  const dp = Array.from({ length: a.length + 1 }, (_, i) =>
+    Array.from({ length: b.length + 1 }, (_, j) => i === 0 ? j : j === 0 ? i : 0)
+  )
+  for (let i = 1; i <= a.length; i++)
+    for (let j = 1; j <= b.length; j++)
+      dp[i][j] = a[i - 1] === b[j - 1]
+        ? dp[i - 1][j - 1]
+        : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
+  return dp[a.length][b.length]
+}
+
+/** Score d'un mot input contre un mot du dictionnaire */
+function scoreWord(input: string, keyword: string): number {
+  const ni = normalize(input), nk = normalize(keyword)
+  const si = stem(ni),        sk = stem(nk)
+  if (ni === nk)              return 12   // exact
+  if (si === sk)              return 10   // même racine
+  if (nk.startsWith(ni) && ni.length >= 3) return 8  // préfixe
+  if (nk.includes(ni) && ni.length >= 4)  return 6  // sous-chaîne
+  if (ni.includes(nk) && nk.length >= 4)  return 5  // inverse
+  const d = lev(si, sk)
+  if (d === 1 && si.length >= 4) return 4  // 1 faute
+  if (d === 2 && si.length >= 6) return 2  // 2 fautes
+  return 0
+}
+
+/** Retourne la catégorie la plus probable ou null si confiance insuffisante */
 function guessCategory(input: string): ShoppingCategory | null {
-  const normalized = input.toLowerCase().trim()
-  if (!normalized) return null
+  const tokens = normalize(input).split(/[\s,]+/).filter(t => t.length >= 2)
+  if (tokens.length === 0) return null
+
+  const scores: Record<ShoppingCategory, number> = {
+    legumes: 0, viandes: 0, cremerie: 0, epicerie: 0, maison: 0,
+  }
+
   for (const [cat, words] of Object.entries(KEYWORDS) as [ShoppingCategory, string[]][]) {
-    if (words.some(w => normalized.includes(w) || w.includes(normalized) && normalized.length >= 3)) {
-      return cat
+    for (const token of tokens) {
+      let best = 0
+      for (const kw of words) {
+        const s = scoreWord(token, kw)
+        if (s > best) best = s
+        if (best >= 12) break   // exact → pas la peine de continuer
+      }
+      scores[cat] += best
     }
   }
-  return null
+
+  const [topCat, topScore] = (Object.entries(scores) as [ShoppingCategory, number][])
+    .reduce((a, b) => b[1] > a[1] ? b : a)
+
+  return topScore >= 4 ? topCat : null
 }
+
 
 export default function AddItemSheet() {
   const addShoppingItem = useAppStore((s) => s.addShoppingItem)
