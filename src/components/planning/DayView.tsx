@@ -25,12 +25,23 @@ interface Props {
 
 export default function DayView({ dayIdx }: Props) {
   const openSheet = useAppStore((s) => s.openSheet)
+  const weekOffset = useAppStore((s) => s.weekOffset)
   const plan = useAppStore((s) => selectCurrentWeekPlan(s)[dayIdx])
 
   if (!plan) return null
 
+  const isEmpty = !plan.pdej && !plan.midi && !plan.soir &&
+    !plan.midi_entree && !plan.midi_dessert && !plan.soir_entree && !plan.soir_dessert
+
   return (
     <div className="flex flex-col gap-4">
+      {isEmpty && weekOffset !== 0 && (
+        <div className="flex flex-col items-center gap-2 py-8 text-center">
+          <span className="text-4xl">🗓️</span>
+          <p className="text-sm font-bold text-text1">Rien de planifié</p>
+          <p className="text-xs text-muted">Appuie sur un slot pour ajouter un repas</p>
+        </div>
+      )}
       {PERIODS.map(({ period, label, slotKey, entreeKey, dessertKey, dotClass }) => {
         const mainMeal = slotKey === 'pdej' ? plan.pdej : slotKey === 'midi' ? plan.midi : plan.soir
         const entreeMeal = entreeKey === 'midi_entree' ? plan.midi_entree : entreeKey === 'soir_entree' ? plan.soir_entree : null

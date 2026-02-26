@@ -66,8 +66,13 @@ export default function PlanningPage() {
   const onTouchEnd = (e: React.TouchEvent) => {
     if (!isHorizontal.current) return
     const dx = e.changedTouches[0].clientX - touchStartX.current
-    if (dx < -50 && selectedIdx < 6) goToDay(selectedIdx + 1)
-    else if (dx > 50 && selectedIdx > 0) goToDay(selectedIdx - 1)
+    if (dx < -50) {
+      if (selectedIdx < 6) goToDay(selectedIdx + 1)
+      else { setWeekOffset(weekOffset + 1); setSelectedIdx(0); setDisplayIdx(0) }
+    } else if (dx > 50) {
+      if (selectedIdx > 0) goToDay(selectedIdx - 1)
+      else { setWeekOffset(weekOffset - 1); setSelectedIdx(6); setDisplayIdx(6) }
+    }
   }
 
   const weekLabel = useMemo(() => {
@@ -144,6 +149,12 @@ export default function PlanningPage() {
       <div className="flex gap-2.5 px-5 pb-4 overflow-x-auto no-scrollbar">
         {Array.from({ length: 7 }).map((_, i) => {
           const d = getDayFromMonday(monday, i)
+          const day = weekPlan[i]
+          const hasMeal = day != null && (
+            day.pdej !== null || day.midi !== null || day.soir !== null ||
+            day.midi_entree !== null || day.midi_dessert !== null ||
+            day.soir_entree !== null || day.soir_dessert !== null
+          )
           return (
             <DayChip
               key={i}
@@ -151,6 +162,7 @@ export default function PlanningPage() {
               dayNum={d.getDate()}
               isToday={i === todayIdx}
               isSelected={i === selectedIdx}
+              hasMeal={hasMeal}
               onClick={() => goToDay(i)}
             />
           )

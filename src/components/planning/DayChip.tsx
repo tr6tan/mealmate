@@ -5,10 +5,11 @@ interface Props {
   dayNum: number
   isToday: boolean
   isSelected: boolean
+  hasMeal: boolean
   onClick: () => void
 }
 
-export default function DayChip({ dayLabel, dayNum, isToday, isSelected, onClick }: Props) {
+export default function DayChip({ dayLabel, dayNum, isToday, isSelected, hasMeal, onClick }: Props) {
   return (
     <button
       onClick={onClick}
@@ -39,8 +40,12 @@ export default function DayChip({ dayLabel, dayNum, isToday, isSelected, onClick
       >
         {dayNum}
       </span>
-      {/* dot sous aujourd'hui */}
-      {isToday && <span className="w-1 h-1 rounded-full bg-terra mt-0.5" />}
+      {/* dot : today = terra, repas planifié = sage, sinon transparent */}
+      <span className={cn(
+        'w-1.5 h-1.5 rounded-full mt-0.5 transition-colors',
+        isToday ? 'bg-terra' : hasMeal ? 'bg-sage' : 'bg-transparent',
+      )} />
     </button>
   )
 }
+
