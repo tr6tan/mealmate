@@ -34,6 +34,7 @@ export default function SettingsPage() {
   const updateSettings = useAppStore((s) => s.updateSettings)
   const clearWeek = useAppStore((s) => s.clearWeek)
   const resetRecipes = useAppStore((s) => s.resetRecipes)
+  const syncStatus = useAppStore((s) => s.syncStatus)
 
   const handlePersonnes = () => {
     const val = window.prompt('Nombre de personnes :', String(settings.personnes))
@@ -98,7 +99,17 @@ export default function SettingsPage() {
 
       {/* Section Inviter */}
       <div className="px-5 mb-5">
-        <p className="text-xs font-extrabold tracking-[0.08em] uppercase text-muted mb-2.5 pl-1">Foyer partagé</p>
+        <div className="flex items-center gap-2 mb-2.5 pl-1">
+          <p className="text-xs font-extrabold tracking-[0.08em] uppercase text-muted">Foyer partagé</p>
+          <span
+            title={syncStatus === 'synced' ? 'Syncé' : syncStatus === 'error' ? 'Erreur de sync' : 'Connexion...'}
+            className={`w-2 h-2 rounded-full flex-shrink-0 ${
+              syncStatus === 'synced' ? 'bg-green-500' :
+              syncStatus === 'error'  ? 'bg-red-500' :
+              'bg-yellow-400 animate-pulse'
+            }`}
+          />
+        </div>
         <InviteCard />
       </div>
 

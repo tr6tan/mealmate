@@ -32,6 +32,7 @@ interface AppState {
   activeTab: ActiveTab
   currentDayIdx: number
   sheetState: SheetState
+  syncStatus: 'connecting' | 'synced' | 'error'
 
   // Data
   weekPlan: WeekPlan
@@ -44,6 +45,7 @@ interface AppState {
   setCurrentDayIdx: (idx: number) => void
   openSheet: (state: SheetState) => void
   closeSheet: () => void
+  setSyncStatus: (status: 'connecting' | 'synced' | 'error') => void
 
   // Actions — Planning
   setMeal: (dayIdx: number, slotKey: SlotKey, meal: Meal | null) => void
@@ -77,6 +79,7 @@ export const useAppStore = create<AppState>()(
       activeTab: 'planning',
       currentDayIdx: -1,
       sheetState: { sheet: null },
+      syncStatus: 'connecting',
 
       weekPlan: buildInitialWeek(),
       recipes: DEFAULT_RECIPES,
@@ -89,9 +92,9 @@ export const useAppStore = create<AppState>()(
       // ── UI ──
       setActiveTab: (tab) => set({ activeTab: tab }),
       setCurrentDayIdx: (idx) => set({ currentDayIdx: idx }),
-
       openSheet: (state) => set({ sheetState: state }),
       closeSheet: () => set({ sheetState: { sheet: null } }),
+      setSyncStatus: (status) => set({ syncStatus: status }),
 
       // ── Planning ──
       setMeal: (dayIdx, slotKey, meal) =>

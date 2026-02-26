@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import type { Period, Recipe } from '@/types'
@@ -19,11 +19,23 @@ export default function AddMealSheet() {
   const setMeal = useAppStore((s) => s.setMeal)
   const closeSheet = useAppStore((s) => s.closeSheet)
 
-  const [activeTab, setActiveTab] = useState<MealTab>(sheetState.addMealPeriod ?? 'midi')
+  const isOpen = sheetState.sheet === 'add-meal'
+  const [activeTab, setActiveTab] = useState<MealTab>('midi')
   const [freeName, setFreeName] = useState('')
   const [freeEmoji, setFreeEmoji] = useState('🍽️')
   const [showFreeForm, setShowFreeForm] = useState(false)
   const [search, setSearch] = useState('')
+
+  // Reset à chaque ouverture du sheet
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(sheetState.addMealPeriod ?? 'midi')
+      setSearch('')
+      setShowFreeForm(false)
+      setFreeName('')
+      setFreeEmoji('🍽️')
+    }
+  }, [isOpen, sheetState.addMealPeriod])
 
   const context = sheetState.mealContext
 
