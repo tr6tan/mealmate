@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef, useCallback } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import {
   DAY_SHORT, DAY_LONG, MONTHS,
@@ -7,7 +7,6 @@ import {
 } from '@/lib/utils'
 import DayChip from './DayChip'
 import DayView from './DayView'
-import type { Period } from '@/types'
 
 export default function PlanningPage() {
   const currentDayIdx = useAppStore((s) => s.currentDayIdx)
@@ -17,15 +16,49 @@ export default function PlanningPage() {
   const monday = useMemo(() => getWeekMonday(), [])
   const todayIdx = useMemo(() => getTodayIndex(monday), [monday])
 
-  // Si currentDayIdx pas encore initialisé
   const [selectedIdx, setSelectedIdx] = useState(currentDayIdx >= 0 ? currentDayIdx : 0)
+  // 'left' | 'right' | null
+  const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null)
+  const [displayIdx, setDisplayIdx] = useState(selectedIdx)
+
   useEffect(() => {
     if (currentDayIdx >= 0) setSelectedIdx(currentDayIdx)
   }, [currentDayIdx])
 
-  const handleSelectDay = (idx: number) => {
+  const goToDay = useCallback((idx: number) => {
+    if (idx === selectedIdx) return
+    const dir = idx > selectedIdx ? 'left' : 'right'
+    setSlideDir(dir)
     setSelectedIdx(idx)
     setCurrentDayIdx(idx)
+    setTimeout(() => {
+      setDisplayIdx(idx)
+      setSlideDir(null)
+    }, 220)
+  }, [selectedIdx, setCurrentDayIdx])
+
+  // ── Swipe handling ──────────────────────────────────────────────────────────
+  const touchStartX = useRef(0)
+  const touchStartY = useRef(0)
+  const isHorizontal = useRef(false)
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
+    isHorizontal.current = false
+  }
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    const dx = Math.abs(e.touches[0].clientX - touchStartX.current)
+    const dy = Math.abs(e.touches[0].clientY - touchStartY.current)
+    if (dx > dy && dx > 8) isHorizontal.current = true
+  }
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (!isHorizontal.current) return
+    const dx = e.changedTouches[0].clientX - touchStartX.current
+    if (dx < -50 && selectedIdx < 6) goToDay(selectedIdx + 1)
+    else if (dx > 50 && selectedIdx > 0) goToDay(selectedIdx - 1)
   }
 
   const weekLabel = useMemo(() => {
@@ -70,18 +103,31 @@ export default function PlanningPage() {
               dayNum={d.getDate()}
               isToday={i === todayIdx}
               isSelected={i === selectedIdx}
-              onClick={() => handleSelectDay(i)}
+              onClick={() => goToDay(i)}
             />
           )
         })}
       </div>
 
-      {/* Day view */}
-      <div className="px-5 pb-6">
+      {/* Day view avec swipe */}
+      <div
+        className="px-5 pb-6 overflow-hidden"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
         <div className="text-[17px] font-extrabold text-text1 mb-3 pl-2.5 border-l-[3px] border-terra">
           {selectedLabel}
         </div>
-        <DayView dayIdx={selectedIdx} />
+        <div
+          className={cn(
+            'transition-all duration-200 ease-out',
+            slideDir === 'left'  && 'animate-slide-left',
+            slideDir === 'right' && 'animate-slide-right',
+          )}
+        >
+          <DayView dayIdx={displayIdx} />
+        </div>
       </div>
     </div>
   )
