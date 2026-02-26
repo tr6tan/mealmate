@@ -12,9 +12,10 @@ interface Props {
   recipe: Recipe
   view: 'grid' | 'list'
   onClick: () => void
+  planCount?: number
 }
 
-export default function RecipeCard({ recipe, view, onClick }: Props) {
+export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Props) {
   if (view === 'list') {
     return (
       <button
@@ -37,7 +38,14 @@ export default function RecipeCard({ recipe, view, onClick }: Props) {
             {recipe.rapide && <span className="text-[10px]">&#x26A1;</span>}
           </div>
           <p className="text-[13px] font-extrabold text-text1 truncate">{recipe.name}</p>
-          <p className="text-[11px] text-muted font-semibold">{recipe.time}</p>
+          <div className="flex items-center gap-2 mt-0.5">
+            <p className="text-[11px] text-muted font-semibold">{recipe.time}</p>
+            {planCount > 0 && (
+              <span className="text-[10px] font-bold text-terra bg-terra-light px-1.5 py-0.5 rounded-md">
+                📅 {planCount}×
+              </span>
+            )}
+          </div>
         </div>
         {/* Fav */}
         {recipe.fav && <span className="text-[#E91E63] text-base flex-shrink-0">♥</span>}
@@ -84,7 +92,12 @@ export default function RecipeCard({ recipe, view, onClick }: Props) {
       {/* Infos */}
       <div className="p-2.5 flex-1 flex flex-col">
         <p className="text-xs font-extrabold text-text1 leading-snug mb-auto">{recipe.name}</p>
-        <p className="text-[11px] text-muted font-semibold mt-1.5">{recipe.time}</p>
+        <div className="flex items-center justify-between mt-1.5">
+          <p className="text-[11px] text-muted font-semibold">{recipe.time}</p>
+          {planCount > 0 && (
+            <span className="text-[9px] font-bold text-terra">📅{planCount}×</span>
+          )}
+        </div>
       </div>
     </button>
   )

@@ -1,6 +1,6 @@
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
-import { PERIOD_LONG } from '@/lib/utils'
+import { PERIOD_LONG, haptic } from '@/lib/utils'
 import type { Period, SlotKey } from '@/types'
 import { showToast } from '@/components/ui/Toast'
 
@@ -25,6 +25,7 @@ export default function MealActionsSheet() {
   const recipe = recipes.find((r) => r.name === meal.name)
 
   const handleRemove = () => {
+    haptic([10, 30, 10])
     const snapshot = meal
     setMeal(dayIdx, slotKey, null)
     closeSheet()

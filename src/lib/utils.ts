@@ -74,3 +74,8 @@ export const CAT_LABELS: Record<string, string> = {
   epicerie: 'Épicerie',
   maison: 'Maison & Hygiène',
 }
+
+/** Vibration haptic légère (iOS silent, Android light) */
+export function haptic(pattern: number | number[] = 8) {
+  try { navigator.vibrate?.(pattern) } catch { /* silencé si non supporté */ }
+}

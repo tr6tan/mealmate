@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import type { Period, Recipe } from '@/types'
-import { cn, PERIOD_LABEL } from '@/lib/utils'
+import { cn, PERIOD_LABEL, haptic } from '@/lib/utils'
 import { showToast } from '@/components/ui/Toast'
 
 type MealTab = Period
@@ -41,6 +41,7 @@ export default function AddMealSheet() {
 
   const handleSelect = (recipe: Recipe) => {
     if (!context) return
+    haptic(10)
     setMeal(context.dayIdx, context.slotKey, {
       name: recipe.name,
       emoji: recipe.emoji,
@@ -54,6 +55,7 @@ export default function AddMealSheet() {
 
   const handleFree = () => {
     if (!context || !freeName.trim()) return
+    haptic(10)
     setMeal(context.dayIdx, context.slotKey, {
       name: freeName.trim(),
       emoji: freeEmoji,

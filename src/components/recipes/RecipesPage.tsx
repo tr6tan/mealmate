@@ -16,13 +16,32 @@ const FILTERS: { key: FilterKey; label: string }[] = [
 ]
 
 export default function RecipesPage() {
-  const recipes = useAppStore((s) => s.recipes)
+  const recipes   = useAppStore((s) => s.recipes)
+  const weekPlans = useAppStore((s) => s.weekPlans)
   const openSheet = useAppStore((s) => s.openSheet)
 
   const [search, setSearch]     = useState('')
   const [filter, setFilter]     = useState<FilterKey>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [favFirst, setFavFirst] = useState(false)
+
+  // Compte de planification par recipe.id (toutes semaines confondues)
+  const planCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const weekPlan of Object.values(weekPlans)) {
+      for (let day = 0; day < 7; day++) {
+        const plan = weekPlan[day]
+        if (!plan) continue
+        const slots = [plan.pdej, plan.midi, plan.midi_entree, plan.midi_dessert, plan.soir, plan.soir_entree, plan.soir_dessert]
+        slots.forEach((meal) => {
+          if (!meal) return
+          const r = recipes.find((rc) => rc.name === meal.name)
+          if (r) counts[r.id] = (counts[r.id] ?? 0) + 1
+        })
+      }
+    }
+    return counts
+  }, [weekPlans, recipes])
 
   const filtered = useMemo(() => {
     let list = recipes.filter((r) => {
@@ -165,6 +184,7 @@ export default function RecipesPage() {
               key={recipe.id}
               recipe={recipe}
               view="grid"
+              planCount={planCounts[recipe.id] ?? 0}
               onClick={() => openSheet({ sheet: 'recipe-detail', recipeContext: recipe })}
             />
           ))}
@@ -187,6 +207,7 @@ export default function RecipesPage() {
               key={recipe.id}
               recipe={recipe}
               view="list"
+              planCount={planCounts[recipe.id] ?? 0}
               onClick={() => openSheet({ sheet: 'recipe-detail', recipeContext: recipe })}
             />
           ))}
