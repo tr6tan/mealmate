@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect, useRef, type ReactNode } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import SplashScreen from '@/components/ui/SplashScreen'
 import { useAppStore } from '@/store/useAppStore'
 import { getTodayIndex, getWeekMonday } from '@/lib/utils'
 import { useFoyerSync } from '@/hooks/useFoyerSync'
@@ -19,6 +20,9 @@ const NewRecipeSheet    = lazy(() => import('@/components/sheets/NewRecipeSheet'
 const EditRecipeSheet   = lazy(() => import('@/components/sheets/EditRecipeSheet'))
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true)
+  const hideSplash = useCallback(() => setShowSplash(false), [])
+
   const activeTab = useAppStore((s) => s.activeTab)
   const setCurrentDayIdx = useAppStore((s) => s.setCurrentDayIdx)
   const darkMode = useAppStore((s) => s.settings.darkMode)
@@ -43,7 +47,9 @@ export default function App() {
   }, [setCurrentDayIdx])
 
   return (
-    <AppShell
+    <>
+      {showSplash && <SplashScreen onDone={hideSplash} />}
+      <AppShell
       nav={
         <Suspense fallback={null}>
           <TabPanel active={activeTab === 'planning'}><PlanningPage /></TabPanel>
@@ -67,6 +73,7 @@ export default function App() {
       <Toast />
       <SyncBanner />
     </AppShell>
+    </>
   )
 }
 
