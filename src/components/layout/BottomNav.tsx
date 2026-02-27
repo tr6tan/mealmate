@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+﻿import type { ReactNode } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import type { ActiveTab } from '@/types'
 import { cn } from '@/lib/utils'
@@ -45,7 +45,7 @@ const navItems: NavItem[] = [
   },
   {
     id: 'settings',
-    label: 'R�glages',
+    label: 'Réglages',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="3" />
