@@ -178,7 +178,7 @@ export default function RecipesPage() {
         </div>
       ) : viewMode === 'grid' ? (
         /* Vue grille */
-        <div className="grid grid-cols-2 gap-3 px-5">
+        <div className="grid grid-cols-3 gap-2 px-5">
           {filtered.map((recipe) => (
             <RecipeCard
               key={recipe.id}
@@ -190,13 +190,13 @@ export default function RecipesPage() {
           ))}
           <button
             onClick={() => openSheet({ sheet: 'new-recipe' })}
-            className="bg-terra-light border-2 border-dashed border-terra rounded-2xl flex flex-col items-center justify-center gap-2 min-h-[170px] active:scale-[0.96] transition-transform"
+            className="bg-terra-light border-2 border-dashed border-terra rounded-xl flex flex-col items-center justify-center gap-1 min-h-[110px] active:scale-[0.96] transition-transform"
           >
-            <svg className="w-7 h-7 text-terra" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <svg className="w-5 h-5 text-terra" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <line x1="12" y1="5" x2="12" y2="19"/>
               <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-            <span className="text-[11px] font-extrabold text-terra">Nouvelle recette</span>
+            <span className="text-[10px] font-extrabold text-terra">Nouvelle</span>
           </button>
         </div>
       ) : (

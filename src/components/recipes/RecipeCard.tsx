@@ -56,10 +56,10 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
   return (
     <button
       onClick={onClick}
-      className="bg-card rounded-2xl border-[1.5px] border-border overflow-hidden active:scale-[0.96] transition-transform text-left flex flex-col"
+      className="bg-card rounded-xl border-[1.5px] border-border overflow-hidden active:scale-[0.96] transition-transform text-left flex flex-col"
     >
       {/* Visuel */}
-      <div className="relative w-full h-[110px] bg-gradient-to-br from-terra-light to-sep flex-shrink-0">
+      <div className="relative w-full h-[72px] bg-gradient-to-br from-terra-light to-sep flex-shrink-0">
         {recipe.photo ? (
           <img
             src={recipe.photo}
@@ -69,20 +69,20 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
             onError={(e) => (e.currentTarget.style.display = 'none')}
           />
         ) : (
-          <span className="absolute inset-0 flex items-center justify-center text-4xl">{recipe.emoji}</span>
+          <span className="absolute inset-0 flex items-center justify-center text-3xl">{recipe.emoji}</span>
         )}
         {/* Badges overlay */}
-        <div className="absolute top-1.5 left-1.5 flex gap-1">
+        <div className="absolute top-1 left-1 flex gap-0.5">
           {recipe.fav && (
-            <span className="w-5 h-5 rounded-full bg-white/90 flex items-center justify-center text-[11px] shadow-sm">♥</span>
+            <span className="w-4 h-4 rounded-full bg-white/90 flex items-center justify-center text-[9px] shadow-sm">♥</span>
           )}
           {recipe.rapide && (
-            <span className="w-5 h-5 rounded-full bg-white/90 flex items-center justify-center text-[11px] shadow-sm">&#x26A1;</span>
+            <span className="w-4 h-4 rounded-full bg-white/90 flex items-center justify-center text-[9px] shadow-sm">⚡</span>
           )}
         </div>
         {/* Period badge */}
         <span className={cn(
-          'absolute bottom-1.5 right-1.5 text-[9px] font-extrabold tracking-wide uppercase px-1.5 py-0.5 rounded-md bg-white/90',
+          'absolute bottom-1 right-1 text-[8px] font-extrabold tracking-wide uppercase px-1 py-0.5 rounded bg-white/90',
           PERIOD_COLOR[recipe.period],
         )}>
           {PERIOD_LABEL[recipe.period]}
@@ -90,10 +90,10 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
       </div>
 
       {/* Infos */}
-      <div className="p-2.5 flex-1 flex flex-col">
-        <p className="text-xs font-extrabold text-text1 leading-snug mb-auto">{recipe.name}</p>
-        <div className="flex items-center justify-between mt-1.5">
-          <p className="text-[11px] text-muted font-semibold">{recipe.time}</p>
+      <div className="px-2 pt-1.5 pb-2 flex-1 flex flex-col">
+        <p className="text-[11px] font-extrabold text-text1 leading-snug mb-auto line-clamp-2">{recipe.name}</p>
+        <div className="flex items-center justify-between mt-1">
+          <p className="text-[10px] text-muted font-semibold">{recipe.time}</p>
           {planCount > 0 && (
             <span className="text-[9px] font-bold text-terra">📅{planCount}×</span>
           )}
