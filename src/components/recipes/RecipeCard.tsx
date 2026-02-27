@@ -7,6 +7,11 @@ const PERIOD_COLOR: Record<string, string> = {
   soir: 'text-evening bg-[#F4F0FA]',
 }
 const PERIOD_LABEL: Record<string, string> = { pdej: 'Petit-dej', midi: 'Midi', soir: 'Soir' }
+const PERIOD_GRADIENT: Record<string, string> = {
+  pdej: 'from-amber-50 to-orange-100',
+  midi: 'from-terra-light to-[#FFE8DC]',
+  soir: 'from-[#EEF2FF] to-[#E8F0FE]',
+}
 
 interface Props {
   recipe: Recipe
@@ -59,7 +64,7 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
       className="bg-card rounded-xl border-[1.5px] border-border overflow-hidden active:scale-[0.96] transition-transform text-left flex flex-col"
     >
       {/* Visuel */}
-      <div className="relative w-full h-[72px] bg-gradient-to-br from-terra-light to-sep flex-shrink-0">
+      <div className={`relative w-full h-[72px] bg-gradient-to-br ${PERIOD_GRADIENT[recipe.period] ?? 'from-terra-light to-sep'} flex-shrink-0`}>
         {recipe.photo ? (
           <img
             src={recipe.photo}
@@ -69,7 +74,7 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
             onError={(e) => (e.currentTarget.style.display = 'none')}
           />
         ) : (
-          <span className="absolute inset-0 flex items-center justify-center text-3xl">{recipe.emoji}</span>
+          <span className="absolute inset-0 flex items-center justify-center text-4xl">{recipe.emoji}</span>
         )}
         {/* Badges overlay */}
         <div className="absolute top-1 left-1 flex gap-0.5">

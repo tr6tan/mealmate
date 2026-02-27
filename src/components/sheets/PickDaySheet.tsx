@@ -45,7 +45,13 @@ export default function PickDaySheet() {
     return localOffset > 0 ? `Dans ${localOffset} semaines` : `Il y a ${Math.abs(localOffset)} semaines`
   })()
 
+  const moveFrom = sheetState.pickDayContext?.moveFrom
+
   const handleConfirm = () => {
+    // Si déplacement : vider le slot original AVANT de changer weekOffset
+    if (moveFrom) {
+      setMeal(moveFrom.dayIdx, moveFrom.slotKey, null)
+    }
     setWeekOffset(localOffset)
     setMeal(pickedDay, SLOT_MAP[pickedPeriod], {
       name: recipe.name,
@@ -56,13 +62,13 @@ export default function PickDaySheet() {
     setCurrentDayIdx(pickedDay)
     setActiveTab('planning')
     closeSheet()
-    showToast(`${recipe.name} ajouté au planning !`)
+    showToast(moveFrom ? `${recipe.name} déplacé !` : `${recipe.name} ajouté au planning !`)
   }
 
   return (
     <BottomSheet name="pick-day">
       <h2 className="text-[17px] font-extrabold text-text1 truncate mb-4">
-        Ajouter au planning : {recipe.name}
+        {moveFrom ? `Déplacer : ${recipe.name}` : `Ajouter au planning : ${recipe.name}`}
       </h2>
 
       {/* Navigation semaine */}
@@ -126,7 +132,7 @@ export default function PickDaySheet() {
         onClick={handleConfirm}
         className="w-full py-3.5 bg-terra text-white rounded-2xl text-sm font-extrabold shadow-terra active:scale-[0.97] transition-transform"
       >
-        Ajouter au planning
+        {moveFrom ? 'Déplacer ici' : 'Ajouter au planning'}
       </button>
     </BottomSheet>
   )

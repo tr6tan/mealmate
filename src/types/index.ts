@@ -89,7 +89,7 @@ export interface SheetState {
   mealContext?: { dayIdx: number; slotKey: SlotKey }
   actionContext?: { dayIdx: number; slotKey: SlotKey; meal: Meal }
   recipeContext?: Recipe
-  pickDayContext?: { recipe: Recipe }
+  pickDayContext?: { recipe: Recipe; moveFrom?: { dayIdx: number; slotKey: SlotKey } }
   addMealPeriod?: Period
 }
 

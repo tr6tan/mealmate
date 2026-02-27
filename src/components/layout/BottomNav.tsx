@@ -56,8 +56,10 @@ const navItems: NavItem[] = [
 ]
 
 export default function BottomNav() {
-  const activeTab = useAppStore((s) => s.activeTab)
+  const activeTab    = useAppStore((s) => s.activeTab)
   const setActiveTab = useAppStore((s) => s.setActiveTab)
+  const shoppingItems = useAppStore((s) => s.shoppingItems)
+  const remaining = shoppingItems.filter((i) => !i.checked).length
 
   return (
     <nav className="nav-ios-safe fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-xl border-t border-sep flex justify-around items-stretch">
@@ -71,11 +73,16 @@ export default function BottomNav() {
           >
             <span
               className={cn(
-                'flex items-center justify-center w-12 h-7 rounded-full [&>svg]:w-5 [&>svg]:h-5 [&>svg]:stroke-current transition-all duration-200',
+                'relative flex items-center justify-center w-12 h-7 rounded-full [&>svg]:w-5 [&>svg]:h-5 [&>svg]:stroke-current transition-all duration-200',
                 active ? 'bg-terra-light text-terra' : 'text-muted bg-transparent',
               )}
             >
               {item.icon}
+              {item.id === 'courses' && remaining > 0 && (
+                <span className="absolute -top-1 right-0.5 min-w-[16px] h-4 bg-terra text-white text-[9px] font-extrabold rounded-full flex items-center justify-center px-1 leading-none">
+                  {remaining}
+                </span>
+              )}
             </span>
             <span
               className={cn(

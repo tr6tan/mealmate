@@ -1,6 +1,17 @@
+import { useState } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import { showToast } from '@/components/ui/Toast'
+
+function scaleQty(qty: string, factor: number): string {
+  if (!qty || factor === 1) return qty
+  const match = qty.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/)
+  if (!match) return qty
+  const num = parseFloat(match[1].replace(',', '.'))
+  const unit = match[2].trim()
+  const scaled = Math.round(num * factor * 10) / 10
+  return unit ? `${scaled} ${unit}` : `${scaled}`
+}
 
 export default function RecipeDetailSheet() {
   const sheetState     = useAppStore((s) => s.sheetState)
@@ -10,6 +21,7 @@ export default function RecipeDetailSheet() {
   const addShoppingItem = useAppStore((s) => s.addShoppingItem)
   const openSheet      = useAppStore((s) => s.openSheet)
   const closeSheet     = useAppStore((s) => s.closeSheet)
+  const [portions, setPortions] = useState(2)
 
   const recipe = sheetState.recipeContext
   if (!recipe) return <BottomSheet name="recipe-detail"><div /></BottomSheet>
@@ -31,8 +43,9 @@ export default function RecipeDetailSheet() {
   }
   const handleAddToCourses = () => {
     if (!recipe.ingredients?.length) return
+    const factor = portions / 2
     recipe.ingredients.forEach((ing) => {
-      addShoppingItem({ name: ing.name, qty: ing.qty, category: ing.category, checked: false })
+      addShoppingItem({ name: ing.name, qty: scaleQty(ing.qty, factor), category: ing.category, checked: false })
     })
     showToast(`${recipe.ingredients.length} ingrédient${recipe.ingredients.length > 1 ? 's' : ''} ajouté${recipe.ingredients.length > 1 ? 's' : ''} aux courses !`)
   }
@@ -116,7 +129,20 @@ export default function RecipeDetailSheet() {
       {/* Ingrédients */}
       {recipe.ingredients && recipe.ingredients.length > 0 && (
         <>
-          <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-2">Ingrédients</p>
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted">Ingrédients</p>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setPortions((p) => Math.max(1, p - 1))}
+                className="w-6 h-6 rounded-full bg-sep text-text2 font-extrabold text-sm flex items-center justify-center active:scale-90 transition-transform"
+              >−</button>
+              <span className="text-[12px] font-extrabold text-text1 min-w-[52px] text-center">{portions} pers.</span>
+              <button
+                onClick={() => setPortions((p) => Math.min(20, p + 1))}
+                className="w-6 h-6 rounded-full bg-sep text-text2 font-extrabold text-sm flex items-center justify-center active:scale-90 transition-transform"
+              >+</button>
+            </div>
+          </div>
           <div className="space-y-1.5 mb-5">
             {recipe.ingredients.map((ing, i) => (
               <div
@@ -124,7 +150,7 @@ export default function RecipeDetailSheet() {
                 className="flex items-center gap-2.5 px-3 py-2.5 rounded-[11px] bg-card border-[1.5px] border-border"
               >
                 <span className="flex-1 text-[13px] font-bold text-text1">{ing.name}</span>
-                <span className="text-[11px] font-bold text-muted bg-sep px-2 py-0.5 rounded-[7px]">{ing.qty}</span>
+                <span className="text-[11px] font-bold text-muted bg-sep px-2 py-0.5 rounded-[7px]">{scaleQty(ing.qty, portions / 2)}</span>
               </div>
             ))}
           </div>

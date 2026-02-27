@@ -49,6 +49,24 @@ export default function MealActionsSheet() {
     if (recipe) openSheet({ sheet: 'recipe-detail', recipeContext: recipe })
   }
 
+  const handleMove = () => {
+    openSheet({
+      sheet: 'pick-day',
+      pickDayContext: {
+        recipe: {
+          id: '',
+          name: meal.name,
+          emoji: meal.emoji,
+          time: meal.time,
+          fav: meal.fav,
+          period,
+          rapide: false,
+        },
+        moveFrom: { dayIdx, slotKey },
+      },
+    })
+  }
+
   return (
     <BottomSheet name="meal-actions">
       {/* En-tête repas */}
@@ -82,6 +100,14 @@ export default function MealActionsSheet() {
             <span className="text-muted">›</span>
           </button>
         )}
+        <button
+          onClick={handleMove}
+          className="w-full flex items-center gap-3.5 px-4 py-3.5 bg-sep rounded-2xl text-sm font-bold text-text1 text-left"
+        >
+          <span className="text-xl">📅</span>
+          <span className="flex-1">Déplacer vers un autre jour</span>
+          <span className="text-muted">›</span>
+        </button>
       </div>
 
       <button

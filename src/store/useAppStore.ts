@@ -171,7 +171,22 @@ export const useAppStore = create<AppState>()(
             })
           })
         }
-        set({ shoppingItems: items })
+        // Déduplication par nom (case-insensitive)
+        const merged = new Map<string, ShoppingItem>()
+        for (const item of items) {
+          const key = item.name.toLowerCase().trim()
+          if (merged.has(key)) {
+            const existing = merged.get(key)!
+            if (item.qty && existing.qty) {
+              existing.qty = `${existing.qty} + ${item.qty}`
+            } else if (item.qty) {
+              existing.qty = item.qty
+            }
+          } else {
+            merged.set(key, { ...item })
+          }
+        }
+        set({ shoppingItems: Array.from(merged.values()) })
       },
 
       // ── Recipes ──
