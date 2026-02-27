@@ -1,158 +1,130 @@
-import { useEffect, useState } from 'react'
+﻿import { useEffect, useState } from 'react'
 
+/**
+ * Splash screen minimaliste premium.
+ * Fond = couleur bg de l'app -> sortie totalement seamless.
+ * Animation principale : trace SVG (stroke-dashoffset) + fade-in du wordmark.
+ */
 export default function SplashScreen({ onDone }: { onDone: () => void }) {
-  const [phase, setPhase] = useState<'in' | 'show' | 'out'>('in')
+  const [stage, setStage] = useState<0 | 1 | 2>(0)
+  // 0 = invisible  1 = anime  2 = sortie
 
   useEffect(() => {
-    // Légère pause pour forcer le reflow avant la transition d'entrée
-    const t1 = setTimeout(() => setPhase('show'), 60)
-    // Début du fade-out après 2s
-    const t2 = setTimeout(() => setPhase('out'), 2000)
-    // Démontage après la fin de la sortie
-    const t3 = setTimeout(() => onDone(), 2550)
-    return () => {
-      clearTimeout(t1)
-      clearTimeout(t2)
-      clearTimeout(t3)
-    }
+    const t0 = setTimeout(() => setStage(1), 50)   // demarrer l'animation
+    const t1 = setTimeout(() => setStage(2), 1800)  // commencer la sortie
+    const t2 = setTimeout(() => onDone(), 2150)      // demonter
+    return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2) }
   }, [onDone])
-
-  const isShow = phase === 'show'
-  const isOut = phase === 'out'
 
   return (
     <>
       <style>{`
-        @keyframes splash-pulse {
-          0%, 100% { transform: scale(1);   opacity: 0.25; }
-          50%       { transform: scale(1.12); opacity: 0.35; }
+        @keyframes draw {
+          from { stroke-dashoffset: 314; }
+          to   { stroke-dashoffset: 0;   }
         }
-        @keyframes splash-pulse2 {
-          0%, 100% { transform: scale(1);   opacity: 0.18; }
-          50%       { transform: scale(1.08); opacity: 0.28; }
+        @keyframes draw-detail {
+          from { stroke-dashoffset: 80; }
+          to   { stroke-dashoffset: 0;  }
         }
-        @keyframes bounce-logo {
-          0%, 100% { transform: translateY(0px) scale(1);    }
-          40%       { transform: translateY(-10px) scale(1.06); }
-          60%       { transform: translateY(-6px) scale(1.03);  }
+        .splash-circle {
+          stroke-dasharray: 314;
+          stroke-dashoffset: 314;
+          animation: draw 0.85s cubic-bezier(0.4,0,0.2,1) 0.05s forwards;
         }
-        @keyframes dot-bounce {
-          0%, 80%, 100% { transform: translateY(0);   opacity: 0.5; }
-          40%            { transform: translateY(-6px); opacity: 1;   }
+        .splash-fork {
+          stroke-dasharray: 80;
+          stroke-dashoffset: 80;
+          animation: draw-detail 0.5s cubic-bezier(0.4,0,0.2,1) 0.65s forwards;
+        }
+        .splash-knife {
+          stroke-dasharray: 80;
+          stroke-dashoffset: 80;
+          animation: draw-detail 0.5s cubic-bezier(0.4,0,0.2,1) 0.85s forwards;
         }
       `}</style>
 
-      {/* Conteneur principal */}
       <div
-        className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden"
         style={{
-          background: 'linear-gradient(150deg, #E07B54 0%, #C4623C 55%, #9B5EA0 100%)',
-          opacity:    isOut ? 0 : isShow ? 1 : 0,
-          transform:  isOut ? 'scale(1.06)' : isShow ? 'scale(1)' : 'scale(0.94)',
-          transition: isOut
-            ? 'opacity 480ms ease-in, transform 480ms ease-in'
-            : 'opacity 600ms ease-out, transform 600ms ease-out',
+          position:      'fixed',
+          inset:         0,
+          zIndex:        9999,
+          display:       'flex',
+          flexDirection: 'column',
+          alignItems:    'center',
+          justifyContent:'center',
+          background:    '#FAFAF7',
+          opacity:       stage === 2 ? 0 : stage === 1 ? 1 : 0,
+          transition:    stage === 2
+            ? 'opacity 320ms ease-in'
+            : 'opacity 200ms ease-out',
+          pointerEvents: stage === 2 ? 'none' : 'auto',
         }}
       >
-        {/* Blob décoratif haut-gauche */}
+        {/* Icone SVG */}
         <div
-          className="absolute -top-24 -left-24 w-72 h-72 rounded-full"
           style={{
-            background: 'rgba(255,255,255,0.12)',
-            animation: 'splash-pulse 3.5s ease-in-out infinite',
-          }}
-        />
-        {/* Blob décoratif bas-droite */}
-        <div
-          className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full"
-          style={{
-            background: 'rgba(255,255,255,0.10)',
-            animation: 'splash-pulse2 4s ease-in-out infinite 0.8s',
-          }}
-        />
-        {/* Cercle subtil au centre-haut */}
-        <div
-          className="absolute top-10 right-10 w-32 h-32 rounded-full"
-          style={{ background: 'rgba(255,255,255,0.07)' }}
-        />
-
-        {/* Contenu central */}
-        <div
-          className="flex flex-col items-center gap-3 relative z-10"
-          style={{
-            opacity:   isShow ? 1 : 0,
-            transform: isShow ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'opacity 700ms ease-out 100ms, transform 700ms ease-out 100ms',
+            opacity:   stage === 1 ? 1 : 0,
+            transform: stage === 1 ? 'translateY(0)' : 'translateY(8px)',
+            transition:'opacity 300ms ease-out, transform 300ms ease-out',
           }}
         >
-          {/* Emoji animé */}
-          <div
-            style={{
-              fontSize: '5rem',
-              lineHeight: 1,
-              animation: isShow ? 'bounce-logo 1.8s ease-in-out infinite' : 'none',
-            }}
+          <svg
+            width="72"
+            height="72"
+            viewBox="0 0 72 72"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
           >
-            🍽️
-          </div>
-
-          {/* Nom de l'app */}
-          <div
-            style={{
-              opacity:   isShow ? 1 : 0,
-              transform: isShow ? 'translateY(0)' : 'translateY(12px)',
-              transition: 'opacity 600ms ease-out 350ms, transform 600ms ease-out 350ms',
-            }}
-          >
-            <h1
-              className="text-white font-bold text-center"
-              style={{
-                fontSize: '2.6rem',
-                letterSpacing: '-0.02em',
-                textShadow: '0 2px 16px rgba(0,0,0,0.15)',
-              }}
-            >
-              MealMate
-            </h1>
-          </div>
-
-          {/* Tagline */}
-          <div
-            style={{
-              opacity:   isShow ? 1 : 0,
-              transform: isShow ? 'translateY(0)' : 'translateY(10px)',
-              transition: 'opacity 600ms ease-out 550ms, transform 600ms ease-out 550ms',
-            }}
-          >
-            <p
-              className="text-white/70 text-center"
-              style={{
-                fontSize: '0.75rem',
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-                fontWeight: 500,
-              }}
-            >
-              Plan · Cuisiner · Savourer
-            </p>
-          </div>
+            {/* Cercle */}
+            <circle
+              className="splash-circle"
+              cx="36" cy="36" r="30"
+              stroke="#E07B54"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            {/* Fourchette */}
+            <path
+              className="splash-fork"
+              d="M28 23 L28 30 M25 23 L25 28 M31 23 L31 28 M27.5 30 L27.5 49"
+              stroke="#E07B54"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            {/* Couteau */}
+            <path
+              className="splash-knife"
+              d="M44 23 C44 23 47 26 47 30 C47 34 44 35.5 44 35.5 L44 49"
+              stroke="#E07B54"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </div>
 
-        {/* Loader dots — apparaît en dernier */}
+        {/* Wordmark */}
         <div
-          className="absolute bottom-14 flex gap-2"
           style={{
-            opacity:   isShow ? 1 : 0,
-            transition: 'opacity 400ms ease-out 900ms',
+            marginTop:  18,
+            opacity:    stage === 1 ? 1 : 0,
+            transform:  stage === 1 ? 'translateY(0)' : 'translateY(8px)',
+            transition: 'opacity 500ms ease-out 700ms, transform 500ms ease-out 700ms',
           }}
         >
-          {[0, 150, 300].map((delay) => (
-            <span
-              key={delay}
-              className="w-2 h-2 rounded-full bg-white/60"
-              style={{ animation: `dot-bounce 1.2s ease-in-out ${delay}ms infinite` }}
-            />
-          ))}
+          <span
+            style={{
+              fontFamily:    'system-ui, -apple-system, sans-serif',
+              fontSize:      '1.45rem',
+              fontWeight:    700,
+              letterSpacing: '-0.03em',
+              color:         '#1C1C1E',
+            }}
+          >
+            Meal<span style={{ color: '#E07B54' }}>Mate</span>
+          </span>
         </div>
       </div>
     </>
