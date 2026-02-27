@@ -37,7 +37,7 @@ interface AppState {
   currentDayIdx: number
   weekOffset: number           // 0 = semaine courante, -1 = passée, +1 = prochaine
   sheetState: SheetState
-  syncStatus: 'connecting' | 'synced' | 'error'
+  syncStatus: 'connecting' | 'synced' | 'saving' | 'updated' | 'error'
 
   // Data
   weekPlans: WeekPlans
@@ -51,7 +51,7 @@ interface AppState {
   setWeekOffset: (offset: number) => void
   openSheet: (state: SheetState) => void
   closeSheet: () => void
-  setSyncStatus: (status: 'connecting' | 'synced' | 'error') => void
+  setSyncStatus: (status: 'connecting' | 'synced' | 'saving' | 'updated' | 'error') => void
 
   // Actions — Planning
   setMeal: (dayIdx: number, slotKey: SlotKey, meal: Meal | null) => void
@@ -250,11 +250,16 @@ export const useAppStore = create<AppState>()(
         weekPlans = Object.fromEntries(
           Object.entries(weekPlans).filter(([key]) => new Date(key) >= cutoff)
         )
+        // darkMode est une préférence locale : on la préserve lors des mises à jour distantes
+        const localDarkMode = get().settings.darkMode
         set({
           weekPlans,
           recipes:       data.recipes       ?? get().recipes,
           shoppingItems: data.shoppingItems ?? get().shoppingItems,
-          settings:      data.settings      ?? get().settings,
+          settings: {
+            ...(data.settings ?? get().settings),
+            darkMode: localDarkMode,
+          },
         })
       },
     }),
