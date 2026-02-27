@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+﻿import { useState, useEffect } from 'react'
 import { useAppStore, selectCurrentWeekPlan } from '@/store/useAppStore'
 import type { Period, SlotKey } from '@/types'
 import { haptic, getTodayIndex, getMondayByOffset } from '@/lib/utils'
@@ -29,6 +29,11 @@ export default function DayView({ dayIdx }: Props) {
   const weekOffset = useAppStore((s) => s.weekOffset)
   const plan       = useAppStore((s) => selectCurrentWeekPlan(s)[dayIdx])
   const [pdejOpen, setPdejOpen] = useState(!!plan?.pdej)
+
+  // Sync pdejOpen quand on change de jour ou quand un repas pdej est ajouté/retiré
+  useEffect(() => {
+    setPdejOpen(!!plan?.pdej)
+  }, [dayIdx, !!plan?.pdej])
 
   if (!plan) return null
 

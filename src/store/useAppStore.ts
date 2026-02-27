@@ -174,19 +174,24 @@ export const useAppStore = create<AppState>()(
         // Déduplication par nom (case-insensitive)
         const merged = new Map<string, ShoppingItem>()
         for (const item of items) {
-          const key = item.name.toLowerCase().trim()
-          if (merged.has(key)) {
-            const existing = merged.get(key)!
+          const itemKey = item.name.toLowerCase().trim()
+          if (merged.has(itemKey)) {
+            const existing = merged.get(itemKey)!
             if (item.qty && existing.qty) {
               existing.qty = `${existing.qty} + ${item.qty}`
             } else if (item.qty) {
               existing.qty = item.qty
             }
           } else {
-            merged.set(key, { ...item })
+            merged.set(itemKey, { ...item })
           }
         }
-        set({ shoppingItems: Array.from(merged.values()) })
+        // Conserver les articles manuels (sans ingrédients de recette) non encore présents
+        const generatedNames = new Set(merged.keys())
+        const existingManual = get().shoppingItems.filter(
+          (i) => !generatedNames.has(i.name.toLowerCase().trim())
+        )
+        set({ shoppingItems: [...Array.from(merged.values()), ...existingManual] })
       },
 
       // ── Recipes ──
