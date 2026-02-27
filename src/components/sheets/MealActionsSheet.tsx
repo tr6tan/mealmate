@@ -62,7 +62,7 @@ export default function MealActionsSheet() {
 
       {/* Actions */}
       <div className="space-y-2 mb-3">
-        {recipe && (
+        {!meal.isRestaurant && recipe && (
           <button
             onClick={handleDetail}
             className="w-full flex items-center gap-3.5 px-4 py-3.5 bg-sep rounded-2xl text-sm font-bold text-text1 text-left"
@@ -72,14 +72,16 @@ export default function MealActionsSheet() {
             <span className="text-muted">›</span>
           </button>
         )}
-        <button
-          onClick={handleChange}
-          className="w-full flex items-center gap-3.5 px-4 py-3.5 bg-sep rounded-2xl text-sm font-bold text-text1 text-left"
-        >
-          <span className="text-xl">🔄</span>
-          <span className="flex-1">Changer de repas</span>
-          <span className="text-muted">›</span>
-        </button>
+        {!meal.isRestaurant && (
+          <button
+            onClick={handleChange}
+            className="w-full flex items-center gap-3.5 px-4 py-3.5 bg-sep rounded-2xl text-sm font-bold text-text1 text-left"
+          >
+            <span className="text-xl">🔄</span>
+            <span className="flex-1">Changer de repas</span>
+            <span className="text-muted">›</span>
+          </button>
+        )}
       </div>
 
       <button

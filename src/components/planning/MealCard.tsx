@@ -7,6 +7,30 @@ interface Props {
 }
 
 export default function MealCard({ meal, onPress }: Props) {
+  if (meal.isRestaurant) {
+    return (
+      <button
+        onClick={onPress}
+        className={cn(
+          'w-full rounded-xl px-3.5 py-3 flex items-center gap-2.5',
+          'border-[1.5px] border-amber-200 bg-amber-50',
+          'active:scale-[0.98] transition-transform duration-150 text-left',
+        )}
+      >
+        <span className="text-[28px] flex-shrink-0 leading-none">🍽️</span>
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-bold text-amber-800">Restaurant</div>
+          <span className="text-[11px] font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-lg inline-block mt-1.5">
+            On mange dehors 🎉
+          </span>
+        </div>
+        <svg className="w-4 h-4 text-amber-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </button>
+    )
+  }
+
   return (
     <button
       onClick={onPress}

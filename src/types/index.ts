@@ -21,6 +21,7 @@ export interface Meal {
   time: string
   fav: boolean
   photo?: string
+  isRestaurant?: boolean
 }
 
 export interface DayPlan {

@@ -1,5 +1,6 @@
 import { useAppStore, selectCurrentWeekPlan } from '@/store/useAppStore'
 import type { Period, SlotKey } from '@/types'
+import { haptic } from '@/lib/utils'
 import MealCard from './MealCard'
 import MealAddSlot from './MealAddSlot'
 import OptionalSlot from './OptionalSlot'
@@ -25,6 +26,7 @@ interface Props {
 
 export default function DayView({ dayIdx }: Props) {
   const openSheet = useAppStore((s) => s.openSheet)
+  const setMeal = useAppStore((s) => s.setMeal)
   const weekOffset = useAppStore((s) => s.weekOffset)
   const plan = useAppStore((s) => selectCurrentWeekPlan(s)[dayIdx])
 
@@ -91,6 +93,10 @@ export default function DayView({ dayIdx }: Props) {
                     mealContext: { dayIdx, slotKey },
                   })
                 }
+                onRestaurant={() => {
+                  haptic([10, 50])
+                  setMeal(dayIdx, slotKey, { name: 'Restaurant', emoji: '🍽️', time: '', fav: false, isRestaurant: true })
+                }}
               />
             )}
 
