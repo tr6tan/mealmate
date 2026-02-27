@@ -55,6 +55,21 @@ export default function DayView({ dayIdx }: Props) {
               {label}
             </div>
 
+            {/* Entrée (avant le plat, hors pdej) */}
+            {period !== 'pdej' && (
+              <div className="mb-1.5">
+                <OptionalSlot
+                  label="Entrée"
+                  meal={entreeMeal ?? null}
+                  onPress={() =>
+                    entreeMeal
+                      ? openSheet({ sheet: 'meal-actions', actionContext: { dayIdx, slotKey: entreeKey, meal: entreeMeal } })
+                      : openSheet({ sheet: 'add-meal', addMealPeriod: period, mealContext: { dayIdx, slotKey: entreeKey } })
+                  }
+                />
+              </div>
+            )}
+
             {/* Slot principal */}
             {mainMeal ? (
               <MealCard
@@ -79,18 +94,9 @@ export default function DayView({ dayIdx }: Props) {
               />
             )}
 
-            {/* Slots optionnels (entrée/dessert) hors pdej */}
+            {/* Dessert (après le plat, hors pdej) */}
             {period !== 'pdej' && (
-              <div className="mt-1.5 space-y-1">
-                <OptionalSlot
-                  label="Entrée"
-                  meal={entreeMeal ?? null}
-                  onPress={() =>
-                    entreeMeal
-                      ? openSheet({ sheet: 'meal-actions', actionContext: { dayIdx, slotKey: entreeKey, meal: entreeMeal } })
-                      : openSheet({ sheet: 'add-meal', addMealPeriod: period, mealContext: { dayIdx, slotKey: entreeKey } })
-                  }
-                />
+              <div className="mt-1.5">
                 <OptionalSlot
                   label="Dessert"
                   meal={dessertMeal ?? null}
