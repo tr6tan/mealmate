@@ -84,7 +84,7 @@
     margin-bottom: env(safe-area-inset-bottom);
   }
   .pb-nav-safe {
-    padding-bottom: calc(72px + env(safe-area-inset-bottom));
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
   }
   /* Nav iOS PWA : fond qui s’étend sous le home indicator */
   .nav-ios-safe {

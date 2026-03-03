@@ -32,7 +32,7 @@ export default function Toast() {
 
   return (
     <div
-      style={{ bottom: 'calc(88px + env(safe-area-inset-bottom))' }}
+      style={{ bottom: 'calc(72px + env(safe-area-inset-bottom))' }}
       className={cn(
         'fixed left-1/2 -translate-x-1/2 z-[200]',
         'bg-text1 text-white px-4 py-3 rounded-2xl',
