@@ -74,7 +74,7 @@ export default function BottomNav() {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className="flex flex-col items-center gap-0.5 pt-2 pb-1.5 px-4 flex-1 border-none bg-transparent cursor-pointer relative"
+              className="flex flex-col items-center gap-0.5 pt-1.5 pb-1 px-4 flex-1 border-none bg-transparent cursor-pointer relative"
             >
               {/* Indicateur actif — barre en haut */}
               {active && (
@@ -84,7 +84,7 @@ export default function BottomNav() {
               )}
               <span
                 className={cn(
-                  'relative flex items-center justify-center w-10 h-8 rounded-xl [&>svg]:w-5 [&>svg]:h-5 [&>svg]:stroke-current transition-all duration-200',
+                  'relative flex items-center justify-center w-10 h-7 rounded-xl [&>svg]:w-5 [&>svg]:h-5 [&>svg]:stroke-current transition-all duration-200',
                   active ? 'text-terra' : 'text-muted',
                 )}
               >

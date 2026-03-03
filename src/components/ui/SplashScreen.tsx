@@ -22,7 +22,7 @@ export default function SplashScreen({ onDone }: { onDone: () => void }) {
         inset:         0,
         zIndex:        9999,
         overflow:      'hidden',
-        background:    '#F8F8F7',
+        background:    '#D23D2D',
         opacity:       stage === 2 ? 0 : 1,
         transition:    stage === 2 ? 'opacity 340ms ease-in' : 'none',
         pointerEvents: stage === 2 ? 'none' : 'auto',
