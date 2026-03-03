@@ -96,7 +96,10 @@ export default function ShoppingPage() {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto no-scrollbar overscroll-contain pb-nav-safe">
+      <div
+        className="flex-1 overflow-y-auto no-scrollbar overscroll-contain"
+        style={{ paddingBottom: total > 0 ? 'calc(120px + env(safe-area-inset-bottom, 0px))' : 'calc(60px + env(safe-area-inset-bottom, 0px))' }}
+      >
       {total === 0 ? (
         /* ── Empty state ── */
         <div className="px-5 pt-6 flex flex-col items-center gap-5">

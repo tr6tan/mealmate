@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 import type {
   ActiveTab,
   AppSettings,
@@ -84,6 +85,7 @@ interface AppState {
 // ── Store ─────────────────────────────────────────────────────────────────────
 
 export const useAppStore = create<AppState>()(
+  persist(
     (set, get) => ({
       // ── Initial state ──
       activeTab: 'planning',
@@ -283,6 +285,18 @@ export const useAppStore = create<AppState>()(
         })
       },
     }),
+    {
+      name: 'mealmate-store',
+      storage: createJSONStorage(() => localStorage),
+      // Persister uniquement les données métier (pas l'UI)
+      partialize: (s) => ({
+        weekPlans:     s.weekPlans,
+        recipes:       s.recipes,
+        shoppingItems: s.shoppingItems,
+        settings:      s.settings,
+      }),
+    },
+  ),
 )
 
 // ── Selectors ─────────────────────────────────────────────────────────────────

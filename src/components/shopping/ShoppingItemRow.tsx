@@ -13,11 +13,12 @@ export default function ShoppingItemRow({ item }: Props) {
   return (
     <div
       className={cn(
-        'group bg-card rounded-xl px-3 py-2.5 flex items-center gap-2.5 border-[1.5px] cursor-pointer transition-all duration-250 animate-slide-in',
+        'group bg-card rounded-xl px-3 py-2.5 flex items-center gap-2.5 border-[1.5px] cursor-pointer transition-colors duration-200',
         item.checked
           ? 'border-sage/30 bg-sage/5'
           : 'border-border',
       )}
+      style={{ touchAction: 'manipulation' }}
       onClick={() => { navigator.vibrate?.(25); toggleShoppingItem(item.id) }}
     >
       {/* Checkbox */}

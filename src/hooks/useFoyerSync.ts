@@ -10,6 +10,8 @@ const COLLECTION = import.meta.env.VITE_APP_ENV === 'dev' ? 'foyers_dev' : 'foye
 
 // Timers par champ — une file séparée par slice de données
 const _timers: Record<string, ReturnType<typeof setTimeout>> = {}
+// Derniers champs en attente d'écriture (pour le flush beforeunload)
+const _pendingFields: Record<string, Partial<FoyerData>> = {}
 
 /** Écriture debounced par champ : évite qu'un user écrase les données de l'autre. */
 function scheduleFieldWrite(
@@ -21,7 +23,10 @@ function scheduleFieldWrite(
 ) {
   const key = Object.keys(fields).join(',')
   if (_timers[key]) clearTimeout(_timers[key])
+  // Mémorise les champs en attente pour le flush beforeunload
+  _pendingFields[key] = fields
   _timers[key] = setTimeout(async () => {
+    delete _pendingFields[key]
     onSaving()
     try {
       const ref = doc(db, COLLECTION, foyerId)
@@ -32,6 +37,20 @@ function scheduleFieldWrite(
       onError()
     }
   }, 600)
+}
+
+/** Flush immédiat de tous les champs en attente (appelé avant kill de l'app). */
+function flushPendingWrites(foyerId: string) {
+  const merged: Partial<FoyerData> = {}
+  for (const fields of Object.values(_pendingFields)) {
+    Object.assign(merged, fields)
+  }
+  if (Object.keys(merged).length === 0) return
+  // Annule les debounces en cours
+  Object.values(_timers).forEach(clearTimeout)
+  // Écrit immédiatement (best-effort, ne bloque pas le kill)
+  const ref = doc(db, COLLECTION, foyerId)
+  void updateDoc(ref, merged as Record<string, unknown>)
 }
 
 export function useFoyerSync() {
@@ -94,9 +113,18 @@ export function useFoyerSync() {
       }
     })
 
+    // ── Flush avant kill (visibilitychange est plus fiable que beforeunload sur iOS PWA) ──
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        flushPendingWrites(foyerId)
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+
     return () => {
       unsubFirestore()
       unsubStore()
+      document.removeEventListener('visibilitychange', handleVisibility)
       Object.values(_timers).forEach(clearTimeout)
     }
   }, [foyerId, hydrate, setSyncStatus])
