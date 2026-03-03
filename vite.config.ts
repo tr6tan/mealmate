@@ -14,7 +14,7 @@ export default defineConfig({
         short_name: 'MealMate',
         description: 'Planificateur de repas de la semaine',
         theme_color: '#D23D2D',
-        background_color: '#F8EECB',
+        background_color: '#FFFCF0',
         display: 'standalone',
         orientation: 'portrait',
         scope: '/',

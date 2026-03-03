@@ -43,8 +43,10 @@
     margin: 0;
     padding: 0;
     overscroll-behavior: none;
-    /* Fond html = card color : la zone physique sous la navbar iOS PWA
-       ne montre plus la couleur crème du fond de page */
+  }
+
+  html {
+    /* Zone physique sous la navbar iOS PWA (coins arrondís) = couleur de la nav */
     background-color: rgb(var(--c-card));
   }
 

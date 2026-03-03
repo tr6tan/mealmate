@@ -21,6 +21,13 @@ export default function AppShell({ nav, children }: Props) {
       {/* Nav fixe en bas */}
       <BottomNav />
 
+      {/* Remplissage safe-area sous la nav (coins arrondis iPhone) */}
+      <div
+        aria-hidden
+        className="fixed bottom-0 left-0 right-0 bg-card"
+        style={{ height: 'env(safe-area-inset-bottom, 0px)', zIndex: 29 }}
+      />
+
       {/* Overlay */}
       {sheetState.sheet && (
         <div
