@@ -135,10 +135,9 @@ export default function AddMealSheet() {
         </div>
       )}
 
-      {/* Tabs */}
+      {/* Tabs + Search — figés */}
       {!showFreeForm && (
         <>
-          {/* Search */}
           <div className="flex items-center gap-2 px-3 py-2.5 mb-2.5 rounded-xl bg-sep border-[1.5px] border-border">
             <svg className="w-3.5 h-3.5 text-muted flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input
@@ -150,7 +149,7 @@ export default function AddMealSheet() {
             />
             {search && <button onClick={() => setSearch('')} className="text-muted flex items-center"><svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>}
           </div>
-          <div className="flex bg-sep rounded-xl p-0.5 mb-3.5 gap-0.5">
+          <div className="flex bg-sep rounded-xl p-0.5 mb-3 gap-0.5">
             {TABS.map((t) => (
               <button
                 key={t.key}
@@ -166,9 +165,14 @@ export default function AddMealSheet() {
               </button>
             ))}
           </div>
+        </>
+      )}
+      </div>{/* fin header figé */}
 
-          {/* Suggestions */}
-          <div className="space-y-0.5">
+      {/* ── Liste scrollable ─────────────────────────────────────────────── */}
+      {!showFreeForm && (
+        <div className="flex-1 overflow-y-auto no-scrollbar pb-safe">
+          <div className="space-y-0.5 pb-4">
             {filtered.map((recipe) => (
               <button
                 key={recipe.id}
@@ -194,7 +198,7 @@ export default function AddMealSheet() {
               </button>
             ))}
           </div>
-        </>
+        </div>
       )}
     </BottomSheet>
   )

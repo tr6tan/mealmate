@@ -73,7 +73,7 @@ export default function BottomNav() {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className="flex flex-col items-center gap-1 pt-2 pb-2 px-4 flex-1 border-none bg-transparent cursor-pointer relative"
+              className="flex flex-col items-center gap-0.5 pt-2 pb-1.5 px-4 flex-1 border-none bg-transparent cursor-pointer relative"
             >
               {/* Indicateur actif — barre en haut */}
               {active && (
