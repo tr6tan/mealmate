@@ -141,84 +141,80 @@ export default function PlanningPage() {
   return (
     <div>
       {/* Header */}
-      <div className="px-5 pt-4 pb-3">
-        <h1 className="text-2xl font-black text-text1">Planning</h1>
+      <div className="px-5 pt-5 pb-3">
+        {/* Titre + nav semaine */}
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <p className="text-[10px] font-black tracking-[0.12em] uppercase text-muted">Mon planning</p>
+            <h1 className="text-[26px] font-black text-text1 leading-tight">{weekTitle}</h1>
+          </div>
+          <div className="flex items-center gap-1.5">
+            {planCount > 0 && (
+              <button
+                onClick={handleShare}
+                className="w-8 h-8 flex items-center justify-center rounded-full border border-border text-muted text-base active:scale-90 transition-transform"
+                aria-label="Partager le planning"
+              >
+                ↑
+              </button>
+            )}
+            <button
+              onClick={() => setViewMode(v => v === 'day' ? 'week' : 'day')}
+              className="w-8 h-8 flex items-center justify-center rounded-full text-base transition-all active:scale-90 border"
+              style={viewMode === 'week'
+                ? { background: '#990000', color: '#fff', borderColor: '#990000' }
+                : { background: 'transparent', color: '#96908A', borderColor: '#E6E4E0' }}
+            >
+              {viewMode === 'week' ? '▤' : '▦'}
+            </button>
+          </div>
+        </div>
 
-        {/* Navigation semaines */}
-        <div className="flex items-center gap-2 mt-1">
+        {/* Barre de navigation semaine */}
+        <div className="flex items-center gap-2">
           <button
             onClick={() => changeWeek(-1)}
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-bg2 text-text1 text-base font-bold leading-none active:scale-90 transition-transform"
-            aria-label="Semaine précédente"
+            className="w-8 h-8 flex items-center justify-center rounded-full border border-border text-muted text-lg font-bold leading-none active:scale-90 transition-transform"
           >
             ‹
           </button>
-
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-extrabold text-terra truncate">{weekTitle}</p>
-            <p className="text-[12px] text-muted font-semibold">
-              {weekLabel}
-              {planCount > 0 && (
-                <span className="ml-2 text-[11px] font-bold text-terra bg-terra-light px-2 py-0.5 rounded-full">
-                  {planCount}/21
-                </span>
-              )}
-              {weekOffset < 0 && (
-                <span className="ml-2 text-[11px] font-bold text-muted bg-sep px-2 py-0.5 rounded-full">
-                  📖 Passé
-                </span>
-              )}
-            </p>
+          <div className="flex-1 flex items-center gap-2 min-w-0">
+            <p className="text-[12px] text-muted font-semibold truncate">{weekLabel}</p>
+            {planCount > 0 && (
+              <span className="text-[10px] font-black px-2 py-0.5 rounded-full flex-shrink-0" style={{ color: '#990000', background: '#99000014' }}>
+                {planCount}/21
+              </span>
+            )}
+            {weekOffset < 0 && (
+              <span className="text-[10px] font-bold text-muted bg-sep px-2 py-0.5 rounded-full flex-shrink-0">
+                📖 Passé
+              </span>
+            )}
           </div>
-
-          {planCount > 0 && (
-            <button
-              onClick={handleShare}
-              className="w-7 h-7 flex items-center justify-center rounded-full bg-bg2 text-text1 text-base font-bold leading-none active:scale-90 transition-transform"
-              aria-label="Partager le planning"
-              title="Copier le planning"
-            >
-              ↑
-            </button>
-          )}
-
-          <button
-            onClick={() => changeWeek(1)}
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-bg2 text-text1 text-base font-bold leading-none active:scale-90 transition-transform"
-            aria-label="Semaine suivante"
-          >
-            ›
-          </button>
-
           {weekOffset !== 0 && (
             <button
               onClick={() => { setWeekOffset(0); setWeekSlideDir(null) }}
-              className="text-[11px] font-bold text-terra bg-terra-light px-2 py-1 rounded-full active:scale-90 transition-transform"
+              className="text-[10px] font-black px-2.5 py-1 rounded-full flex-shrink-0 active:scale-90 transition-transform"
+              style={{ color: '#990000', background: '#99000014' }}
             >
               Auj.
             </button>
           )}
-
-          <button
-            onClick={() => setViewMode(v => v === 'day' ? 'week' : 'day')}
-            className={cn(
-              'w-7 h-7 flex items-center justify-center rounded-full text-base transition-all active:scale-90',
-              viewMode === 'week' ? 'bg-terra text-white' : 'bg-bg2 text-text1',
-            )}
-            aria-label={viewMode === 'week' ? 'Vue jour' : 'Vue semaine'}
-            title={viewMode === 'week' ? 'Vue jour' : 'Vue semaine'}
-          >
-            {viewMode === 'week' ? '▤' : '▦'}
-          </button>
-
           {planCount > 0 && (
             <button
               onClick={() => { if (window.confirm('Vider toute la semaine ?')) clearWeek() }}
-              className="text-[11px] font-bold text-[#C0304A] bg-[#FFF0F0] px-2 py-1 rounded-full active:scale-90 transition-transform"
+              className="text-[10px] font-black px-2.5 py-1 rounded-full flex-shrink-0 active:scale-90 transition-transform"
+              style={{ color: '#96908A', background: '#F2F0EE' }}
             >
               Vider
             </button>
           )}
+          <button
+            onClick={() => changeWeek(1)}
+            className="w-8 h-8 flex items-center justify-center rounded-full border border-border text-muted text-lg font-bold leading-none active:scale-90 transition-transform"
+          >
+            ›
+          </button>
         </div>
       </div>
 
@@ -267,8 +263,21 @@ export default function PlanningPage() {
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
-          <div className="text-[17px] font-extrabold text-text1 mb-3 pl-2.5 border-l-[3px] border-terra">
-            {selectedLabel}
+          <div
+            className="flex items-center gap-3 mb-3 rounded-2xl px-4 py-3"
+            style={{ background: '#ffc48f22' }}
+          >
+            <div
+              className="w-1 self-stretch rounded-full flex-shrink-0"
+              style={{ background: '#990000' }}
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-black tracking-[0.1em] uppercase mb-0.5" style={{ color: '#990000', opacity: 0.6 }}>
+                {selectedIdx === todayIdx && weekOffset === 0 ? "Aujourd'hui" : weekTitle}
+              </p>
+              <p className="text-[17px] font-extrabold truncate" style={{ color: '#1C1612' }}>{selectedLabel}</p>
+            </div>
+            <span className="text-2xl">📅</span>
           </div>
           <div
             className={cn(

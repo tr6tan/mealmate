@@ -30,7 +30,7 @@ export default function ShoppingPage() {
   const prevPctRef = useRef(0)
   useEffect(() => {
     if (pct === 100 && total > 0 && prevPctRef.current < 100) {
-      confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 }, colors: ['#E07B54', '#F4A67A', '#6B8F71', '#FFD700'] })
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 }, colors: ['#990000', '#ffc48f', '#99a680', '#9bb5bd'] })
       showToast('🎉 Liste complète !')
     }
     prevPctRef.current = pct
@@ -136,9 +136,9 @@ export default function ShoppingPage() {
               <div
                 className={cn(
                   'h-full rounded-full transition-all duration-500',
-                  pct === 100 ? 'bg-sage' : 'bg-gradient-to-r from-terra to-[#F4A67A]'
+                  pct === 100 ? 'bg-sage' : ''
                 )}
-                style={{ width: `${pct}%` }}
+                style={pct !== 100 ? { background: 'linear-gradient(to right, #990000, #c04040)', width: `${pct}%` } : { width: `${pct}%` }}
               />
             </div>
           </div>
@@ -147,7 +147,8 @@ export default function ShoppingPage() {
           <div className="px-5 mb-5">
             <button
               onClick={handleGenerate}
-              className="w-full bg-terra/10 border-2 border-terra/25 text-terra rounded-2xl py-3 flex items-center justify-center gap-2 text-sm font-extrabold active:scale-[0.97] transition-transform"
+              className="w-full border-2 rounded-2xl py-3 flex items-center justify-center gap-2 text-sm font-extrabold active:scale-[0.97] transition-transform"
+              style={{ borderColor: '#99000030', color: '#990000', background: '#99000008' }}
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
                 <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
@@ -173,9 +174,8 @@ export default function ShoppingPage() {
 
       {/* Barre d'actions fixe en bas */}
       {total > 0 && (
-        <div
-          className="fixed bottom-0 left-0 right-0 z-20 bg-white/95 backdrop-blur-xl border-t border-sep px-5 py-3 flex gap-2"
-          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 72px)' }}
+        <div className="fixed bottom-0 left-0 right-0 z-20 bg-card/98 backdrop-blur-xl border-t border-sep px-5 py-3 flex gap-2"
+          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 64px)' }}
         >
           {checked > 0 && (
             <button

@@ -83,8 +83,9 @@ export default function RecipesPage() {
             title="Favoris en premier"
             className={cn(
               'w-9 h-9 rounded-full flex items-center justify-center text-base transition-all active:scale-90',
-              favFirst ? 'bg-[#FDE8F0] text-[#E91E63]' : 'bg-card border-[1.5px] border-border text-muted',
+              favFirst ? 'text-white' : 'bg-card border-[1.5px] border-border text-muted',
             )}
+            style={favFirst ? { background: '#99a680' } : {}}
           >
             ♥
           </button>
@@ -133,9 +134,10 @@ export default function RecipesPage() {
             className={cn(
               'flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-bold border-2 transition-all duration-200 whitespace-nowrap flex items-center gap-1',
               filter === f.key
-                ? 'bg-terra border-terra text-white'
+                ? 'border-[#990000] text-white'
                 : 'bg-card border-border text-muted',
             )}
+            style={filter === f.key ? { background: '#990000' } : {}}
           >
             {f.label}
             {(counts[f.key] ?? 0) > 0 && (
@@ -151,14 +153,15 @@ export default function RecipesPage() {
       {recipes.length === 0 ? (
         /* Empty state global */
         <div className="px-5 pt-4 flex flex-col items-center gap-4 text-center">
-          <div className="w-20 h-20 rounded-full bg-terra-light flex items-center justify-center text-4xl">🍳</div>
+          <div className="w-20 h-20 rounded-full flex items-center justify-center text-4xl" style={{ background: '#99000012' }}>🍳</div>
           <div>
             <p className="text-base font-extrabold text-text1 mb-1">Aucune recette</p>
             <p className="text-[13px] text-muted font-semibold">Ajoute ta première recette pour commencer à planifier tes repas.</p>
           </div>
           <button
             onClick={() => openSheet({ sheet: 'new-recipe' })}
-            className="w-full bg-terra text-white rounded-2xl py-3.5 text-sm font-extrabold shadow-terra active:scale-[0.97] transition-transform"
+            className="w-full text-white rounded-2xl py-3.5 text-sm font-extrabold active:scale-[0.97] transition-transform"
+            style={{ background: '#990000' }}
           >
             + Créer ma première recette
           </button>
@@ -171,7 +174,8 @@ export default function RecipesPage() {
           <p className="text-[12px] text-muted font-semibold">Essaie un autre mot-clé ou filtre.</p>
           <button
             onClick={() => { setSearch(''); setFilter('all') }}
-            className="px-4 py-2 rounded-full bg-terra-light text-terra text-xs font-extrabold active:scale-95 transition-transform"
+            className="px-4 py-2 rounded-full text-xs font-extrabold active:scale-95 transition-transform"
+            style={{ background: '#99000012', color: '#990000' }}
           >
             Réinitialiser les filtres
           </button>
@@ -190,13 +194,14 @@ export default function RecipesPage() {
           ))}
           <button
             onClick={() => openSheet({ sheet: 'new-recipe' })}
-            className="bg-terra-light border-2 border-dashed border-terra rounded-xl flex flex-col items-center justify-center gap-1 min-h-[110px] active:scale-[0.96] transition-transform"
+            className="border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-1 min-h-[110px] active:scale-[0.96] transition-transform"
+            style={{ background: '#99000008', borderColor: '#99000040' }}
           >
-            <svg className="w-5 h-5 text-terra" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <svg className="w-5 h-5" style={{ color: '#990000' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <line x1="12" y1="5" x2="12" y2="19"/>
               <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
-            <span className="text-[10px] font-extrabold text-terra">Nouvelle</span>
+            <span className="text-[10px] font-extrabold" style={{ color: '#990000' }}>Nouvelle</span>
           </button>
         </div>
       ) : (
@@ -213,10 +218,11 @@ export default function RecipesPage() {
           ))}
           <button
             onClick={() => openSheet({ sheet: 'new-recipe' })}
-            className="flex items-center gap-3.5 px-4 py-3.5 bg-terra-light border-2 border-dashed border-terra rounded-2xl active:scale-[0.98] transition-transform"
+            className="flex items-center gap-3.5 px-4 py-3.5 border-2 border-dashed rounded-2xl active:scale-[0.98] transition-transform"
+            style={{ background: '#99000008', borderColor: '#99000040' }}
           >
-            <div className="w-10 h-10 rounded-xl bg-terra flex items-center justify-center text-white text-xl font-bold flex-shrink-0">+</div>
-            <span className="text-sm font-extrabold text-terra">Nouvelle recette</span>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-xl font-bold flex-shrink-0" style={{ background: '#990000' }}>+</div>
+            <span className="text-sm font-extrabold" style={{ color: '#990000' }}>Nouvelle recette</span>
           </button>
         </div>
       )}

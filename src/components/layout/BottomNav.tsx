@@ -62,14 +62,17 @@ export default function BottomNav() {
   const remaining = shoppingItems.filter((i) => !i.checked).length
 
   return (
-    <nav className="nav-ios-safe fixed bottom-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-xl border-t border-sep flex justify-around items-stretch">
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-30 bg-card backdrop-blur-xl border-t border-sep flex justify-around items-stretch"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+    >
       {navItems.map((item) => {
         const active = activeTab === item.id
         return (
           <button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className="flex flex-col items-center gap-1 pt-2 pb-3 px-4 flex-1 border-none bg-transparent cursor-pointer"
+            className="flex flex-col items-center gap-1 pt-2 pb-2 px-4 flex-1 border-none bg-transparent cursor-pointer"
           >
             <span
               className={cn(

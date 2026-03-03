@@ -15,6 +15,12 @@ interface PeriodConfig {
   dotClass: string
 }
 
+const PERIOD_STYLE = {
+  pdej: { dot: '#ffc48f', bg: '#ffc48f12', label: '#c07820', emoji: '☀️' },
+  midi: { dot: '#990000', bg: '#99000010', label: '#990000', emoji: '🍽️' },
+  soir: { dot: '#9bb5bd', bg: '#9bb5bd12', label: '#4a7480', emoji: '🌙' },
+} as const
+
 const PERIODS: PeriodConfig[] = [
   { period: 'pdej', label: 'Petit-déjeuner', slotKey: 'pdej', entreeKey: 'pdej', dessertKey: 'pdej', dotClass: 'bg-morning' },
   { period: 'midi', label: 'Déjeuner',       slotKey: 'midi', entreeKey: 'midi_entree', dessertKey: 'midi_dessert', dotClass: 'bg-terra' },
@@ -89,25 +95,43 @@ export default function DayView({ dayIdx }: Props) {
             {period === 'pdej' ? (
               <button
                 onClick={() => setPdejOpen((o) => !o)}
-                className="flex items-center gap-2 mb-2.5 w-full text-left"
+                className="flex items-center gap-3 mb-3 w-full text-left"
               >
-                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${dotClass}`} />
-                <span className="text-sm font-extrabold text-text1 flex-1">{label}</span>
+                {/* Pill */}
+                <span
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black flex-shrink-0"
+                  style={{ background: PERIOD_STYLE[period].label, color: '#fff' }}
+                >
+                  {PERIOD_STYLE[period].emoji}
+                  <span>{label}</span>
+                </span>
+                {/* Ligne */}
+                <span className="flex-1 h-px opacity-20" style={{ background: PERIOD_STYLE[period].label }} />
+                {/* Aperçu replié */}
                 {mainMeal && !pdejOpen && (
-                  <span className="text-xs text-muted font-semibold truncate max-w-[110px]">
+                  <span className="text-[11px] font-semibold truncate max-w-[100px] flex-shrink-0" style={{ color: PERIOD_STYLE[period].label, opacity: 0.75 }}>
                     {mainMeal.emoji} {mainMeal.name}
                   </span>
                 )}
                 <span
-                  className={`text-muted text-sm ml-1 inline-block transition-transform duration-200 ${pdejOpen ? 'rotate-180' : ''}`}
+                  className={`text-xs flex-shrink-0 inline-block transition-transform duration-200 ${pdejOpen ? 'rotate-180' : ''}`}
+                  style={{ color: PERIOD_STYLE[period].label, opacity: 0.5 }}
                 >
                   ▾
                 </span>
               </button>
             ) : (
-              <div className="flex items-center gap-2 mb-2.5 text-sm font-extrabold text-text1">
-                <span className={`w-2 h-2 rounded-full flex-shrink-0 ${dotClass}`} />
-                {label}
+              <div className="flex items-center gap-3 mb-3">
+                {/* Pill */}
+                <span
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black flex-shrink-0"
+                  style={{ background: PERIOD_STYLE[period].label, color: '#fff' }}
+                >
+                  {PERIOD_STYLE[period].emoji}
+                  <span>{label}</span>
+                </span>
+                {/* Ligne */}
+                <span className="flex-1 h-px opacity-20" style={{ background: PERIOD_STYLE[period].label }} />
               </div>
             )}
 

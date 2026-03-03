@@ -3,21 +3,22 @@
 @tailwind utilities;
 
 /* ── Design tokens — Light ── */
+/* Palette : parade balloon #ffc48f · sage leaves #99a680 · candle sticks #990000 · chinoiserie plates #9bb5bd */
 :root {
-  --c-bg:          250 250 247; /* #FAFAF7 */
+  --c-bg:          248 248 247; /* #F8F8F7 — blanc neutre légèrement chaud */
   --c-card:        255 255 255; /* #FFFFFF */
-  --c-sep:         242 242 240; /* #F2F2F0 */
-  --c-border:      232 232 229; /* #E8E8E5 */
-  --c-text1:        28  28  30; /* #1C1C1E */
-  --c-text2:        58  58  60; /* #3A3A3C */
-  --c-muted:       142 142 147; /* #8E8E93 */
-  --c-terra:       224 123  84; /* #E07B54 */
-  --c-terra-light: 253 240 235; /* #FDF0EB */
-  --c-terra-dark:  196  98  60; /* #C4623C */
-  --c-sage:        107 158 120; /* #6B9E78 */
-  --c-sage-light:  238 245 240; /* #EEF5F0 */
-  --c-morning:     245 166  35; /* #F5A623 */
-  --c-evening:     124  92 191; /* #7C5CBF */
+  --c-sep:         242 240 238; /* #F2F0EE */
+  --c-border:      230 228 224; /* #E6E4E0 */
+  --c-text1:        24  20  18; /* #181412 */
+  --c-text2:        72  58  46; /* #483A2E */
+  --c-muted:       150 144 138; /* #96908A */
+  --c-terra:       153   0   0; /* #990000 — candle sticks */
+  --c-terra-light: 255 236 220; /* #FFECDC — parade balloon clair */
+  --c-terra-dark:  110   0   0; /* #6E0000 */
+  --c-sage:        153 166 128; /* #99a680 — sage leaves */
+  --c-sage-light:  232 238 224; /* #E8EEE0 */
+  --c-morning:     255 196 143; /* #ffc48f — parade balloon */
+  --c-evening:     155 181 189; /* #9bb5bd — chinoiserie plates */
 }
 
 /* ── Design tokens — Dark ── */

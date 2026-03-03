@@ -2,15 +2,15 @@ import { cn } from '@/lib/utils'
 import type { Recipe } from '@/types'
 
 const PERIOD_COLOR: Record<string, string> = {
-  pdej: 'text-morning bg-[#FFF8EE]',
-  midi: 'text-terra bg-terra-light',
-  soir: 'text-evening bg-[#F4F0FA]',
+  pdej: 'text-[#c07820] bg-[#ffc48f20]',
+  midi: 'text-[#990000] bg-[#99000015]',
+  soir: 'text-[#4a7480] bg-[#9bb5bd20]',
 }
 const PERIOD_LABEL: Record<string, string> = { pdej: 'Petit-dej', midi: 'Midi', soir: 'Soir' }
 const PERIOD_GRADIENT: Record<string, string> = {
-  pdej: 'from-amber-50 to-orange-100',
-  midi: 'from-terra-light to-[#FFE8DC]',
-  soir: 'from-[#EEF2FF] to-[#E8F0FE]',
+  pdej: 'from-[#ffc48f20] to-[#ffc48f40]',
+  midi: 'from-[#99000010] to-[#99000020]',
+  soir: 'from-[#9bb5bd15] to-[#9bb5bd30]',
 }
 
 interface Props {
@@ -46,14 +46,14 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
           <div className="flex items-center gap-2 mt-0.5">
             <p className="text-[11px] text-muted font-semibold">{recipe.time}</p>
             {planCount > 0 && (
-              <span className="text-[10px] font-bold text-terra bg-terra-light px-1.5 py-0.5 rounded-md">
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md" style={{ color: '#990000', background: '#99000012' }}>
                 📅 {planCount}×
               </span>
             )}
           </div>
         </div>
         {/* Fav */}
-        {recipe.fav && <span className="text-[#E91E63] text-base flex-shrink-0">♥</span>}
+          {recipe.fav && <span className="flex-shrink-0" style={{ color: '#99a680' }}>♥</span>}
       </button>
     )
   }

@@ -13,38 +13,37 @@ export default function DayChip({ dayLabel, dayNum, isToday, isSelected, hasMeal
   return (
     <button
       onClick={onClick}
-      className={cn(
-        'flex-shrink-0 flex flex-col items-center px-3.5 py-2.5 rounded-2xl cursor-pointer border-2 transition-all duration-200',
-        // Default
-        'bg-card border-transparent',
-        // Today
-        isToday && 'bg-white border-terra shadow-[0_0_0_1px_#E07B54]',
-        // Selected (not today)
-        isSelected && !isToday && 'bg-terra-light border-terra',
-      )}
+      style={
+        isToday
+          ? { background: '#990000', border: '2px solid #990000' }
+          : isSelected
+          ? { background: '#99000015', border: '2px solid #990000' }
+          : { background: '#F4F0EA', border: '2px solid transparent' }
+      }
+      className="flex-shrink-0 flex flex-col items-center px-3.5 py-2.5 rounded-2xl cursor-pointer transition-all duration-200"
     >
       <span
-        className={cn(
-          'text-[10px] font-black tracking-widest uppercase',
-          isToday ? 'text-terra' : 'text-muted',
-          isSelected && !isToday && 'text-terra',
-        )}
+        className="text-[10px] font-black tracking-widest uppercase"
+        style={{ color: isToday ? 'rgba(255,255,255,0.75)' : isSelected ? '#990000' : '#988C80' }}
       >
         {dayLabel}
       </span>
       <span
-        className={cn(
-          'text-xl font-black mt-0.5',
-          isToday || isSelected ? 'text-terra' : 'text-text1',
-        )}
+        className="text-xl font-black mt-0.5"
+        style={{ color: isToday ? '#fff' : isSelected ? '#990000' : '#1C1612' }}
       >
         {dayNum}
       </span>
-      {/* dot : today = terra, repas planifié = sage, sinon transparent */}
-      <span className={cn(
-        'w-1.5 h-1.5 rounded-full mt-0.5 transition-colors',
-        isToday ? 'bg-terra' : hasMeal ? 'bg-sage' : 'bg-transparent',
-      )} />
+      <span
+        className="w-1.5 h-1.5 rounded-full mt-0.5 transition-colors"
+        style={{
+          background: isToday
+            ? 'rgba(255,255,255,0.6)'
+            : hasMeal
+            ? '#99a680'
+            : 'transparent',
+        }}
+      />
     </button>
   )
 }

@@ -51,11 +51,11 @@ export default function MealCard({ meal, onPress }: Props) {
       <div className="flex-1 min-w-0">
         <div className="text-sm font-bold text-text1 truncate">{meal.name}</div>
         <div className="flex gap-1.5 mt-1.5 flex-wrap">
-          <span className="text-[11px] font-bold text-[#E65100] bg-[#FFF3E0] px-2 py-0.5 rounded-lg">
+          <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg" style={{ color: '#990000', background: '#99000012' }}>
             {meal.time}
           </span>
           {meal.fav && (
-            <span className="text-[11px] font-bold text-[#E91E63] bg-[#FFF0F0] px-2 py-0.5 rounded-lg">
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg" style={{ color: '#99a680', background: '#99a68018' }}>
               Favori
             </span>
           )}

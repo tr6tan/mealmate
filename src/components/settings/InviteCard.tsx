@@ -3,7 +3,11 @@ import { QRCodeSVG } from 'qrcode.react'
 import { getInviteUrl } from '@/lib/foyer'
 import { showToast } from '@/components/ui/Toast'
 
-export default function InviteCard() {
+interface InviteCardProps {
+  onlineCount: number
+}
+
+export default function InviteCard({ onlineCount }: InviteCardProps) {
   const url = getInviteUrl()
   const [copied, setCopied] = useState(false)
 
@@ -16,9 +20,17 @@ export default function InviteCard() {
 
   return (
     <div className="bg-card rounded-2xl border-[1.5px] border-border p-4">
-      <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-3">
-        Rejoindre ce foyer
-      </p>
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted">
+          Rejoindre ce foyer
+        </p>
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#E8F5E9]">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#4CAF50] animate-pulse" />
+          <span className="text-[10px] font-extrabold text-[#2E7D32]">
+            {onlineCount} connecté{onlineCount > 1 ? 's' : ''}
+          </span>
+        </div>
+      </div>
 
       {/* QR code */}
       <div className="flex flex-col items-center gap-3 mb-4">

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAppStore, selectCurrentWeekPlan } from '@/store/useAppStore'
 import { showToast } from '@/components/ui/Toast'
 import InviteCard from './InviteCard'
+import { useFoyerPresence } from '@/hooks/useFoyerPresence'
 
 // ─── Mini modal d'édition (remplace window.prompt) ───────────────────────────
 interface EditModalProps {
@@ -99,6 +100,7 @@ export default function SettingsPage() {
   const recipes        = useAppStore((s) => s.recipes)
   const shoppingItems  = useAppStore((s) => s.shoppingItems)
   const weekPlan       = useAppStore(selectCurrentWeekPlan)
+  const onlineCount    = useFoyerPresence()
 
   const [editField, setEditField]     = useState<EditField>(null)
   const [dangerField, setDangerField] = useState<DangerField>(null)
@@ -157,6 +159,12 @@ export default function SettingsPage() {
             <h2 className="text-[17px] font-black text-text1 truncate">{settings.nomFoyer}</h2>
             <p className="text-[12px] text-muted font-semibold mt-0.5">
               {settings.personnes} personne{settings.personnes > 1 ? 's' : ''}
+              {onlineCount > 0 && (
+                <span className="ml-2 inline-flex items-center gap-1">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#4CAF50] animate-pulse" />
+                  <span className="text-[#2E7D32]">{onlineCount} en ligne</span>
+                </span>
+              )}
             </p>
           </div>
           <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[10px] font-extrabold flex-shrink-0 ${syncBg}`}>
@@ -217,7 +225,7 @@ export default function SettingsPage() {
       {/* ── Foyer partagé ── */}
       <div className="px-5 mb-5">
         <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-2.5 pl-1">Foyer partagé</p>
-        <InviteCard />
+        <InviteCard onlineCount={onlineCount} />
       </div>
 
       {/* ── Données ── */}
