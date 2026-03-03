@@ -63,41 +63,45 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-30 bg-card backdrop-blur-xl border-t border-sep flex justify-around items-stretch"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      className="fixed bottom-0 left-0 right-0 z-30 bg-card backdrop-blur-xl border-t border-sep flex flex-col"
     >
-      {navItems.map((item) => {
-        const active = activeTab === item.id
-        return (
-          <button
-            key={item.id}
-            onClick={() => setActiveTab(item.id)}
-            className="flex flex-col items-center gap-1 pt-2 pb-2 px-4 flex-1 border-none bg-transparent cursor-pointer"
-          >
-            <span
-              className={cn(
-                'relative flex items-center justify-center w-12 h-7 rounded-full [&>svg]:w-5 [&>svg]:h-5 [&>svg]:stroke-current transition-all duration-200',
-                active ? 'bg-terra-light text-terra' : 'text-muted bg-transparent',
-              )}
+      {/* Rangée de boutons */}
+      <div className="flex justify-around items-stretch">
+        {navItems.map((item) => {
+          const active = activeTab === item.id
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className="flex flex-col items-center gap-1 pt-2 pb-2 px-4 flex-1 border-none bg-transparent cursor-pointer"
             >
-              {item.icon}
-              {item.id === 'courses' && remaining > 0 && (
-                <span className="absolute -top-1 right-0.5 min-w-[16px] h-4 bg-terra text-white text-[9px] font-extrabold rounded-full flex items-center justify-center px-1 leading-none">
-                  {remaining}
-                </span>
-              )}
-            </span>
-            <span
-              className={cn(
-                'text-[10px] font-bold tracking-wide transition-colors duration-200',
-                active ? 'text-terra' : 'text-muted',
-              )}
-            >
-              {item.label}
-            </span>
-          </button>
-        )
-      })}
+              <span
+                className={cn(
+                  'relative flex items-center justify-center w-12 h-7 rounded-full [&>svg]:w-5 [&>svg]:h-5 [&>svg]:stroke-current transition-all duration-200',
+                  active ? 'bg-terra-light text-terra' : 'text-muted bg-transparent',
+                )}
+              >
+                {item.icon}
+                {item.id === 'courses' && remaining > 0 && (
+                  <span className="absolute -top-1 right-0.5 min-w-[16px] h-4 bg-terra text-white text-[9px] font-extrabold rounded-full flex items-center justify-center px-1 leading-none">
+                    {remaining}
+                  </span>
+                )}
+              </span>
+              <span
+                className={cn(
+                  'text-[10px] font-bold tracking-wide transition-colors duration-200',
+                  active ? 'text-terra' : 'text-muted',
+                )}
+              >
+                {item.label}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+      {/* Remplissage safe-area iOS/Android — évite l'espace vide sous la nav en PWA */}
+      <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} className="bg-card" />
     </nav>
   )
 }

@@ -264,22 +264,6 @@ export default function PlanningPage() {
           onTouchEnd={onTouchEnd}
         >
           <div
-            className="flex items-center gap-3 mb-3 rounded-2xl px-4 py-3"
-            style={{ background: '#ffc48f22' }}
-          >
-            <div
-              className="w-1 self-stretch rounded-full flex-shrink-0"
-              style={{ background: '#990000' }}
-            />
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-black tracking-[0.1em] uppercase mb-0.5" style={{ color: '#990000', opacity: 0.6 }}>
-                {selectedIdx === todayIdx && weekOffset === 0 ? "Aujourd'hui" : weekTitle}
-              </p>
-              <p className="text-[17px] font-extrabold truncate" style={{ color: '#1C1612' }}>{selectedLabel}</p>
-            </div>
-            <span className="text-2xl">📅</span>
-          </div>
-          <div
             className={cn(
               'transition-all duration-200 ease-out',
               slideDir === 'left'  && 'animate-slide-left',
