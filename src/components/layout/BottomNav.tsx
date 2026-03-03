@@ -64,6 +64,7 @@ export default function BottomNav() {
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-30 bg-card backdrop-blur-xl border-t border-sep flex flex-col"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       {/* Rangée de boutons */}
       <div className="flex justify-around items-stretch">
@@ -106,8 +107,7 @@ export default function BottomNav() {
           )
         })}
       </div>
-      {/* Remplissage safe-area iOS/Android — évite l'espace vide sous la nav en PWA */}
-      <div style={{ height: 'env(safe-area-inset-bottom, 0px)' }} className="bg-card" />
+      {/* Plus besoin du spacer div — padding-bottom sur le nav gère la safe area */}
     </nav>
   )
 }
