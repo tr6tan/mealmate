@@ -25,6 +25,7 @@ function scheduleFieldWrite(
   if (_timers[key]) clearTimeout(_timers[key])
   // Mémorise les champs en attente pour le flush beforeunload
   _pendingFields[key] = fields
+  // Délai réduit à 0 : Firestore gère lui-même le batching et la file offline
   _timers[key] = setTimeout(async () => {
     delete _pendingFields[key]
     onSaving()
@@ -36,7 +37,7 @@ function scheduleFieldWrite(
       console.error('[MealMate] Erreur Firestore write:', e)
       onError()
     }
-  }, 600)
+  }, 0)
 }
 
 /** Flush immédiat de tous les champs en attente (appelé avant kill de l'app). */

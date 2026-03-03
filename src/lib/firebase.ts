@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { getFirestore } from 'firebase/firestore'
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore'
 
 // Colle ici ta config Firebase (console.firebase.google.com → Ton projet → </> → Config)
 // OU remplis le fichier .env.local avec tes valeurs
@@ -13,4 +13,12 @@ const firebaseConfig = {
 }
 
 const app = initializeApp(firebaseConfig)
-export const db = getFirestore(app)
+
+// Persistance offline native Firestore (IndexedDB)
+// — Les écritures hors ligne sont mises en file et envoyées dès le retour de connexion
+// — Les lectures fonctionnent depuis le cache même sans réseau
+export const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({
+    tabManager: persistentMultipleTabManager(),
+  }),
+})
