@@ -13,8 +13,8 @@ export default function AppShell({ nav, children }: Props) {
 
   return (
     <div className="relative flex flex-col h-[100dvh] bg-bg overflow-hidden">
-      {/* Contenu scrollable */}
-      <main className="flex-1 overflow-y-auto overflow-x-hidden no-scrollbar pt-safe pb-nav-safe">
+      {/* Contenu — chaque page gère son propre scroll */}
+      <main className="flex-1 overflow-hidden flex flex-col">
         {nav}
       </main>
 

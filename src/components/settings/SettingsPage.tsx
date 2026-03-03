@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useAppStore, selectCurrentWeekPlan } from '@/store/useAppStore'
 import { showToast } from '@/components/ui/Toast'
 import InviteCard from './InviteCard'
@@ -52,7 +52,7 @@ function EditModal({ label, value, type, onSave, onClose }: EditModalProps) {
 
 // ─── Ligne de réglage ─────────────────────────────────────────────────────────
 interface SettingsRowProps {
-  icon: string
+  icon: ReactNode
   iconBg: string
   label: string
   value?: string
@@ -147,7 +147,9 @@ export default function SettingsPage() {
     .join('')
 
   return (
-    <div className="pb-8">
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="flex-shrink-0 pt-safe" />
+      <div className="flex-1 overflow-y-auto no-scrollbar overscroll-contain pb-nav-safe">
 
       {/* ── Hero foyer ── */}
       <div className="px-5 pt-5 pb-4">
@@ -199,21 +201,21 @@ export default function SettingsPage() {
         <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-2.5 pl-1">Préférences</p>
         <div className="bg-card rounded-xl border-[1.5px] border-border overflow-hidden">
           <SettingsRow
-            icon="🏠"
+          icon={<svg className="w-5 h-5 text-terra" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>}
             iconBg="bg-[#FFF3EE]"
             label="Nom du foyer"
             value={settings.nomFoyer}
             onClick={() => setEditField('nom')}
           />
           <SettingsRow
-            icon="👥"
+          icon={<svg className="w-5 h-5 text-sage" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>}
             iconBg="bg-[#EEF6F0]"
             label="Nombre de personnes"
             value={`${settings.personnes} pers.`}
             onClick={() => setEditField('personnes')}
           />
           <SettingsRow
-            icon="🌙"
+          icon={<svg className="w-5 h-5 text-text2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>}
             iconBg="bg-[#EEF2FF]"
             label="Mode sombre"
             value={settings.darkMode ? 'Actif' : 'Désactivé'}
@@ -233,7 +235,7 @@ export default function SettingsPage() {
         <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-2.5 pl-1">Données</p>
         <div className="bg-card rounded-xl border-[1.5px] border-border overflow-hidden">
           <SettingsRow
-            icon="🗑️"
+          icon={<svg className="w-5 h-5 text-[#C0304A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>}
             iconBg="bg-[#FDE8F0]"
             label="Effacer la semaine"
             sub="Remet tous les repas à zéro"
@@ -243,7 +245,7 @@ export default function SettingsPage() {
             confirmLabel="Appuyer à nouveau pour confirmer"
           />
           <SettingsRow
-            icon="🔄"
+          icon={<svg className="w-5 h-5 text-[#C0304A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>}
             iconBg="bg-[#FDE8F0]"
             label="Réinitialiser les recettes"
             sub="Supprime vos recettes personnalisées"
@@ -256,11 +258,12 @@ export default function SettingsPage() {
       </div>
 
       {/* ── Footer ── */}
-      <div className="px-5 text-center mt-2">
-        <p className="text-[11px] font-semibold text-muted">MealMate v1.0 · Fait avec ❤️</p>
+      <div className="px-5 text-center mt-2 pb-6">
+        <p className="text-[11px] font-semibold text-muted">MealMate v1.0 · Fait avec <svg className="w-3 h-3 inline text-[#C0304A]" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></p>
       </div>
+      </div>{/* /scroll */}
 
-      {/* ── EditModal ── */}
+      {/* Modals en dehors du scroll container pour éviter les bugs iOS PWA */}
       {editField === 'nom' && (
         <EditModal
           label="Nom du foyer"

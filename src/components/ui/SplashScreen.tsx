@@ -37,7 +37,7 @@ export default function SplashScreen({ onDone }: { onDone: () => void }) {
           width:        '200vmax',
           height:       '200vmax',
           borderRadius: '50%',
-          background:   '#990000',
+          background:   '#D23D2D',
           transform:    stage === 1
             ? 'translate(-50%, -50%) scale(1)'
             : 'translate(-50%, -50%) scale(0)',

@@ -5,12 +5,12 @@ import type { ShoppingCategory } from '@/types'
 import { CAT_LABELS, cn } from '@/lib/utils'
 import { showToast } from '@/components/ui/Toast'
 
-const CATEGORIES: { id: ShoppingCategory; icon: string }[] = [
-  { id: 'legumes',  icon: '🥦' },
-  { id: 'viandes',  icon: '🥩' },
-  { id: 'cremerie', icon: '🧀' },
-  { id: 'epicerie', icon: '🛒' },
-  { id: 'maison',   icon: '🧴' },
+const CATEGORIES: { id: ShoppingCategory }[] = [
+  { id: 'legumes' },
+  { id: 'viandes' },
+  { id: 'cremerie' },
+  { id: 'epicerie' },
+  { id: 'maison' },
 ]
 
 // ─── Moteur de reconnaissance ─────────────────────────────────────────────────
@@ -205,7 +205,7 @@ export default function AddItemSheet() {
         <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted">Catégorie</p>
         {autoDetected && (
           <span className="text-[10px] font-bold text-[#2E7D32] bg-[#E8F5E9] px-2 py-0.5 rounded-full">
-            ✦ Détectée auto
+            Détectée auto
           </span>
         )}
       </div>
@@ -221,7 +221,7 @@ export default function AddItemSheet() {
                 : 'bg-card border-border text-muted',
             )}
           >
-            {cat.icon} {CAT_LABELS[cat.id].split(' ')[0]}
+            {CAT_LABELS[cat.id].split(' ')[0]}
           </button>
         ))}
       </div>

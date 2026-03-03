@@ -1,4 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" rx="22" fill="#E07B54"/>
-  <text y=".9em" font-size="80" x="10">🍽</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fond crème arrondi -->
+  <rect width="512" height="512" rx="112" fill="#F8EECB"/>
+
+  <!-- Fourchette — 3 dents -->
+  <rect x="199" y="76" width="28" height="148" rx="14" fill="#D23D2D"/>
+  <rect x="242" y="76" width="28" height="148" rx="14" fill="#D23D2D"/>
+  <rect x="285" y="76" width="28" height="148" rx="14" fill="#D23D2D"/>
+
+  <!-- Base pleine couvrant le bas des 3 dents -->
+  <rect x="199" y="198" width="114" height="48" fill="#D23D2D"/>
+
+  <!-- Cône de transition dents → manche -->
+  <path d="M199,240 L313,240 L287,278 L225,278 Z" fill="#D23D2D"/>
+
+  <!-- Manche -->
+  <rect x="225" y="263" width="62" height="174" rx="31" fill="#D23D2D"/>
 </svg>

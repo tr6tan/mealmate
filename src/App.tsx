@@ -83,7 +83,7 @@ function TabPanel({ active, children }: { active: boolean; children: ReactNode }
   if (active) hasMountedRef.current = true
   if (!hasMountedRef.current) return null
   return (
-    <div className={active ? 'block' : 'hidden'}>
+    <div className={active ? 'flex flex-col flex-1 min-h-0' : 'hidden'}>
       {children}
     </div>
   )

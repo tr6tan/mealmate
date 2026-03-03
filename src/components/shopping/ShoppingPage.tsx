@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect } from 'react'
+import { useMemo, useRef, useEffect, useState } from 'react'
 import confetti from 'canvas-confetti'
 import { useAppStore } from '@/store/useAppStore'
 import type { ShoppingCategory } from '@/types'
@@ -6,12 +6,12 @@ import { CAT_LABELS, MONTHS, getMondayByOffset, cn } from '@/lib/utils'
 import ShoppingCategorySection from './ShoppingCategorySection'
 import { showToast } from '@/components/ui/Toast'
 
-const CATEGORIES: { id: ShoppingCategory; icon: string }[] = [
-  { id: 'legumes',  icon: '🥦' },
-  { id: 'viandes',  icon: '🥩' },
-  { id: 'cremerie', icon: '🧀' },
-  { id: 'epicerie', icon: '🛒' },
-  { id: 'maison',   icon: '🧴' },
+const CATEGORIES: { id: ShoppingCategory }[] = [
+  { id: 'legumes' },
+  { id: 'viandes' },
+  { id: 'cremerie' },
+  { id: 'epicerie' },
+  { id: 'maison' },
 ]
 
 export default function ShoppingPage() {
@@ -22,6 +22,13 @@ export default function ShoppingPage() {
   const shoppingItems       = useAppStore((s) => s.shoppingItems)
   const weekOffset          = useAppStore((s) => s.weekOffset)
 
+  const [clearConfirm, setClearConfirm] = useState(false)
+
+  const handleClearAll = () => {
+    if (clearConfirm) { clearAllItems(); showToast('Liste vidée'); setClearConfirm(false) }
+    else { setClearConfirm(true); setTimeout(() => setClearConfirm(false), 3000) }
+  }
+
   const total   = shoppingItems.length
   const checked = shoppingItems.filter((i) => i.checked).length
   const remaining = total - checked
@@ -30,8 +37,8 @@ export default function ShoppingPage() {
   const prevPctRef = useRef(0)
   useEffect(() => {
     if (pct === 100 && total > 0 && prevPctRef.current < 100) {
-      confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 }, colors: ['#990000', '#ffc48f', '#99a680', '#9bb5bd'] })
-      showToast('🎉 Liste complète !')
+      confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 }, colors: ['#D23D2D', '#F5C065', '#31603D', '#6E433D'] })
+      showToast('Liste complète !')
     }
     prevPctRef.current = pct
   }, [pct, total])
@@ -50,18 +57,18 @@ export default function ShoppingPage() {
   }
 
   const handleCopy = () => {
-    const CAT_ICONS: Record<string, string> = { legumes: '🥦', viandes: '🥩', cremerie: '🧀', epicerie: '🛒', maison: '🧴' }
     const lines = shoppingItems
       .filter((i) => !i.checked)
-      .map((i) => `${CAT_ICONS[i.category] ?? ''} ${i.name}${i.qty ? ' – ' + i.qty : ''}`)
+      .map((i) => `${CAT_LABELS[i.category]} : ${i.name}${i.qty ? ' – ' + i.qty : ''}`)
     if (!lines.length) { showToast('La liste est vide !'); return }
-    navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('📋 Liste copiée !'))
+    navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('Liste copiée !'))
   }
 
   return (
-    <div className="pb-36">
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="flex-shrink-0 pt-safe" />
       {/* Header */}
-      <div className="flex items-center justify-between px-5 pt-4 pb-3">
+      <div className="flex-shrink-0 flex items-center justify-between px-5 pt-4 pb-3">
         <div>
           <h1 className="text-2xl font-black text-text1">Courses</h1>
           <p className="text-[13px] text-muted font-semibold mt-0.5">{weekLabel}</p>
@@ -89,11 +96,12 @@ export default function ShoppingPage() {
         </div>
       </div>
 
+      <div className="flex-1 overflow-y-auto no-scrollbar overscroll-contain pb-nav-safe">
       {total === 0 ? (
         /* ── Empty state ── */
         <div className="px-5 pt-6 flex flex-col items-center gap-5">
-          <div className="w-20 h-20 rounded-full bg-terra-light flex items-center justify-center text-4xl">
-            🛒
+          <div className="w-20 h-20 rounded-full bg-terra-light flex items-center justify-center">
+            <svg className="w-9 h-9" style={{ color: '#D23D2D80' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
           </div>
           <div className="text-center">
             <p className="text-base font-extrabold text-text1 mb-1">Liste vide</p>
@@ -127,7 +135,7 @@ export default function ShoppingPage() {
                   pct === 100 ? 'text-sage' : 'text-terra'
                 )}>{pct}%</span>
                 <span className="text-[12px] font-bold text-muted">
-                  {remaining > 0 ? `${remaining} restant${remaining > 1 ? 's' : ''}` : '✅ Tout coché !'}
+                  {remaining > 0 ? `${remaining} restant${remaining > 1 ? 's' : ''}` : 'Tout coché !'}
                 </span>
               </div>
               <span className="text-[12px] font-bold text-muted">{checked}/{total}</span>
@@ -138,7 +146,7 @@ export default function ShoppingPage() {
                   'h-full rounded-full transition-all duration-500',
                   pct === 100 ? 'bg-sage' : ''
                 )}
-                style={pct !== 100 ? { background: 'linear-gradient(to right, #990000, #c04040)', width: `${pct}%` } : { width: `${pct}%` }}
+                style={pct !== 100 ? { background: 'linear-gradient(to right, #D23D2D, #A32E20)', width: `${pct}%` } : { width: `${pct}%` }}
               />
             </div>
           </div>
@@ -148,7 +156,7 @@ export default function ShoppingPage() {
             <button
               onClick={handleGenerate}
               className="w-full border-2 rounded-2xl py-3 flex items-center justify-center gap-2 text-sm font-extrabold active:scale-[0.97] transition-transform"
-              style={{ borderColor: '#99000030', color: '#990000', background: '#99000008' }}
+              style={{ borderColor: '#D23D2D30', color: '#D23D2D', background: '#D23D2D08' }}
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
                 <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
@@ -164,13 +172,13 @@ export default function ShoppingPage() {
               <ShoppingCategorySection
                 key={cat.id}
                 category={cat.id}
-                icon={cat.icon}
                 label={CAT_LABELS[cat.id]}
               />
             ))}
           </div>
         </>
       )}
+      </div>{/* /scroll */}
 
       {/* Barre d'actions fixe en bas */}
       {total > 0 && (
@@ -186,15 +194,13 @@ export default function ShoppingPage() {
             </button>
           )}
           <button
-            onClick={() => {
-              if (window.confirm('Vider toute la liste de courses ?')) {
-                clearAllItems()
-                showToast('Liste vidée')
-              }
-            }}
-            className="flex-1 py-2.5 rounded-xl bg-[#FDE8F0] text-[#C0304A] text-xs font-extrabold active:scale-95 transition-transform"
+            onClick={handleClearAll}
+            className="flex-1 py-2.5 rounded-xl text-xs font-extrabold active:scale-95 transition-transform"
+            style={clearConfirm
+              ? { background: '#FDE8F0', color: '#C0304A' }
+              : { background: '#FDE8F0', color: '#C0304A' }}
           >
-            Vider la liste
+            {clearConfirm ? 'Confirmer ?' : 'Vider la liste'}
           </button>
         </div>
       )}

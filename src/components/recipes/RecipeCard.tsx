@@ -2,15 +2,15 @@ import { cn } from '@/lib/utils'
 import type { Recipe } from '@/types'
 
 const PERIOD_COLOR: Record<string, string> = {
-  pdej: 'text-[#c07820] bg-[#ffc48f20]',
-  midi: 'text-[#990000] bg-[#99000015]',
-  soir: 'text-[#4a7480] bg-[#9bb5bd20]',
+  pdej: 'text-[#B07A10] bg-[#F5C06520]',
+  midi: 'text-[#D23D2D] bg-[#D23D2D15]',
+  soir: 'text-[#5A3832] bg-[#6E433D20]',
 }
 const PERIOD_LABEL: Record<string, string> = { pdej: 'Petit-dej', midi: 'Midi', soir: 'Soir' }
 const PERIOD_GRADIENT: Record<string, string> = {
-  pdej: 'from-[#ffc48f20] to-[#ffc48f40]',
-  midi: 'from-[#99000010] to-[#99000020]',
-  soir: 'from-[#9bb5bd15] to-[#9bb5bd30]',
+  pdej: 'from-[#F5C06520] to-[#F5C06540]',
+  midi: 'from-[#D23D2D10] to-[#D23D2D20]',
+  soir: 'from-[#6E433D15] to-[#6E433D30]',
 }
 
 interface Props {
@@ -28,10 +28,10 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
         className="w-full bg-card rounded-2xl border-[1.5px] border-border flex items-center gap-3 px-3 py-2.5 text-left active:scale-[0.98] transition-transform"
       >
         {/* Thumbnail */}
-        <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-gradient-to-br from-terra-light to-sep flex items-center justify-center text-2xl">
+        <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-gradient-to-br from-terra-light to-sep flex items-center justify-center">
           {recipe.photo
             ? <img src={recipe.photo} alt={recipe.name} className="w-full h-full object-cover" loading="lazy" />
-            : <span>{recipe.emoji}</span>
+            : <svg className="w-6 h-6 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v4M8 11v6M12 3v10M12 17v4M16 3v4M16 11v6" /></svg>
           }
         </div>
         {/* Info */}
@@ -40,20 +40,20 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
             <span className={cn('text-[9px] font-extrabold tracking-[0.07em] uppercase px-1.5 py-0.5 rounded-md', PERIOD_COLOR[recipe.period])}>
               {PERIOD_LABEL[recipe.period]}
             </span>
-            {recipe.rapide && <span className="text-[10px]">&#x26A1;</span>}
+            {recipe.rapide && <svg className="w-3 h-3 text-[#B07A10]" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>}
           </div>
           <p className="text-[13px] font-extrabold text-text1 truncate">{recipe.name}</p>
           <div className="flex items-center gap-2 mt-0.5">
             <p className="text-[11px] text-muted font-semibold">{recipe.time}</p>
             {planCount > 0 && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md" style={{ color: '#990000', background: '#99000012' }}>
-                📅 {planCount}×
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md" style={{ color: '#D23D2D', background: '#D23D2D12' }}>
+                {planCount}×
               </span>
             )}
           </div>
         </div>
         {/* Fav */}
-          {recipe.fav && <span className="flex-shrink-0" style={{ color: '#99a680' }}>♥</span>}
+          {recipe.fav && <svg className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#31603D' }} viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>}
       </button>
     )
   }
@@ -74,15 +74,21 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
             onError={(e) => (e.currentTarget.style.display = 'none')}
           />
         ) : (
-          <span className="absolute inset-0 flex items-center justify-center text-4xl">{recipe.emoji}</span>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <svg className="w-7 h-7 text-muted/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v4M8 11v6M12 3v10M12 17v4M16 3v4M16 11v6" /></svg>
+          </div>
         )}
         {/* Badges overlay */}
         <div className="absolute top-1 left-1 flex gap-0.5">
           {recipe.fav && (
-            <span className="w-4 h-4 rounded-full bg-white/90 flex items-center justify-center text-[9px] shadow-sm">♥</span>
+            <span className="w-4 h-4 rounded-full bg-white/90 flex items-center justify-center shadow-sm">
+              <svg className="w-2.5 h-2.5 text-[#31603D]" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </span>
           )}
           {recipe.rapide && (
-            <span className="w-4 h-4 rounded-full bg-white/90 flex items-center justify-center text-[9px] shadow-sm">⚡</span>
+            <span className="w-4 h-4 rounded-full bg-white/90 flex items-center justify-center shadow-sm">
+              <svg className="w-2.5 h-2.5 text-[#B07A10]" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </span>
           )}
         </div>
         {/* Period badge */}
@@ -100,7 +106,7 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
         <div className="flex items-center justify-between mt-1">
           <p className="text-[10px] text-muted font-semibold">{recipe.time}</p>
           {planCount > 0 && (
-            <span className="text-[9px] font-bold text-terra">📅{planCount}×</span>
+            <span className="text-[9px] font-bold text-terra">{planCount}×</span>
           )}
         </div>
       </div>

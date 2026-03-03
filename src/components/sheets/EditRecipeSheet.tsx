@@ -7,12 +7,12 @@ import { showToast } from '@/components/ui/Toast'
 
 const PERIODS: Period[] = ['pdej', 'midi', 'soir']
 const TIME_OPTIONS = ['5 min', '10 min', '15 min', '20 min', '30 min', '45 min', '1h', '1h30']
-const CAT_OPTIONS: { id: ShoppingCategory; icon: string; label: string }[] = [
-  { id: 'legumes',  icon: '🥦', label: 'Légumes'  },
-  { id: 'viandes',  icon: '🥩', label: 'Viandes'  },
-  { id: 'cremerie', icon: '🧀', label: 'Crèmerie' },
-  { id: 'epicerie', icon: '🛒', label: 'Épicerie'  },
-  { id: 'maison',   icon: '🧴', label: 'Maison'   },
+const CAT_OPTIONS: { id: ShoppingCategory; label: string }[] = [
+  { id: 'legumes',  label: 'Lég.' },
+  { id: 'viandes',  label: 'Vde.' },
+  { id: 'cremerie', label: 'Crem.' },
+  { id: 'epicerie', label: 'Épic.' },
+  { id: 'maison',   label: 'Mais.' },
 ]
 
 function resizeToBase64(file: File, maxW = 800, quality = 0.72): Promise<string> {
@@ -44,7 +44,6 @@ export default function EditRecipeSheet() {
   const recipe = sheetState.sheet === 'edit-recipe' ? sheetState.recipeContext : undefined
 
   const [name,        setName]        = useState('')
-  const [emoji,       setEmoji]       = useState('🍽️')
   const [time,        setTime]        = useState('')
   const [timeCustom,  setTimeCustom]  = useState(false)
   const [period,      setPeriod]      = useState<Period>('midi')
@@ -59,7 +58,6 @@ export default function EditRecipeSheet() {
   useEffect(() => {
     if (recipe) {
       setName(recipe.name)
-      setEmoji(recipe.emoji)
       setTime(recipe.time)
       setTimeCustom(!TIME_OPTIONS.includes(recipe.time))
       setPeriod(recipe.period)
@@ -100,7 +98,7 @@ export default function EditRecipeSheet() {
     const cleanIngredients = ingredients.filter((i) => i.name.trim())
     updateRecipe(recipe.id, {
       name: name.trim(),
-      emoji,
+      emoji: recipe.emoji,
       period,
       time: time.trim() || '? min',
       fav,
@@ -119,25 +117,18 @@ export default function EditRecipeSheet() {
     <BottomSheet name="edit-recipe" className="max-h-[92dvh]">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-[17px] font-extrabold text-text1">Modifier la recette</h2>
-        <button onClick={closeSheet} className="text-muted text-xl">✕</button>
+        <button onClick={closeSheet} className="text-muted flex items-center"><svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
 
       <div className="space-y-2.5 mb-4">
-        {/* Emoji + nom */}
-        <div className="flex gap-2">
-          <input
-            value={emoji}
-            onChange={(e) => setEmoji(e.target.value)}
-            className="w-14 px-3 py-3 bg-card border-[1.5px] border-border rounded-2xl text-xl text-center outline-none focus:border-terra"
-          />
-          <input
-            type="text"
-            placeholder="Nom de la recette…"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="flex-1 px-3.5 py-3 bg-card border-[1.5px] border-border rounded-2xl text-sm font-semibold text-text1 outline-none placeholder:text-muted focus:border-terra transition-colors"
-          />
-        </div>
+        {/* Nom */}
+        <input
+          type="text"
+          placeholder="Nom de la recette…"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full px-3.5 py-3 bg-card border-[1.5px] border-border rounded-2xl text-sm font-semibold text-text1 outline-none placeholder:text-muted focus:border-terra transition-colors"
+        />
       </div>
 
       {/* Temps */}
@@ -195,8 +186,8 @@ export default function EditRecipeSheet() {
           {photo ? (
             <img src={photo} alt="aperçu" className="w-full h-full object-cover" />
           ) : (
-            <>
-              <span className="text-2xl">📷</span>
+            <>          
+              <svg className="w-6 h-6 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
               <span className="text-[11px] font-bold text-muted">Ajouter une photo</span>
             </>
           )}
@@ -284,7 +275,7 @@ export default function EditRecipeSheet() {
               className="w-10 py-2.5 bg-card border-[1.5px] border-border rounded-xl text-sm outline-none focus:border-terra transition-colors text-center cursor-pointer"
             >
               {CAT_OPTIONS.map((c) => (
-                <option key={c.id} value={c.id}>{c.icon}</option>
+                <option key={c.id} value={c.id}>{c.label}</option>
               ))}
             </select>
             <button

@@ -73,24 +73,30 @@ export default function BottomNav() {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className="flex flex-col items-center gap-1 pt-2 pb-2 px-4 flex-1 border-none bg-transparent cursor-pointer"
+              className="flex flex-col items-center gap-1 pt-2 pb-2 px-4 flex-1 border-none bg-transparent cursor-pointer relative"
             >
+              {/* Indicateur actif — barre en haut */}
+              {active && (
+                <span
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[3px] rounded-full bg-terra"
+                />
+              )}
               <span
                 className={cn(
-                  'relative flex items-center justify-center w-12 h-7 rounded-full [&>svg]:w-5 [&>svg]:h-5 [&>svg]:stroke-current transition-all duration-200',
-                  active ? 'bg-terra-light text-terra' : 'text-muted bg-transparent',
+                  'relative flex items-center justify-center w-10 h-8 rounded-xl [&>svg]:w-5 [&>svg]:h-5 [&>svg]:stroke-current transition-all duration-200',
+                  active ? 'text-terra' : 'text-muted',
                 )}
               >
                 {item.icon}
                 {item.id === 'courses' && remaining > 0 && (
-                  <span className="absolute -top-1 right-0.5 min-w-[16px] h-4 bg-terra text-white text-[9px] font-extrabold rounded-full flex items-center justify-center px-1 leading-none">
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-terra text-white text-[9px] font-extrabold rounded-full flex items-center justify-center px-1 leading-none">
                     {remaining}
                   </span>
                 )}
               </span>
               <span
                 className={cn(
-                  'text-[10px] font-bold tracking-wide transition-colors duration-200',
+                  'text-[10px] font-black tracking-wide transition-colors duration-200',
                   active ? 'text-terra' : 'text-muted',
                 )}
               >

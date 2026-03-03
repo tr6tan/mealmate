@@ -15,22 +15,22 @@ export default function DayChip({ dayLabel, dayNum, isToday, isSelected, hasMeal
       onClick={onClick}
       style={
         isToday
-          ? { background: '#990000', border: '2px solid #990000' }
+          ? { background: '#D23D2D', border: '2px solid #D23D2D', boxShadow: '0 4px 14px rgba(210,61,45,0.35)' }
           : isSelected
-          ? { background: '#99000015', border: '2px solid #990000' }
-          : { background: '#F4F0EA', border: '2px solid transparent' }
+          ? { background: '#FFFCF0', border: '2px solid #D23D2D' }
+          : { background: '#FFFCF0', border: '2px solid transparent', opacity: 0.75 }
       }
       className="flex-shrink-0 flex flex-col items-center px-3.5 py-2.5 rounded-2xl cursor-pointer transition-all duration-200"
     >
       <span
         className="text-[10px] font-black tracking-widest uppercase"
-        style={{ color: isToday ? 'rgba(255,255,255,0.75)' : isSelected ? '#990000' : '#988C80' }}
+        style={{ color: isToday ? 'rgba(255,255,255,0.75)' : isSelected ? '#D23D2D' : '#986C58' }}
       >
         {dayLabel}
       </span>
       <span
         className="text-xl font-black mt-0.5"
-        style={{ color: isToday ? '#fff' : isSelected ? '#990000' : '#1C1612' }}
+        style={{ color: isToday ? '#fff' : isSelected ? '#281008' : '#986C58' }}
       >
         {dayNum}
       </span>
@@ -40,7 +40,7 @@ export default function DayChip({ dayLabel, dayNum, isToday, isSelected, hasMeal
           background: isToday
             ? 'rgba(255,255,255,0.6)'
             : hasMeal
-            ? '#99a680'
+            ? '#31603D'
             : 'transparent',
         }}
       />

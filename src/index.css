@@ -3,22 +3,22 @@
 @tailwind utilities;
 
 /* ── Design tokens — Light ── */
-/* Palette : parade balloon #ffc48f · sage leaves #99a680 · candle sticks #990000 · chinoiserie plates #9bb5bd */
+/* Palette : fire red #D23D2D · vanilla cream #F8EECB · retro green #31603D · saffron #F5C065 · russet #6E433D */
 :root {
-  --c-bg:          248 248 247; /* #F8F8F7 — blanc neutre légèrement chaud */
-  --c-card:        255 255 255; /* #FFFFFF */
-  --c-sep:         242 240 238; /* #F2F0EE */
-  --c-border:      230 228 224; /* #E6E4E0 */
-  --c-text1:        24  20  18; /* #181412 */
-  --c-text2:        72  58  46; /* #483A2E */
-  --c-muted:       150 144 138; /* #96908A */
-  --c-terra:       153   0   0; /* #990000 — candle sticks */
-  --c-terra-light: 255 236 220; /* #FFECDC — parade balloon clair */
-  --c-terra-dark:  110   0   0; /* #6E0000 */
-  --c-sage:        153 166 128; /* #99a680 — sage leaves */
-  --c-sage-light:  232 238 224; /* #E8EEE0 */
-  --c-morning:     255 196 143; /* #ffc48f — parade balloon */
-  --c-evening:     155 181 189; /* #9bb5bd — chinoiserie plates */
+  --c-bg:          248 238 203; /* #F8EECB — vanilla cream */
+  --c-card:        255 252 240; /* #FFFCF0 — ivoire chaud, contraste net sur bg */
+  --c-sep:         237 224 168; /* #EDE0A8 — séparateur doré doux */
+  --c-border:      216 200 128; /* #D8C880 — bordure dorée lisible */
+  --c-text1:        40  16   8; /* #281008 — brun très foncé */
+  --c-text2:       110  67  61; /* #6E433D — russet */
+  --c-muted:       152 108  88; /* #986C58 — brun moyen léger */
+  --c-terra:       210  61  45; /* #D23D2D — fire red */
+  --c-terra-light: 250 220 215; /* #FADCD7 — fire red très clair */
+  --c-terra-dark:  155  30  18; /* #9B1E12 */
+  --c-sage:         49  96  61; /* #31603D — retro green */
+  --c-sage-light:  185 215 190; /* #B9D7BE — vert sauge clair */
+  --c-morning:     245 192 101; /* #F5C065 — saffron (petit-déj) */
+  --c-evening:     110  67  61; /* #6E433D — russet (dîner) */
 }
 
 /* ── Design tokens — Dark ── */

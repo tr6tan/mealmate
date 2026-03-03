@@ -16,9 +16,9 @@ interface PeriodConfig {
 }
 
 const PERIOD_STYLE = {
-  pdej: { dot: '#ffc48f', bg: '#ffc48f12', label: '#c07820', emoji: '☀️' },
-  midi: { dot: '#990000', bg: '#99000010', label: '#990000', emoji: '🍽️' },
-  soir: { dot: '#9bb5bd', bg: '#9bb5bd12', label: '#4a7480', emoji: '🌙' },
+  pdej: { dot: '#F5C065', bg: '#F5C06518', label: '#9B6A00' },
+  midi: { dot: '#D23D2D', bg: '#D23D2D14', label: '#D23D2D' },
+  soir: { dot: '#6E433D', bg: '#6E433D14', label: '#6E433D' },
 } as const
 
 const PERIODS: PeriodConfig[] = [
@@ -56,14 +56,15 @@ export default function DayView({ dayIdx }: Props) {
       {/* ── Banner "Ce soir" (aujourd'hui seulement) ──────────────────────── */}
       {isToday && plan.soir && (
         <button
-          className="flex items-center gap-3 bg-[#F4F0FA] border-[1.5px] border-evening/30 rounded-2xl px-3.5 py-2.5 text-left active:scale-[0.98] transition-transform"
+          className="flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-left active:scale-[0.98] transition-transform border-[1.5px]"
+          style={{ background: '#6E433D10', borderColor: '#6E433D30' }}
           onClick={() =>
             openSheet({ sheet: 'meal-actions', actionContext: { dayIdx, slotKey: 'soir', meal: plan.soir! } })
           }
         >
-          <span className="text-2xl leading-none flex-shrink-0">{plan.soir.emoji}</span>
+          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#6E433D' }} />
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-extrabold text-evening uppercase tracking-wide mb-0.5">Ce soir</p>
+            <p className="text-[10px] font-extrabold uppercase tracking-wide mb-0.5" style={{ color: '#6E433D' }}>Ce soir</p>
             <p className="text-[13px] font-extrabold text-text1 truncate">{plan.soir.name}</p>
           </div>
           {plan.soir.time && (
@@ -77,7 +78,6 @@ export default function DayView({ dayIdx }: Props) {
       {/* ── Empty state ────────────────────────────────────────────────────── */}
       {isEmpty && weekOffset !== 0 && (
         <div className="flex flex-col items-center gap-2 py-8 text-center">
-          <span className="text-4xl">🗓️</span>
           <p className="text-sm font-bold text-text1">Rien de planifié</p>
           <p className="text-xs text-muted">Appuie sur un slot pour ajouter un repas</p>
         </div>
@@ -99,23 +99,23 @@ export default function DayView({ dayIdx }: Props) {
               >
                 {/* Pill */}
                 <span
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black flex-shrink-0"
-                  style={{ background: PERIOD_STYLE[period].label, color: '#fff' }}
+                  className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-black flex-shrink-0 border"
+                  style={{ background: PERIOD_STYLE[period].bg, color: PERIOD_STYLE[period].label, borderColor: PERIOD_STYLE[period].label + '30' }}
                 >
-                  {PERIOD_STYLE[period].emoji}
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: PERIOD_STYLE[period].dot }} />
                   <span>{label}</span>
                 </span>
                 {/* Ligne */}
-                <span className="flex-1 h-px opacity-20" style={{ background: PERIOD_STYLE[period].label }} />
+                <span className="flex-1 h-px opacity-15" style={{ background: PERIOD_STYLE[period].label }} />
                 {/* Aperçu replié */}
                 {mainMeal && !pdejOpen && (
-                  <span className="text-[11px] font-semibold truncate max-w-[100px] flex-shrink-0" style={{ color: PERIOD_STYLE[period].label, opacity: 0.75 }}>
-                    {mainMeal.emoji} {mainMeal.name}
+                  <span className="text-[11px] font-semibold truncate max-w-[100px] flex-shrink-0" style={{ color: PERIOD_STYLE[period].label, opacity: 0.7 }}>
+                    {mainMeal.name}
                   </span>
                 )}
                 <span
                   className={`text-xs flex-shrink-0 inline-block transition-transform duration-200 ${pdejOpen ? 'rotate-180' : ''}`}
-                  style={{ color: PERIOD_STYLE[period].label, opacity: 0.5 }}
+                  style={{ color: PERIOD_STYLE[period].label, opacity: 0.4 }}
                 >
                   ▾
                 </span>
@@ -124,14 +124,14 @@ export default function DayView({ dayIdx }: Props) {
               <div className="flex items-center gap-3 mb-3">
                 {/* Pill */}
                 <span
-                  className="flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black flex-shrink-0"
-                  style={{ background: PERIOD_STYLE[period].label, color: '#fff' }}
+                  className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-black flex-shrink-0 border"
+                  style={{ background: PERIOD_STYLE[period].bg, color: PERIOD_STYLE[period].label, borderColor: PERIOD_STYLE[period].label + '30' }}
                 >
-                  {PERIOD_STYLE[period].emoji}
+                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: PERIOD_STYLE[period].dot }} />
                   <span>{label}</span>
                 </span>
                 {/* Ligne */}
-                <span className="flex-1 h-px opacity-20" style={{ background: PERIOD_STYLE[period].label }} />
+                <span className="flex-1 h-px opacity-15" style={{ background: PERIOD_STYLE[period].label }} />
               </div>
             )}
 
@@ -169,7 +169,7 @@ export default function DayView({ dayIdx }: Props) {
                     }
                     onRestaurant={() => {
                       haptic([10, 50])
-                      setMeal(dayIdx, slotKey, { name: 'Restaurant', emoji: '🍽️', time: '', fav: false, isRestaurant: true })
+                      setMeal(dayIdx, slotKey, { name: 'Restaurant', emoji: '', time: '', fav: false, isRestaurant: true })
                     }}
                   />
                 )}

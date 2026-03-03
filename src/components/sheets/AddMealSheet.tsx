@@ -23,7 +23,7 @@ export default function AddMealSheet() {
   const weekPlans = useAppStore((s) => s.weekPlans)
   const [activeTab, setActiveTab] = useState<MealTab>('midi')
   const [freeName, setFreeName] = useState('')
-  const [freeEmoji, setFreeEmoji] = useState('🍽️')
+  const [freeEmoji, setFreeEmoji] = useState('')
   const [showFreeForm, setShowFreeForm] = useState(false)
   const [search, setSearch] = useState('')
 
@@ -34,7 +34,7 @@ export default function AddMealSheet() {
       setSearch('')
       setShowFreeForm(false)
       setFreeName('')
-      setFreeEmoji('🍽️')
+      setFreeEmoji('')
     }
   }, [isOpen, sheetState.addMealPeriod])
 
@@ -94,7 +94,7 @@ export default function AddMealSheet() {
     })
     closeSheet()
     setFreeName('')
-    setFreeEmoji('🍽️')
+    setFreeEmoji('')
     setShowFreeForm(false)
     showToast('Repas ajouté !')
   }
@@ -108,7 +108,9 @@ export default function AddMealSheet() {
           onClick={() => setShowFreeForm((v) => !v)}
           className="bg-terra-light text-terra text-xs font-extrabold px-2.5 py-1.5 rounded-[10px] border-2 border-dashed border-terra/40"
         >
-          {showFreeForm ? '← Suggestions' : '✏️ Libre'}
+          {showFreeForm
+            ? <><svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg> Suggestions</>
+            : <><svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Libre</>}
         </button>
       </div>
 
@@ -116,11 +118,6 @@ export default function AddMealSheet() {
       {showFreeForm && (
         <div className="mb-3.5 bg-terra-light rounded-2xl p-3 border-2 border-dashed border-terra">
           <div className="flex gap-2 mb-2">
-            <input
-              value={freeEmoji}
-              onChange={(e) => setFreeEmoji(e.target.value)}
-              className="w-12 h-10 rounded-xl bg-white/60 text-center text-xl border-none outline-none"
-            />
             <input
               type="text"
               placeholder="Nom du repas…"
@@ -151,7 +148,7 @@ export default function AddMealSheet() {
               onChange={(e) => setSearch(e.target.value)}
               className="flex-1 bg-transparent outline-none text-[13px] font-semibold text-text1 placeholder:text-muted"
             />
-            {search && <button onClick={() => setSearch('')} className="text-muted text-xs">✕</button>}
+            {search && <button onClick={() => setSearch('')} className="text-muted flex items-center"><svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>}
           </div>
           <div className="flex bg-sep rounded-xl p-0.5 mb-3.5 gap-0.5">
             {TABS.map((t) => (
@@ -178,16 +175,18 @@ export default function AddMealSheet() {
                 onClick={() => handleSelect(recipe)}
                 className="w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-[13px] text-left hover:bg-sep active:bg-sep transition-colors"
               >
-                <span className="text-[22px] flex-shrink-0">{recipe.emoji}</span>
+                <div className="w-9 h-9 rounded-xl bg-sep flex items-center justify-center flex-shrink-0">
+                  <svg className="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v4M8 11v6M12 3v10M12 17v4M16 3v4M16 11v6" /></svg>
+                </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[13px] font-bold text-text1 truncate">{recipe.name}</p>
                   <div className="flex gap-1.5 mt-0.5 flex-wrap">
                     <span className="text-[11px] text-muted font-semibold">{recipe.time}</span>
-                    {recipe.fav && <span className="text-[11px] text-[#E91E63]">♥</span>}
-                    {recipe.rapide && <span className="text-[11px] text-[#2E7D32] font-bold">⚡ Rapide</span>}
+                    {recipe.fav && <svg className="w-3 h-3" style={{ color: '#E91E63' }} viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>}
+                    {recipe.rapide && <span className="text-[11px] text-[#2E7D32] font-bold flex items-center gap-0.5"><svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Rapide</span>}
                     {(planCounts[recipe.id] ?? 0) > 0 && (
                       <span className="text-[10px] font-extrabold text-terra bg-terra-light px-1.5 py-0.5 rounded-[6px]">
-                        📅 {planCounts[recipe.id]}×
+                        {planCounts[recipe.id]}×
                       </span>
                     )}
                   </div>

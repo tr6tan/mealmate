@@ -28,6 +28,12 @@ export default function PlanningPage() {
   const [displayIdx, setDisplayIdx] = useState(selectedIdx)
   const [weekSlideDir, setWeekSlideDir] = useState<'left' | 'right' | null>(null)
   const [viewMode, setViewMode] = useState<'day' | 'week'>('day')
+  const [clearWeekConfirm, setClearWeekConfirm] = useState(false)
+
+  const handleClearWeek = () => {
+    if (clearWeekConfirm) { clearWeek(); setClearWeekConfirm(false) }
+    else { setClearWeekConfirm(true); setTimeout(() => setClearWeekConfirm(false), 3000) }
+  }
 
   // Sync depuis store (ouverture via PickDay, etc.)
   useEffect(() => {
@@ -118,8 +124,8 @@ export default function PlanningPage() {
 
   const handleShare = useCallback(() => {
     const DAY_NAMES = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-    const SLOT_LABELS: Record<string, string> = { pdej: '☀️ Matin', midi: '🍽 Midi', soir: '🌙 Soir' }
-    const lines: string[] = [`📅 ${weekTitle} (${weekLabel})`, '']
+    const SLOT_LABELS: Record<string, string> = { pdej: 'Matin', midi: 'Midi', soir: 'Soir' }
+    const lines: string[] = [`${weekTitle} (${weekLabel})`, '']
     for (let i = 0; i < 7; i++) {
       const day = weekPlan[i]
       if (!day) continue
@@ -131,17 +137,19 @@ export default function PlanningPage() {
       if (!slots.length) continue
       lines.push(`**${DAY_NAMES[i]}**`)
       slots.forEach(({ key, meal }) => {
-        lines.push(`  ${SLOT_LABELS[key]} ${meal!.emoji} ${meal!.name}`)
+        lines.push(`  ${SLOT_LABELS[key]} ${meal!.name}`)
       })
     }
     if (lines.length <= 2) { showToast('Planning vide — rien à partager !'); return }
-    navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('📋 Planning copié !'))
+    navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('Planning copié !'))
   }, [weekPlan, weekTitle, weekLabel])
 
   return (
-    <div>
+    <div className="flex flex-col h-full overflow-hidden">
+      {/* Safe-area top */}
+      <div className="flex-shrink-0 pt-safe" />
       {/* Header */}
-      <div className="px-5 pt-5 pb-3">
+      <div className="flex-shrink-0 px-5 pt-5 pb-3">
         {/* Titre + nav semaine */}
         <div className="flex items-center justify-between mb-2">
           <div>
@@ -152,18 +160,18 @@ export default function PlanningPage() {
             {planCount > 0 && (
               <button
                 onClick={handleShare}
-                className="w-8 h-8 flex items-center justify-center rounded-full border border-border text-muted text-base active:scale-90 transition-transform"
+                className="w-8 h-8 flex items-center justify-center rounded-full border border-border text-muted active:scale-90 transition-transform"
                 aria-label="Partager le planning"
               >
-                ↑
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
               </button>
             )}
             <button
               onClick={() => setViewMode(v => v === 'day' ? 'week' : 'day')}
               className="w-8 h-8 flex items-center justify-center rounded-full text-base transition-all active:scale-90 border"
               style={viewMode === 'week'
-                ? { background: '#990000', color: '#fff', borderColor: '#990000' }
-                : { background: 'transparent', color: '#96908A', borderColor: '#E6E4E0' }}
+                ? { background: '#D23D2D', color: '#fff', borderColor: '#D23D2D' }
+                : { background: 'transparent', color: '#986C58', borderColor: '#D8C880' }}
             >
               {viewMode === 'week' ? '▤' : '▦'}
             </button>
@@ -181,13 +189,13 @@ export default function PlanningPage() {
           <div className="flex-1 flex items-center gap-2 min-w-0">
             <p className="text-[12px] text-muted font-semibold truncate">{weekLabel}</p>
             {planCount > 0 && (
-              <span className="text-[10px] font-black px-2 py-0.5 rounded-full flex-shrink-0" style={{ color: '#990000', background: '#99000014' }}>
+              <span className="text-[10px] font-black px-2 py-0.5 rounded-full flex-shrink-0" style={{ color: '#D23D2D', background: '#D23D2D12', border: '1px solid #D23D2D25' }}>
                 {planCount}/21
               </span>
             )}
             {weekOffset < 0 && (
               <span className="text-[10px] font-bold text-muted bg-sep px-2 py-0.5 rounded-full flex-shrink-0">
-                📖 Passé
+                Passé
               </span>
             )}
           </div>
@@ -195,18 +203,20 @@ export default function PlanningPage() {
             <button
               onClick={() => { setWeekOffset(0); setWeekSlideDir(null) }}
               className="text-[10px] font-black px-2.5 py-1 rounded-full flex-shrink-0 active:scale-90 transition-transform"
-              style={{ color: '#990000', background: '#99000014' }}
+              style={{ color: '#D23D2D', background: '#D23D2D14' }}
             >
               Auj.
             </button>
           )}
           {planCount > 0 && (
             <button
-              onClick={() => { if (window.confirm('Vider toute la semaine ?')) clearWeek() }}
+              onClick={handleClearWeek}
               className="text-[10px] font-black px-2.5 py-1 rounded-full flex-shrink-0 active:scale-90 transition-transform"
-              style={{ color: '#96908A', background: '#F2F0EE' }}
+              style={clearWeekConfirm
+                ? { color: '#C0304A', background: '#FDE8F0' }
+                : { color: '#986C58', background: '#6E433D10' }}
             >
-              Vider
+              {clearWeekConfirm ? 'Confirmer ?' : 'Vider'}
             </button>
           )}
           <button
@@ -218,6 +228,8 @@ export default function PlanningPage() {
         </div>
       </div>
 
+      {/* Zone scrollable interne */}
+      <div className="flex-1 overflow-y-auto no-scrollbar overscroll-contain pb-nav-safe">
       {/* Day chips + contenu animé au changement de semaine */}
       <div className={cn(
         'transition-all duration-250 ease-out',
@@ -281,13 +293,15 @@ export default function PlanningPage() {
               }}
               className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-dashed border-terra text-terra text-sm font-extrabold active:scale-[0.97] transition-transform"
             >
-              <span>♻️</span> Réutiliser la semaine précédente
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+              Réutiliser la semaine précédente
             </button>
           )}
         </div>
         </>
       )}
       </div>
+      </div>{/* /zone scrollable */}
     </div>
   )
 }
