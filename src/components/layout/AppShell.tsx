@@ -15,9 +15,10 @@ export default function AppShell({ nav, children }: Props) {
     <div
       className="relative flex flex-col bg-bg overflow-hidden"
       style={{
-        height: '100dvh',
-        /* Fallback pour iOS Safari < 15.4 qui ne supporte pas dvh */
-        minHeight: '-webkit-fill-available',
+        /* position:fixed inset:0 est le moyen le plus robuste de couvrir
+           exactement l'écran physique sur iOS PWA (évite les bugs dvh/fill-available) */
+        position: 'fixed',
+        inset: 0,
       }}
     >
       {/* Contenu — chaque page gère son propre scroll */}
