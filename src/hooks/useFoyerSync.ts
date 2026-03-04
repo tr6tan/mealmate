@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-import { getFoyerId } from '@/lib/foyer'
+import { getFoyerId, isFoyerInvite } from '@/lib/foyer'
 import { useAppStore } from '@/store/useAppStore'
 import { DEFAULT_RECIPES } from '@/data/defaultRecipes'
 import type { FoyerData } from '@/types'
@@ -68,7 +68,14 @@ export function useFoyerSync() {
     const unsubFirestore = onSnapshot(ref, (snap) => {
       setSyncStatus('synced')
       if (!snap.exists()) {
-        // Premier lancement : initialise le doc Firestore
+        if (isFoyerInvite()) {
+          // Invité : le doc du host n'est pas encore dans le cache local.
+          // On ne crée JAMAIS le doc — on attend que Firestore renvoie
+          // les vraies données du serveur (second snapshot).
+          setSyncStatus('connecting')
+          return
+        }
+        // Foyer créé localement (premier lancement) : on initialise le doc.
         const state = useAppStore.getState()
         const { darkMode: _dm, ...settingsToWrite } = state.settings
         void _dm
