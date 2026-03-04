@@ -32,7 +32,8 @@ function scheduleFieldWrite(
     onSaving()
     try {
       const ref = doc(db, COLLECTION, foyerId)
-      await updateDoc(ref, fields as Record<string, unknown>)
+      // setDoc merge:true fonctionne même si le doc n'existe pas (contrairement à updateDoc)
+      await setDoc(ref, fields as Record<string, unknown>, { merge: true })
       onSaved()
     } catch (e) {
       console.error('[MealMate] Erreur Firestore write:', e)
@@ -52,7 +53,7 @@ function flushPendingWrites(foyerId: string) {
   Object.values(_timers).forEach(clearTimeout)
   // Écrit immédiatement (best-effort, ne bloque pas le kill)
   const ref = doc(db, COLLECTION, foyerId)
-  void updateDoc(ref, merged as Record<string, unknown>)
+  void setDoc(ref, merged as Record<string, unknown>, { merge: true })
 }
 
 export function useFoyerSync() {
@@ -68,10 +69,11 @@ export function useFoyerSync() {
 
     // ── Firestore → Store ────────────────────────────────────────────────────
     const unsubFirestore = onSnapshot(ref, { includeMetadataChanges: true }, (snap) => {
-      // Snapshot depuis notre propre écriture en attente → ignorer (évite l'écho)
-      if (snap.metadata.hasPendingWrites) return
-
+      // On a reçu un snapshot = Firestore répond (cache ou serveur)
+      // On met à jour le statut immédiatement, même avec des écritures en attente
       setSyncStatus('synced')
+      // Snapshot depuis notre propre écriture en attente → on évite de re-hydrater (écho)
+      if (snap.metadata.hasPendingWrites) return
       if (!snap.exists()) {
         if (isFoyerInvite()) {
           // Invité : le doc du host n'est pas encore dans le cache local.
