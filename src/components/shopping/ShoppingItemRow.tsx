@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import type { ShoppingItem } from '@/types'
 import { cn } from '@/lib/utils'
@@ -10,23 +11,45 @@ export default function ShoppingItemRow({ item }: Props) {
   const toggleShoppingItem = useAppStore((s) => s.toggleShoppingItem)
   const removeShoppingItem = useAppStore((s) => s.removeShoppingItem)
 
+  // Évite le double-fire touchEnd + click sur iOS
+  const didToggle = useRef(false)
+
+  const handleToggleTouchEnd = (e: React.TouchEvent) => {
+    e.preventDefault()
+    didToggle.current = true
+    navigator.vibrate?.(30)
+    toggleShoppingItem(item.id)
+  }
+  const handleToggleClick = () => {
+    if (didToggle.current) { didToggle.current = false; return }
+    navigator.vibrate?.(30)
+    toggleShoppingItem(item.id)
+  }
+
+  const handleDeleteTouchEnd = (e: React.TouchEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    removeShoppingItem(item.id)
+  }
+
   return (
-    <button
-      type="button"
+    // div valide : pas de button imbriqué dans un button (HTML invalide sur iOS)
+    <div
+      role="button"
+      tabIndex={0}
       className={cn(
-        'group w-full bg-card rounded-xl px-3 py-2.5 flex items-center gap-2.5 border-[1.5px] cursor-pointer transition-colors duration-200 text-left',
-        item.checked
-          ? 'border-sage/30 bg-sage/5'
-          : 'border-border',
+        'group w-full bg-card rounded-xl px-3 py-3.5 flex items-center gap-3 border-[1.5px] cursor-pointer transition-colors duration-200 select-none',
+        item.checked ? 'border-sage/30 bg-sage/5' : 'border-border',
       )}
-      style={{ touchAction: 'manipulation' }}
-      onClick={() => { navigator.vibrate?.(25); toggleShoppingItem(item.id) }}
+      style={{ touchAction: 'manipulation', WebkitUserSelect: 'none' }}
+      onTouchEnd={handleToggleTouchEnd}
+      onClick={handleToggleClick}
     >
       {/* Checkbox */}
       <div
         className={cn(
           'w-6 h-6 rounded-[7px] border-2 flex items-center justify-center flex-shrink-0 transition-all duration-200',
-          item.checked ? 'bg-sage border-sage text-white scale-95' : 'border-border',
+          item.checked ? 'bg-sage border-sage text-white' : 'border-border',
         )}
       >
         {item.checked && (
@@ -56,15 +79,17 @@ export default function ShoppingItemRow({ item }: Props) {
         </span>
       )}
 
-      {/* Supprimer */}
+      {/* Supprimer — bouton autonome, pas imbriqué dans un button */}
       <button
         type="button"
+        onTouchEnd={handleDeleteTouchEnd}
         onClick={(e) => { e.stopPropagation(); removeShoppingItem(item.id) }}
-        className="text-muted opacity-0 group-hover:opacity-60 transition-opacity ml-1 active:opacity-100 flex items-center"
+        className="text-muted/40 active:text-terra transition-colors ml-1 p-1 -mr-1 flex items-center"
+        style={{ touchAction: 'manipulation' }}
         aria-label="Supprimer"
       >
-        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
-    </button>
+    </div>
   )
 }
