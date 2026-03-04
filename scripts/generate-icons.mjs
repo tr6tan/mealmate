@@ -11,15 +11,15 @@ const svgRounded = readFileSync(resolve(__dirname, '../public/favicon.svg'))
 
 // ── SVG maskable (fond plein carré — icône adaptative Android/iOS) ───────────
 const svgMaskable = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#F5F0EC"/>
+  <rect width="512" height="512" fill="#F8EECB"/>
 
-  <g stroke="#3D52E0" stroke-linecap="round" stroke-linejoin="round">
+  <g stroke="#D23D2D" stroke-linecap="round" stroke-linejoin="round">
     <path d="M 122,212 L 120,178 C 120,158 186,140 256,138 C 326,140 392,158 392,178
              L 390,212 C 368,228 340,238 310,230 C 290,224 272,234 256,234
              C 240,234 222,224 202,230 C 172,238 144,228 122,212 Z"
-          stroke-width="22" fill="#F5F0EC"/>
-    <path d="M 80,300 L 90,248 L 134,272 Z" stroke-width="19" fill="#F5F0EC"/>
-    <path d="M 432,292 L 422,240 L 378,264 Z" stroke-width="19" fill="#F5F0EC"/>
+          stroke-width="22" fill="#F8EECB"/>
+    <path d="M 80,300 L 90,248 L 134,272 Z" stroke-width="19" fill="#F8EECB"/>
+    <path d="M 432,292 L 422,240 L 378,264 Z" stroke-width="19" fill="#F8EECB"/>
     <path d="M 90,252 C 114,280 138,296 168,278 C 196,262 222,278 256,278
              C 290,278 316,262 344,278 C 374,296 398,280 422,244"
           stroke-width="19" fill="none"/>
@@ -30,7 +30,7 @@ const svgMaskable = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox
              C 268,380 286,390 312,394 C 364,400 406,386 434,364
              L 432,402 C 432,422 346,438 256,438
              C 166,438 80,422 80,402 Z"
-          stroke-width="22" fill="#F5F0EC"/>
+          stroke-width="22" fill="#F8EECB"/>
   </g>
 </svg>`)
 
