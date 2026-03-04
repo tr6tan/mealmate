@@ -11,9 +11,10 @@ export default function ShoppingItemRow({ item }: Props) {
   const removeShoppingItem = useAppStore((s) => s.removeShoppingItem)
 
   return (
-    <div
+    <button
+      type="button"
       className={cn(
-        'group bg-card rounded-xl px-3 py-2.5 flex items-center gap-2.5 border-[1.5px] cursor-pointer transition-colors duration-200',
+        'group w-full bg-card rounded-xl px-3 py-2.5 flex items-center gap-2.5 border-[1.5px] cursor-pointer transition-colors duration-200 text-left',
         item.checked
           ? 'border-sage/30 bg-sage/5'
           : 'border-border',
@@ -57,12 +58,13 @@ export default function ShoppingItemRow({ item }: Props) {
 
       {/* Supprimer */}
       <button
+        type="button"
         onClick={(e) => { e.stopPropagation(); removeShoppingItem(item.id) }}
         className="text-muted opacity-0 group-hover:opacity-60 transition-opacity ml-1 active:opacity-100 flex items-center"
         aria-label="Supprimer"
       >
         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
-    </div>
+    </button>
   )
 }

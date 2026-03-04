@@ -65,8 +65,8 @@ export default function BottomNav() {
     <nav
       className="bg-card border-t border-sep flex flex-col flex-shrink-0"
     >
-      {/* Rangée de boutons */}
-      <div className="flex justify-around items-stretch">
+      {/* Rangée de boutons — paddingTop pour descendre vers le bas */}
+      <div className="flex justify-around items-stretch" style={{ paddingTop: '10px' }}>
         {navItems.map((item) => {
           const active = activeTab === item.id
           return (
