@@ -1,5 +1,4 @@
 import type { Meal } from '@/types'
-import { cn } from '@/lib/utils'
 
 interface Props {
   label: string
@@ -8,21 +7,28 @@ interface Props {
 }
 
 export default function OptionalSlot({ label, meal, onPress }: Props) {
+  if (meal) {
+    // Rempli : ligne compacte avec l'emoji et le nom
+    return (
+      <button
+        onClick={onPress}
+        className="w-full flex items-center gap-1.5 px-2 py-1 rounded-lg text-left hover:bg-sep active:bg-sep transition-colors"
+      >
+        {meal.emoji && <span className="text-sm leading-none">{meal.emoji}</span>}
+        <span className="text-[11px] font-bold text-text2 truncate flex-1">{meal.name}</span>
+        <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted opacity-60">{label}</span>
+      </button>
+    )
+  }
+
+  // Vide : juste un petit lien textuel très discret
   return (
     <button
       onClick={onPress}
-      className={cn(
-        'w-full flex items-center gap-2 px-1 py-1.5 rounded-[9px] transition-all duration-150 text-left',
-        'hover:bg-sep active:bg-sep',
-      )}
+      className="flex items-center gap-1 px-2 py-0.5 text-left opacity-40 hover:opacity-70 active:opacity-70 transition-opacity"
     >
-      <span className={cn('text-[10px] font-extrabold uppercase tracking-widest', meal ? 'text-muted' : 'text-text2')}>
-        {label}
-      </span>
-      <span className={cn('flex-1 text-[11px] font-semibold', meal ? 'text-muted font-bold' : 'text-muted')}>
-        {meal ? meal.name : `Ajouter ${label.toLowerCase()}…`}
-      </span>
-      <span className={cn('text-sm font-bold', meal ? 'text-muted' : 'text-muted')}>+</span>
+      <span className="text-[10px] font-bold text-muted">+</span>
+      <span className="text-[10px] font-semibold text-muted">{label}</span>
     </button>
   )
 }

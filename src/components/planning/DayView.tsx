@@ -140,7 +140,7 @@ export default function DayView({ dayIdx }: Props) {
               <>
                 {/* Entrée (hors pdej) */}
                 {period !== 'pdej' && (
-                  <div className="mb-1.5">
+                  <div className="mb-0.5">
                     <OptionalSlot
                       label="Entrée"
                       meal={entreeMeal ?? null}
@@ -177,7 +177,7 @@ export default function DayView({ dayIdx }: Props) {
 
                 {/* Dessert (hors pdej) */}
                 {period !== 'pdej' && (
-                  <div className="mt-1.5">
+                  <div className="mt-0.5">
                     <OptionalSlot
                       label="Dessert"
                       meal={dessertMeal ?? null}
