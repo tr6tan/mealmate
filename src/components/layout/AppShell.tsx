@@ -26,21 +26,8 @@ export default function AppShell({ nav, children }: Props) {
         {nav}
       </main>
 
-      {/* Nav fixe en bas */}
+      {/* Nav en bas — élément flex normal dans AppShell (pas fixed) */}
       <BottomNav />
-
-      {/* Remplissage safe-area sous la nav (home indicator iPhone).
-           On utilise un paddingBottom très généreux pour couvrir la zone physique
-           même si env() n'est pas calculé à temps au premier rendu. */}
-      <div
-        aria-hidden
-        className="fixed bottom-0 left-0 right-0 bg-card"
-        style={{
-          height: 'calc(env(safe-area-inset-bottom, 0px) + 2px)',
-          zIndex: 29,
-          transform: 'translateY(2px)', /* déborde légèrement sous le bord physique */
-        }}
-      />
 
       {/* Overlay */}
       {sheetState.sheet && (
