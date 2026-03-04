@@ -110,6 +110,11 @@ export function useFoyerSync() {
       const data = snap.data() as FoyerData
 
       // ── Merge des recettes par défaut ───────────────────────────────────
+      // 0. Supprime les anciennes recettes dont le nom contient un "+" (migration)
+      const beforeClean = data.recipes ?? []
+      data.recipes = beforeClean.filter((r) => !r.name.includes('+'))
+      let needsWrite = data.recipes.length !== beforeClean.length
+
       // 1. Injecte les nouvelles recettes par défaut manquantes
       // 2. Met à jour les champs modifiés des recettes par défaut existantes
       //    (nom, emoji, photo, temps, ingrédients, étapes, période, rapide)
@@ -118,7 +123,7 @@ export function useFoyerSync() {
       const existingIds = new Set((data.recipes ?? []).map((r) => r.id))
       const missingDefaults = DEFAULT_RECIPES.filter((r) => !existingIds.has(r.id))
 
-      let needsWrite = missingDefaults.length > 0
+      needsWrite = needsWrite || missingDefaults.length > 0
       const updatedRecipes = (data.recipes ?? []).map((recipe) => {
         const def = defaultMap.get(recipe.id)
         if (!def) return recipe // recette custom → intouchable
