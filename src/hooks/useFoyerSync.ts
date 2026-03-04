@@ -67,7 +67,10 @@ export function useFoyerSync() {
     const ref = doc(db, COLLECTION, foyerId)
 
     // ── Firestore → Store ────────────────────────────────────────────────────
-    const unsubFirestore = onSnapshot(ref, (snap) => {
+    const unsubFirestore = onSnapshot(ref, { includeMetadataChanges: true }, (snap) => {
+      // Snapshot depuis notre propre écriture en attente → ignorer (évite l'écho)
+      if (snap.metadata.hasPendingWrites) return
+
       setSyncStatus('synced')
       if (!snap.exists()) {
         if (isFoyerInvite()) {
@@ -146,9 +149,11 @@ export function useFoyerSync() {
 
       hydrate(data)
       isRemoteUpdate.current = false
-      // Signale brièvement qu'une maj distante est arrivée
-      setSyncStatus('updated')
-      setTimeout(() => setSyncStatus('synced'), 2500)
+      // Bannière "mis à jour" seulement pour les vrais changements distants (pas le cache initial)
+      if (!snap.metadata.fromCache) {
+        setSyncStatus('updated')
+        setTimeout(() => setSyncStatus('synced'), 2500)
+      }
     }, () => setSyncStatus('error'))
 
     // ── Store → Firestore ────────────────────────────────────────────────────
