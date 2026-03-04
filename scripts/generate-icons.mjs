@@ -11,48 +11,27 @@ const svgRounded = readFileSync(resolve(__dirname, '../public/favicon.svg'))
 
 // ── SVG maskable (fond plein carré — icône adaptative Android/iOS) ───────────
 const svgMaskable = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Fond plein (pas de border-radius : Android/iOS applique son propre masque) -->
-  <rect width="512" height="512" fill="#F8EECB"/>
+  <rect width="512" height="512" fill="#F5F0EC"/>
 
-  <!-- Corps du bol -->
-  <path d="M 88,294 Q 82,448 256,456 Q 430,448 424,294"
-        fill="none" stroke="#D23D2D" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
-  <ellipse cx="256" cy="294" rx="168" ry="26"
-           fill="#F8EECB" stroke="#D23D2D" stroke-width="22"/>
-
-  <!-- Champignon – chapeau -->
-  <path d="M 208,358 Q 204,308 256,304 Q 308,308 304,358 Z"
-        fill="none" stroke="#D23D2D" stroke-width="16" stroke-linejoin="round"/>
-  <!-- Champignon – pied -->
-  <path d="M 240,356 L 240,388 Q 240,398 256,398 Q 272,398 272,388 L 272,356"
-        fill="none" stroke="#D23D2D" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Olives -->
-  <circle cx="164" cy="382" r="18" fill="none" stroke="#D23D2D" stroke-width="14"/>
-  <circle cx="348" cy="374" r="15" fill="none" stroke="#D23D2D" stroke-width="14"/>
-  <!-- Petite feuille intérieure -->
-  <path d="M 145,342 Q 172,318 195,342"
-        fill="none" stroke="#D23D2D" stroke-width="13" stroke-linecap="round"/>
-
-  <!-- Tige gauche avec feuille -->
-  <path d="M 174,292 C 168,240 158,200 140,162"
-        fill="none" stroke="#D23D2D" stroke-width="16" stroke-linecap="round"/>
-  <path d="M 161,218 C 130,205 110,178 112,150 C 138,158 158,182 161,218 Z"
-        fill="none" stroke="#D23D2D" stroke-width="13" stroke-linejoin="round"/>
-  <!-- Tige centrale avec feuille -->
-  <path d="M 220,290 C 218,230 222,180 228,138"
-        fill="none" stroke="#D23D2D" stroke-width="16" stroke-linecap="round"/>
-  <path d="M 220,202 C 192,188 178,162 184,136 C 208,148 222,174 220,202 Z"
-        fill="none" stroke="#D23D2D" stroke-width="13" stroke-linejoin="round"/>
-  <!-- Asperge droite -->
-  <path d="M 300,290 C 308,240 318,190 322,148"
-        fill="none" stroke="#D23D2D" stroke-width="16" stroke-linecap="round"/>
-  <path d="M 322,148 C 316,132 310,124 322,114 C 334,124 328,132 322,148"
-        fill="none" stroke="#D23D2D" stroke-width="13" stroke-linejoin="round"/>
-  <!-- Petite tige droite avec feuille -->
-  <path d="M 338,292 C 350,256 362,222 368,190"
-        fill="none" stroke="#D23D2D" stroke-width="14" stroke-linecap="round"/>
-  <path d="M 364,210 C 382,196 396,196 398,178 C 378,174 362,186 364,210 Z"
-        fill="none" stroke="#D23D2D" stroke-width="12" stroke-linejoin="round"/>
+  <g stroke="#3D52E0" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 122,212 L 120,178 C 120,158 186,140 256,138 C 326,140 392,158 392,178
+             L 390,212 C 368,228 340,238 310,230 C 290,224 272,234 256,234
+             C 240,234 222,224 202,230 C 172,238 144,228 122,212 Z"
+          stroke-width="22" fill="#F5F0EC"/>
+    <path d="M 80,300 L 90,248 L 134,272 Z" stroke-width="19" fill="#F5F0EC"/>
+    <path d="M 432,292 L 422,240 L 378,264 Z" stroke-width="19" fill="#F5F0EC"/>
+    <path d="M 90,252 C 114,280 138,296 168,278 C 196,262 222,278 256,278
+             C 290,278 316,262 344,278 C 374,296 398,280 422,244"
+          stroke-width="19" fill="none"/>
+    <path d="M 80,312 C 108,338 140,354 174,336 C 202,320 226,336 256,336
+             C 286,336 310,320 338,336 C 372,354 404,338 432,308"
+          stroke-width="19" fill="none"/>
+    <path d="M 78,364 C 106,386 148,400 200,394 C 226,390 244,380 256,380
+             C 268,380 286,390 312,394 C 364,400 406,386 434,364
+             L 432,402 C 432,422 346,438 256,438
+             C 166,438 80,422 80,402 Z"
+          stroke-width="22" fill="#F5F0EC"/>
+  </g>
 </svg>`)
 
 const icons = [
