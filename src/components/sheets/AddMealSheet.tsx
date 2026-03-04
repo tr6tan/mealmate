@@ -58,13 +58,15 @@ export default function AddMealSheet() {
     return counts
   }, [weekPlans, recipes])
 
-  // Tri : popularité + favori en tête
+  // Tri : période correspondante en tête, puis popularité + favori
   const filtered = useMemo(() =>
     recipes
-      .filter((r) => r.period === activeTab && r.name.toLowerCase().includes(search.toLowerCase()))
+      .filter((r) => r.name.toLowerCase().includes(search.toLowerCase()))
       .sort((a, b) => {
-        const sA = (planCounts[a.id] ?? 0) * 2 + (a.fav ? 1 : 0)
-        const sB = (planCounts[b.id] ?? 0) * 2 + (b.fav ? 1 : 0)
+        const periodA = a.period === activeTab ? 1 : 0
+        const periodB = b.period === activeTab ? 1 : 0
+        const sA = periodA * 10 + (planCounts[a.id] ?? 0) * 2 + (a.fav ? 1 : 0)
+        const sB = periodB * 10 + (planCounts[b.id] ?? 0) * 2 + (b.fav ? 1 : 0)
         return sB - sA
       })
   , [recipes, activeTab, search, planCounts])
@@ -205,6 +207,11 @@ export default function AddMealSheet() {
                   <p className="text-[13px] font-bold text-text1 truncate">{recipe.name}</p>
                   <div className="flex gap-1.5 mt-0.5 flex-wrap">
                     <span className="text-[11px] text-muted font-semibold">{recipe.time}</span>
+                    {recipe.period !== activeTab && (
+                      <span className="text-[10px] font-bold text-muted bg-sep px-1.5 py-0.5 rounded-[6px]">
+                        {PERIOD_LABEL[recipe.period]}
+                      </span>
+                    )}
                     {recipe.fav && <svg className="w-3 h-3" style={{ color: '#E91E63' }} viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>}
                     {recipe.rapide && <span className="text-[11px] text-[#2E7D32] font-bold flex items-center gap-0.5"><svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Rapide</span>}
                     {(planCounts[recipe.id] ?? 0) > 0 && (

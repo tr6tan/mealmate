@@ -3,6 +3,7 @@ import { doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { getFoyerId } from '@/lib/foyer'
 import { useAppStore } from '@/store/useAppStore'
+import { DEFAULT_RECIPES } from '@/data/defaultRecipes'
 import type { FoyerData } from '@/types'
 
 // 'foyers_dev' sur la branche dev, 'foyers' en prod
@@ -81,7 +82,36 @@ export function useFoyerSync() {
       }
       // Mise à jour distante → hydrate sans écraser le darkMode local
       isRemoteUpdate.current = true
-      hydrate(snap.data() as FoyerData)
+      const data = snap.data() as FoyerData
+
+      // ── Merge des recettes par défaut ───────────────────────────────────
+      // 1. Injecte les nouvelles recettes par défaut manquantes
+      // 2. Met à jour les champs modifiés des recettes par défaut existantes
+      //    (nom, emoji, photo, temps, ingrédients, étapes, période, rapide)
+      //    sans écraser les préférences utilisateur (fav)
+      const defaultMap = new Map(DEFAULT_RECIPES.map((r) => [r.id, r]))
+      const existingIds = new Set((data.recipes ?? []).map((r) => r.id))
+      const missingDefaults = DEFAULT_RECIPES.filter((r) => !existingIds.has(r.id))
+
+      let needsWrite = missingDefaults.length > 0
+      const updatedRecipes = (data.recipes ?? []).map((recipe) => {
+        const def = defaultMap.get(recipe.id)
+        if (!def) return recipe // recette custom → intouchable
+        const { name, emoji, photo, time, ingredients, steps, period, rapide } = def
+        const changed =
+          recipe.name !== name || recipe.emoji !== emoji || recipe.photo !== photo ||
+          recipe.time !== time || recipe.period !== period || recipe.rapide !== rapide
+        if (!changed) return recipe
+        needsWrite = true
+        return { ...recipe, name, emoji, photo, time, ingredients, steps, period, rapide }
+      })
+
+      data.recipes = [...updatedRecipes, ...missingDefaults]
+      if (needsWrite) {
+        void updateDoc(ref, { recipes: data.recipes })
+      }
+
+      hydrate(data)
       isRemoteUpdate.current = false
       // Signale brièvement qu'une maj distante est arrivée
       setSyncStatus('updated')
