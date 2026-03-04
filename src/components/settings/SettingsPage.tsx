@@ -164,7 +164,7 @@ export default function SettingsPage() {
               {onlineCount > 0 && (
                 <span className="ml-2 inline-flex items-center gap-1">
                   <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#4CAF50] animate-pulse" />
-                  <span className="text-[#2E7D32]">{onlineCount} en ligne</span>
+                  <span className="text-[#2E7D32]">Partenaire en ligne</span>
                 </span>
               )}
             </p>

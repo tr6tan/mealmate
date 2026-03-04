@@ -11,6 +11,9 @@ import {
 import { db } from '@/lib/firebase'
 import { getFoyerId } from '@/lib/foyer'
 
+// Même logique que useFoyerSync : dev vs prod
+const COLLECTION = import.meta.env.VITE_APP_ENV === 'dev' ? 'foyers_dev' : 'foyers'
+
 // ── ID stable par appareil (ne change pas au refresh) ────────────────────────
 const DEVICE_KEY = 'mealmate-device-id'
 function getDeviceId(): string {
@@ -27,16 +30,16 @@ const ONLINE_THRESHOLD_MS = 2 * 60 * 1000
 
 /**
  * Enregistre la présence de l'appareil dans Firestore et retourne
- * le nombre de membres actuellement connectés au foyer.
+ * le nombre d'AUTRES membres actuellement connectés au foyer.
  */
 export function useFoyerPresence(): number {
-  const [onlineCount, setOnlineCount] = useState(1)
+  const [othersCount, setOthersCount] = useState(0)
 
   useEffect(() => {
     const foyerId   = getFoyerId()
     const deviceId  = getDeviceId()
-    const presenceRef = doc(db, 'foyers', foyerId, 'presence', deviceId)
-    const presenceCol = collection(db, 'foyers', foyerId, 'presence')
+    const presenceRef = doc(db, COLLECTION, foyerId, 'presence', deviceId)
+    const presenceCol = collection(db, COLLECTION, foyerId, 'presence')
 
     // Écrit (ou met à jour) notre entrée de présence
     const ping = () => {
@@ -46,21 +49,20 @@ export function useFoyerPresence(): number {
     ping()
     const interval = setInterval(ping, 30_000)
 
-    // Écoute la sous-collection pour compter les membres actifs
+    // Écoute la sous-collection pour compter les membres actifs AUTRES que soi
     const unsubscribe = onSnapshot(presenceCol, (snap) => {
       const threshold = Date.now() - ONLINE_THRESHOLD_MS
-      const active = snap.docs.filter((d) => {
+      const others = snap.docs.filter((d) => {
+        if (d.id === deviceId) return false // exclut l'appareil courant
         const lastSeen = d.data().lastSeen as Timestamp | null
         if (!lastSeen) return false
         return lastSeen.toMillis() > threshold
       })
-      setOnlineCount(Math.max(1, active.length))
+      setOthersCount(others.length)
     }, () => {
-      // En cas d'erreur Firestore, on affiche au moins 1
-      setOnlineCount(1)
+      setOthersCount(0)
     })
 
-    // Nettoyage : on retire notre présence quand on ferme l'onglet
     return () => {
       clearInterval(interval)
       unsubscribe()
@@ -68,5 +70,5 @@ export function useFoyerPresence(): number {
     }
   }, [])
 
-  return onlineCount
+  return othersCount
 }
