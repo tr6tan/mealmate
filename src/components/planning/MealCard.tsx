@@ -46,16 +46,11 @@ export default function MealCard({ meal, onPress, period }: Props) {
         'active:scale-[0.98] transition-transform duration-150 text-left',
       )}
     >
-      {meal.photo
-        ? (
-          <div className="w-10 h-10 rounded-[10px] overflow-hidden flex-shrink-0">
-            <img src={meal.photo} alt="" className="w-full h-full object-cover" />
-          </div>
-        ) : (
-          <div className="w-10 h-10 rounded-[10px] flex-shrink-0 flex items-center justify-center bg-sep">
-            <PeriodIcon period={period ?? 'midi'} className="w-5 h-5 text-muted" />
-          </div>
-        )}
+      <div className="w-10 h-10 rounded-[10px] flex-shrink-0 flex items-center justify-center bg-sep">
+        {meal.emoji
+          ? <span className="text-xl leading-none">{meal.emoji}</span>
+          : <PeriodIcon period={period ?? 'midi'} className="w-5 h-5 text-muted" />}
+      </div>
       <div className="flex-1 min-w-0">
         <div className="text-sm font-bold text-text1 truncate">{meal.name}</div>
         <div className="flex gap-1.5 mt-1.5 flex-wrap">

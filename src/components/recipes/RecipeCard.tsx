@@ -33,16 +33,11 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
         onClick={onClick}
         className="w-full bg-card rounded-2xl border-[1.5px] border-border flex items-center gap-3 px-3 py-2.5 text-left active:scale-[0.98] transition-transform"
       >
-        {/* Thumbnail */}
-        <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-gradient-to-br from-terra-light to-sep flex items-center justify-center">
-          {recipe.photo
-            ? <img src={recipe.photo} alt={recipe.name} className="w-full h-full object-cover" loading="lazy" />
-            : <PeriodIcon
-            period={recipe.period}
-            className="w-6 h-6 opacity-50"
-            style={{ color: PERIOD_ICON_COLOR[recipe.period] }}
-          />
-          }
+        {/* Icône */}
+        <div className="w-11 h-11 rounded-xl flex-shrink-0 bg-gradient-to-br from-terra-light to-sep flex items-center justify-center">
+          {recipe.emoji
+            ? <span className="text-2xl leading-none">{recipe.emoji}</span>
+            : <PeriodIcon period={recipe.period} className="w-6 h-6 opacity-50" style={{ color: PERIOD_ICON_COLOR[recipe.period] }} />}
         </div>
         {/* Info */}
         <div className="flex-1 min-w-0">
@@ -73,55 +68,32 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
       onClick={onClick}
       className="bg-card rounded-xl border-[1.5px] border-border overflow-hidden active:scale-[0.96] transition-transform text-left flex flex-col"
     >
-      {/* Visuel */}
-      <div className={`relative w-full h-[72px] bg-gradient-to-br ${PERIOD_GRADIENT[recipe.period] ?? 'from-terra-light to-sep'} flex-shrink-0`}>
-        {recipe.photo ? (
-          <img
-            src={recipe.photo}
-            alt={recipe.name}
-            loading="lazy"
-            className="w-full h-full object-cover"
-            onError={(e) => (e.currentTarget.style.display = 'none')}
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <PeriodIcon
-              period={recipe.period}
-              className="w-10 h-10 opacity-30"
-              style={{ color: PERIOD_ICON_COLOR[recipe.period] }}
-            />
+      {/* Icône + infos */}
+      <div className={`w-full bg-gradient-to-br ${PERIOD_GRADIENT[recipe.period] ?? 'from-terra-light to-sep'} px-2.5 pt-2.5 pb-2 flex flex-col flex-1`}>
+        <div className="flex items-start justify-between mb-1.5">
+          <span className="text-3xl leading-none">
+            {recipe.emoji || <PeriodIcon period={recipe.period} className="w-8 h-8 opacity-30" style={{ color: PERIOD_ICON_COLOR[recipe.period] }} />}
+          </span>
+          <div className="flex gap-0.5">
+            {recipe.fav && (
+              <svg className="w-3 h-3" style={{ color: '#31603D' }} viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            )}
+            {recipe.rapide && (
+              <svg className="w-3 h-3 text-[#B07A10]" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            )}
           </div>
-        )}
-        {/* Badges overlay */}
-        <div className="absolute top-1 left-1 flex gap-0.5">
-          {recipe.fav && (
-            <span className="w-4 h-4 rounded-full bg-white/90 flex items-center justify-center shadow-sm">
-              <svg className="w-2.5 h-2.5 text-[#31603D]" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-            </span>
-          )}
-          {recipe.rapide && (
-            <span className="w-4 h-4 rounded-full bg-white/90 flex items-center justify-center shadow-sm">
-              <svg className="w-2.5 h-2.5 text-[#B07A10]" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            </span>
-          )}
         </div>
-        {/* Period badge */}
-        <span className={cn(
-          'absolute bottom-1 right-1 text-[8px] font-extrabold tracking-wide uppercase px-1 py-0.5 rounded bg-white/90',
-          PERIOD_COLOR[recipe.period],
-        )}>
-          {PERIOD_LABEL[recipe.period]}
-        </span>
-      </div>
-
-      {/* Infos */}
-      <div className="px-2 pt-1.5 pb-2 flex-1 flex flex-col">
-        <p className="text-[11px] font-extrabold text-text1 leading-snug mb-auto line-clamp-2">{recipe.name}</p>
-        <div className="flex items-center justify-between mt-1">
-          <p className="text-[10px] text-muted font-semibold">{recipe.time}</p>
-          {planCount > 0 && (
-            <span className="text-[9px] font-bold text-terra">{planCount}×</span>
-          )}
+        <p className="text-[11px] font-extrabold text-text1 leading-snug line-clamp-2 mb-auto">{recipe.name}</p>
+        <div className="flex items-center justify-between mt-1.5">
+          <span className={cn('text-[8px] font-extrabold tracking-wide uppercase px-1 py-0.5 rounded', PERIOD_COLOR[recipe.period])}>
+            {PERIOD_LABEL[recipe.period]}
+          </span>
+          <div className="flex items-center gap-1">
+            <p className="text-[10px] text-muted font-semibold">{recipe.time}</p>
+            {planCount > 0 && (
+              <span className="text-[9px] font-bold text-terra">{planCount}×</span>
+            )}
+          </div>
         </div>
       </div>
     </button>

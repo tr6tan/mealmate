@@ -201,7 +201,9 @@ export default function AddMealSheet() {
                 className="w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-[13px] text-left hover:bg-sep active:bg-sep transition-colors"
               >
                 <div className="w-9 h-9 rounded-xl bg-sep flex items-center justify-center flex-shrink-0">
-                  <svg className="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v4M8 11v6M12 3v10M12 17v4M16 3v4M16 11v6" /></svg>
+                  {recipe.emoji
+                    ? <span className="text-xl leading-none">{recipe.emoji}</span>
+                    : <svg className="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v4M8 11v6M12 3v10M12 17v4M16 3v4M16 11v6" /></svg>}
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[13px] font-bold text-text1 truncate">{recipe.name}</p>
