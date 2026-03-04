@@ -64,7 +64,6 @@ export default function BottomNav() {
   return (
     <nav
       className="bg-card border-t border-sep flex flex-col flex-shrink-0"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       {/* Rangée de boutons */}
       <div className="flex justify-around items-stretch">
