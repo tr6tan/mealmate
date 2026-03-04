@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import SplashScreen from '@/components/ui/SplashScreen'
+import ErrorBoundary from '@/components/ui/ErrorBoundary'
 import { useAppStore } from '@/store/useAppStore'
 import { getTodayIndex, getWeekMonday } from '@/lib/utils'
 import { useFoyerSync } from '@/hooks/useFoyerSync'
@@ -47,6 +48,7 @@ export default function App() {
   }, [setCurrentDayIdx])
 
   return (
+    <ErrorBoundary>
     <>
       {showSplash && <SplashScreen onDone={hideSplash} />}
       <AppShell
@@ -74,6 +76,7 @@ export default function App() {
       <SyncBanner />
     </AppShell>
     </>
+    </ErrorBoundary>
   )
 }
 

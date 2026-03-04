@@ -287,6 +287,26 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: 'mealmate-store',
+      version: 2,
+      migrate: (persisted: unknown, version: number) => {
+        const state = persisted as Record<string, unknown>
+        // Sanitize recipes : assure que chaque recette a les champs obligatoires
+        if (Array.isArray(state.recipes)) {
+          state.recipes = state.recipes
+            .filter((r: unknown) => r && typeof r === 'object')
+            .map((r: Record<string, unknown>) => ({
+              ...r,
+              id:     r.id     ?? String(Math.random()),
+              name:   typeof r.name === 'string' && r.name ? r.name : 'Recette sans nom',
+              emoji:  r.emoji  ?? '🍽️',
+              period: r.period === 'pdej' || r.period === 'midi' || r.period === 'soir' ? r.period : 'midi',
+              time:   typeof r.time === 'string' ? r.time : '',
+              fav:    Boolean(r.fav),
+              rapide: Boolean(r.rapide),
+            }))
+        }
+        return state
+      },
       storage: createJSONStorage(() => localStorage),
       // Persister uniquement les données métier (pas l'UI)
       partialize: (s) => ({

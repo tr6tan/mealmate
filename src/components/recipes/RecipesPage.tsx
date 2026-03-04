@@ -45,6 +45,7 @@ export default function RecipesPage() {
 
   const filtered = useMemo(() => {
     let list = recipes.filter((r) => {
+      if (!r || typeof r.name !== 'string') return false
       const matchFilter =
         filter === 'all' ||
         filter === r.period ||
