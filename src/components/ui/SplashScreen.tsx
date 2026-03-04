@@ -8,19 +8,20 @@ export default function SplashScreen({ onDone }: { onDone: () => void }) {
   // 0 = init  1 = expand  2 = fade-out
   const [stage, setStage] = useState<0 | 1 | 2>(0)
 
-  // Force le fond html en rouge pour boucher la zone safe-area-inset-bottom
-  // pendant l'animation (sinon bande blanche visible en bas sur iPhone PWA)
   useEffect(() => {
-    const prev = document.documentElement.style.backgroundColor
+    // Fond rouge sur html pour boucher la safe-area pendant le splash
     document.documentElement.style.backgroundColor = '#D23D2D'
-    return () => { document.documentElement.style.backgroundColor = prev }
-  }, [])
-
-  useEffect(() => {
-    const t0 = setTimeout(() => setStage(1), 40)    // demarre l'expansion
-    const t1 = setTimeout(() => setStage(2), 720)   // demarre le fade-out
-    const t2 = setTimeout(() => onDone(), 1080)     // demonte
-    return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2) }
+    const t0 = setTimeout(() => setStage(1), 40)
+    const t1 = setTimeout(() => {
+      setStage(2)
+      // Dès que le fade commence, repasse au fond card pour qu'il soit visible sous le splash
+      document.documentElement.style.backgroundColor = ''
+    }, 720)
+    const t2 = setTimeout(() => onDone(), 1060)
+    return () => {
+      clearTimeout(t0); clearTimeout(t1); clearTimeout(t2)
+      document.documentElement.style.backgroundColor = ''
+    }
   }, [onDone])
 
   return (

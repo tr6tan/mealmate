@@ -16,12 +16,6 @@ export default function ShoppingCategorySection({ category, label }: Props) {
     [shoppingItems, category],
   )
 
-  // Articles non cochés d'abord, cochés en bas
-  const sorted = useMemo(
-    () => [...items.filter((i) => !i.checked), ...items.filter((i) => i.checked)],
-    [items],
-  )
-
   const remaining = items.filter((i) => !i.checked).length
   const total = items.length
 
@@ -53,7 +47,7 @@ export default function ShoppingCategorySection({ category, label }: Props) {
       </div>
 
       <div className="space-y-1.5">
-        {sorted.map((item) => (
+        {items.map((item) => (
           <ShoppingItemRow key={item.id} item={item} />
         ))}
       </div>

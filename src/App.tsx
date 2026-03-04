@@ -7,11 +7,12 @@ import { useFoyerSync } from '@/hooks/useFoyerSync'
 import AppShell from '@/components/layout/AppShell'
 import Toast from '@/components/ui/Toast'
 import SyncBanner from '@/components/ui/SyncBanner'
-
-const PlanningPage      = lazy(() => import('@/components/planning/PlanningPage'))
-const RecipesPage       = lazy(() => import('@/components/recipes/RecipesPage'))
-const ShoppingPage      = lazy(() => import('@/components/shopping/ShoppingPage'))
-const SettingsPage      = lazy(() => import('@/components/settings/SettingsPage'))
+// Pages : import statique → navigation instantanée (bundle PWA mis en cache de toute façon)
+import PlanningPage  from '@/components/planning/PlanningPage'
+import RecipesPage   from '@/components/recipes/RecipesPage'
+import ShoppingPage  from '@/components/shopping/ShoppingPage'
+import SettingsPage  from '@/components/settings/SettingsPage'
+// Sheets : lazy car rarement ouvertes
 const AddMealSheet      = lazy(() => import('@/components/sheets/AddMealSheet'))
 const MealActionsSheet  = lazy(() => import('@/components/sheets/MealActionsSheet'))
 const RecipeDetailSheet = lazy(() => import('@/components/sheets/RecipeDetailSheet'))
@@ -53,12 +54,12 @@ export default function App() {
       {showSplash && <SplashScreen onDone={hideSplash} />}
       <AppShell
       nav={
-        <Suspense fallback={null}>
+        <>
           <TabPanel active={activeTab === 'planning'}><PlanningPage /></TabPanel>
           <TabPanel active={activeTab === 'recettes'}><RecipesPage /></TabPanel>
           <TabPanel active={activeTab === 'courses'}><ShoppingPage /></TabPanel>
           <TabPanel active={activeTab === 'settings'}><SettingsPage /></TabPanel>
-        </Suspense>
+        </>
       }
     >
       {/* Sheets */}
