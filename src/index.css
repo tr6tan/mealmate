@@ -50,7 +50,14 @@
   }
 
   html {
-    /* Zone physique sous la navbar iOS PWA (coins arrondís) = couleur de la nav */
+    /* Zone physique sous la navbar iOS PWA (coins arrondis) = couleur de la nav.
+       Transparent : le fond vient du AppShell (fixed inset:0). Le SplashScreen
+       met lui-même le fond en rouge le temps de l'animation. */
+    background-color: rgb(var(--c-card));
+  }
+
+  /* Assure que la zone safe-area-inset-bottom a le fond de la nav bar */
+  body {
     background-color: rgb(var(--c-card));
   }
 

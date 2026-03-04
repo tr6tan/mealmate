@@ -8,6 +8,14 @@ export default function SplashScreen({ onDone }: { onDone: () => void }) {
   // 0 = init  1 = expand  2 = fade-out
   const [stage, setStage] = useState<0 | 1 | 2>(0)
 
+  // Force le fond html en rouge pour boucher la zone safe-area-inset-bottom
+  // pendant l'animation (sinon bande blanche visible en bas sur iPhone PWA)
+  useEffect(() => {
+    const prev = document.documentElement.style.backgroundColor
+    document.documentElement.style.backgroundColor = '#D23D2D'
+    return () => { document.documentElement.style.backgroundColor = prev }
+  }, [])
+
   useEffect(() => {
     const t0 = setTimeout(() => setStage(1), 40)    // demarre l'expansion
     const t1 = setTimeout(() => setStage(2), 720)   // demarre le fade-out
