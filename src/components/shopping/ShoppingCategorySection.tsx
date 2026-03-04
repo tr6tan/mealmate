@@ -10,10 +10,10 @@ interface Props {
 }
 
 export default function ShoppingCategorySection({ category, label }: Props) {
-  const items = useAppStore(
-    useMemo(() => (s: { shoppingItems: ReturnType<typeof useAppStore.getState>['shoppingItems'] }) =>
-      s.shoppingItems.filter((i) => i.category === category),
-    [category])
+  const shoppingItems = useAppStore((s) => s.shoppingItems)
+  const items = useMemo(
+    () => shoppingItems.filter((i) => i.category === category),
+    [shoppingItems, category],
   )
 
   // Articles non cochés d'abord, cochés en bas
