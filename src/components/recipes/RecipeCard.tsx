@@ -1,10 +1,16 @@
 import { cn } from '@/lib/utils'
 import type { Recipe } from '@/types'
+import { PeriodIcon } from '@/components/ui/FoodIcons'
 
 const PERIOD_COLOR: Record<string, string> = {
   pdej: 'text-[#B07A10] bg-[#F5C06520]',
   midi: 'text-[#D23D2D] bg-[#D23D2D15]',
   soir: 'text-[#5A3832] bg-[#6E433D20]',
+}
+const PERIOD_ICON_COLOR: Record<string, string> = {
+  pdej: '#B07A10',
+  midi: '#D23D2D',
+  soir: '#6E433D',
 }
 const PERIOD_LABEL: Record<string, string> = { pdej: 'Petit-dej', midi: 'Midi', soir: 'Soir' }
 const PERIOD_GRADIENT: Record<string, string> = {
@@ -31,7 +37,11 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
         <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-gradient-to-br from-terra-light to-sep flex items-center justify-center">
           {recipe.photo
             ? <img src={recipe.photo} alt={recipe.name} className="w-full h-full object-cover" loading="lazy" />
-            : <svg className="w-6 h-6 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v4M8 11v6M12 3v10M12 17v4M16 3v4M16 11v6" /></svg>
+            : <PeriodIcon
+            period={recipe.period}
+            className="w-6 h-6 opacity-50"
+            style={{ color: PERIOD_ICON_COLOR[recipe.period] }}
+          />
           }
         </div>
         {/* Info */}
@@ -75,7 +85,11 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <svg className="w-7 h-7 text-muted/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v4M8 11v6M12 3v10M12 17v4M16 3v4M16 11v6" /></svg>
+            <PeriodIcon
+              period={recipe.period}
+              className="w-10 h-10 opacity-30"
+              style={{ color: PERIOD_ICON_COLOR[recipe.period] }}
+            />
           </div>
         )}
         {/* Badges overlay */}

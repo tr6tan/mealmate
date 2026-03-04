@@ -157,6 +157,7 @@ export default function DayView({ dayIdx }: Props) {
                 {mainMeal ? (
                   <MealCard
                     meal={mainMeal}
+                    period={period}
                     onPress={() =>
                       openSheet({ sheet: 'meal-actions', actionContext: { dayIdx, slotKey, meal: mainMeal } })
                     }

@@ -190,6 +190,12 @@ export default function AddItemSheet() {
           placeholder="Nom de l'article…"
           value={name}
           onChange={(e) => handleNameChange(e.target.value)}
+          onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 300)}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="sentences"
+          spellCheck={false}
+          enterKeyHint="next"
           className="w-full px-3.5 py-3 bg-card border-[1.5px] border-border rounded-2xl text-sm font-semibold text-text1 outline-none placeholder:text-muted focus:border-terra transition-colors"
         />
         <input
@@ -197,6 +203,12 @@ export default function AddItemSheet() {
           placeholder="Quantité (ex : 500g, 2 pièces…)"
           value={qty}
           onChange={(e) => setQty(e.target.value)}
+          onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 300)}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          enterKeyHint="done"
           className="w-full px-3.5 py-3 bg-card border-[1.5px] border-border rounded-2xl text-sm font-semibold text-text1 outline-none placeholder:text-muted focus:border-terra transition-colors"
         />
       </div>

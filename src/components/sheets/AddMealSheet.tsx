@@ -123,10 +123,15 @@ export default function AddMealSheet() {
           <div className="mb-3.5 bg-terra-light rounded-2xl p-3 border-2 border-dashed border-terra">
             <div className="flex gap-2 mb-2">
               <input
-                type="text"
+                              type="text"
                 placeholder="Nom du repas…"
                 value={freeName}
                 onChange={(e) => setFreeName(e.target.value)}
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="sentences"
+                spellCheck={false}
+                enterKeyHint="done"
                 className="flex-1 px-3 py-2 rounded-xl bg-white/60 text-sm font-semibold text-text1 border-none outline-none placeholder:text-muted"
               />
             </div>
@@ -149,6 +154,11 @@ export default function AddMealSheet() {
                 placeholder="Chercher une recette…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck={false}
+                enterKeyHint="search"
                 className="flex-1 bg-transparent outline-none text-[13px] font-semibold text-text1 placeholder:text-muted"
               />
               {search && (

@@ -1,12 +1,14 @@
-import type { Meal } from '@/types'
+import type { Meal, Period } from '@/types'
 import { cn } from '@/lib/utils'
+import { PeriodIcon } from '@/components/ui/FoodIcons'
 
 interface Props {
   meal: Meal
   onPress: () => void
+  period?: Period
 }
 
-export default function MealCard({ meal, onPress }: Props) {
+export default function MealCard({ meal, onPress, period }: Props) {
   if (meal.isRestaurant) {
     return (
       <button
@@ -51,9 +53,7 @@ export default function MealCard({ meal, onPress }: Props) {
           </div>
         ) : (
           <div className="w-10 h-10 rounded-[10px] flex-shrink-0 flex items-center justify-center bg-sep">
-            <svg className="w-5 h-5 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M8 3v4M8 11v6M12 3v10M12 17v4M16 3v4M16 11v6" />
-            </svg>
+            <PeriodIcon period={period ?? 'midi'} className="w-5 h-5 text-muted" />
           </div>
         )}
       <div className="flex-1 min-w-0">

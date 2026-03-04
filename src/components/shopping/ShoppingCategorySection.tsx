@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import type { ShoppingCategory } from '@/types'
 import ShoppingItemRow from './ShoppingItemRow'
+import { CategoryIcon } from '@/components/ui/FoodIcons'
 
 interface Props {
   category: ShoppingCategory
@@ -31,6 +32,10 @@ export default function ShoppingCategorySection({ category, label }: Props) {
       {/* Header catégorie */}
       <div className="flex items-center justify-between pb-2.5 mb-2 border-b-[1.5px] border-border">
         <div className="flex items-center gap-2">
+          <CategoryIcon
+            category={category}
+            className="w-4 h-4 text-muted flex-shrink-0"
+          />
           <span className="text-[11px] font-extrabold tracking-[0.07em] uppercase text-muted">
             {label}
           </span>

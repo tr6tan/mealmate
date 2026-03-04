@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import type { SheetName } from '@/types'
 import { cn } from '@/lib/utils'
@@ -11,13 +11,45 @@ interface Props {
   noScroll?: boolean
 }
 
+/**
+ * Sur iOS PWA, le clavier virtuel ne réduit pas window.innerHeight.
+ * On utilise visualViewport pour détecter le clavier et remonter le sheet.
+ */
+function useKeyboardOffset() {
+  const [offset, setOffset] = useState(0)
+  useEffect(() => {
+    const vv = window.visualViewport
+    if (!vv) return
+    const update = () => {
+      const kbHeight = window.innerHeight - vv.height - vv.offsetTop
+      setOffset(kbHeight > 50 ? kbHeight : 0)
+    }
+    vv.addEventListener('resize', update)
+    vv.addEventListener('scroll', update)
+    return () => {
+      vv.removeEventListener('resize', update)
+      vv.removeEventListener('scroll', update)
+    }
+  }, [])
+  return offset
+}
+
 export default function BottomSheet({ name, children, className, noScroll }: Props) {
   const sheetState = useAppStore((s) => s.sheetState)
   const closeSheet = useAppStore((s) => s.closeSheet)
   const isOpen = sheetState.sheet === name
   const ref = useRef<HTMLDivElement>(null)
+  const keyboardOffset = useKeyboardOffset()
 
-  // Swipe to close (sur le handle uniquement pour ne pas bloquer le scroll interne)
+  // Ferme le clavier iOS quand le sheet se ferme
+  useEffect(() => {
+    if (!isOpen) {
+      const active = document.activeElement as HTMLElement | null
+      active?.blur?.()
+    }
+  }, [isOpen])
+
+  // Swipe to close
   useEffect(() => {
     if (!isOpen) return
     const el = ref.current
@@ -56,10 +88,18 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
             ? 'flex flex-col overflow-hidden'
             : 'overflow-y-auto no-scrollbar',
           'transform transition-transform duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)]',
-          noScroll ? 'px-5 pt-3' : 'px-5 pt-3 pb-10',
-          isOpen ? 'translate-y-0' : 'translate-y-full',
+          noScroll ? 'px-5 pt-3' : 'px-5 pt-3',
+          isOpen ? '' : 'translate-y-full',
           className,
         )}
+        style={isOpen ? {
+          /* Remonte le sheet au-dessus du clavier iOS + laisse une marge confortable */
+          transform: `translateY(-${keyboardOffset}px)`,
+          /* Padding bas = safe-area quand clavier fermé, 8px symbolique si clavier ouvert */
+          paddingBottom: keyboardOffset > 0
+            ? '8px'
+            : 'max(40px, calc(env(safe-area-inset-bottom, 0px) + 24px))',
+        } : undefined}
       >
         {/* Handle */}
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-4 flex-shrink-0" />

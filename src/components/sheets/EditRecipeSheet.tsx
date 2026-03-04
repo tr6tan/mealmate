@@ -127,6 +127,12 @@ export default function EditRecipeSheet() {
           placeholder="Nom de la recette…"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 300)}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="sentences"
+          spellCheck={false}
+          enterKeyHint="next"
           className="w-full px-3.5 py-3 bg-card border-[1.5px] border-border rounded-2xl text-sm font-semibold text-text1 outline-none placeholder:text-muted focus:border-terra transition-colors"
         />
       </div>
@@ -163,8 +169,12 @@ export default function EditRecipeSheet() {
             placeholder="Ex : 25 min"
             value={time}
             onChange={(e) => setTime(e.target.value)}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+            enterKeyHint="done"
             className="flex-1 px-3.5 py-3 bg-card border-[1.5px] border-border rounded-2xl text-sm font-semibold text-text1 outline-none placeholder:text-muted focus:border-terra transition-colors"
-            autoFocus
           />
           <button
             onClick={() => setTimeCustom(false)}
@@ -261,12 +271,22 @@ export default function EditRecipeSheet() {
               placeholder="Ingrédient…"
               value={ing.name}
               onChange={(e) => updateIngredient(idx, { name: e.target.value })}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="sentences"
+              spellCheck={false}
+              enterKeyHint="next"
               className="flex-1 px-3 py-2.5 bg-card border-[1.5px] border-border rounded-xl text-sm text-text1 outline-none placeholder:text-muted focus:border-terra transition-colors"
             />
             <input
               placeholder="Qté"
               value={ing.qty}
               onChange={(e) => updateIngredient(idx, { qty: e.target.value })}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              enterKeyHint="next"
               className="w-16 px-2 py-2.5 bg-card border-[1.5px] border-border rounded-xl text-sm text-text1 outline-none placeholder:text-muted focus:border-terra transition-colors text-center"
             />
             <select
@@ -307,6 +327,10 @@ export default function EditRecipeSheet() {
               placeholder={`Étape ${idx + 1}…`}
               value={step}
               onChange={(e) => updateStep(idx, e.target.value)}
+              autoCorrect="off"
+              autoCapitalize="sentences"
+              spellCheck={false}
+              enterKeyHint="next"
               className="flex-1 px-3 py-2.5 bg-card border-[1.5px] border-border rounded-2xl text-sm text-text1 outline-none placeholder:text-muted focus:border-terra transition-colors resize-none leading-snug"
             />
             {steps.length > 1 && (
