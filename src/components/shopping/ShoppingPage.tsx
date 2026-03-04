@@ -98,7 +98,7 @@ export default function ShoppingPage() {
 
       <div
         className="flex-1 overflow-y-auto no-scrollbar overscroll-contain"
-        style={{ paddingBottom: total > 0 ? 'calc(120px + env(safe-area-inset-bottom, 0px))' : 'calc(60px + env(safe-area-inset-bottom, 0px))' }}
+        style={{ paddingBottom: '16px' }}
       >
       {total === 0 ? (
         /* ── Empty state ── */
@@ -183,11 +183,9 @@ export default function ShoppingPage() {
       )}
       </div>{/* /scroll */}
 
-      {/* Barre d'actions fixe en bas */}
+      {/* Barre d'actions en bas — élément flex statique */}
       {total > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-20 bg-card/98 backdrop-blur-xl border-t border-sep px-5 py-3 flex gap-2"
-          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 60px)' }}
-        >
+        <div className="flex-shrink-0 bg-card/98 backdrop-blur-xl border-t border-sep px-5 py-3 flex gap-2">
           {checked > 0 && (
             <button
               onClick={() => { clearCheckedItems(); showToast('Articles cochés supprimés') }}
