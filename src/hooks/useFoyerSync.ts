@@ -60,6 +60,8 @@ export function useFoyerSync() {
   const hydrate = useAppStore((s) => s._hydrate)
   const setSyncStatus = useAppStore((s) => s.setSyncStatus)
   const isRemoteUpdate = useRef(false)
+  const connectingTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isMergingRecipes = useRef(false)
 
   useEffect(() => {
     const ref = doc(db, COLLECTION, foyerId)
@@ -73,6 +75,12 @@ export function useFoyerSync() {
           // On ne crée JAMAIS le doc — on attend que Firestore renvoie
           // les vraies données du serveur (second snapshot).
           setSyncStatus('connecting')
+          // Timeout de sécurité : si le doc n'arrive pas en 10s, on affiche une erreur
+          if (!connectingTimeout.current) {
+            connectingTimeout.current = setTimeout(() => {
+              setSyncStatus('error')
+            }, 10_000)
+          }
           return
         }
         // Foyer créé localement (premier lancement) : on initialise le doc.
@@ -87,7 +95,17 @@ export function useFoyerSync() {
         }).catch(() => setSyncStatus('error'))
         return
       }
+      // Annule le timeout de connecting si on reçoit enfin les données
+      if (connectingTimeout.current) {
+        clearTimeout(connectingTimeout.current)
+        connectingTimeout.current = null
+      }
+      // Une fois les données du host reçues, l'invité est "ancré" sur ce foyer
+      localStorage.removeItem('mealmate-foyer-invite')
+
       // Mise à jour distante → hydrate sans écraser le darkMode local
+      // Si c'est notre propre updateDoc (merge recettes), on évite de re-hydrater
+      if (isMergingRecipes.current) return
       isRemoteUpdate.current = true
       const data = snap.data() as FoyerData
 
@@ -115,7 +133,10 @@ export function useFoyerSync() {
 
       data.recipes = [...updatedRecipes, ...missingDefaults]
       if (needsWrite) {
-        void updateDoc(ref, { recipes: data.recipes })
+        isMergingRecipes.current = true
+        updateDoc(ref, { recipes: data.recipes }).finally(() => {
+          isMergingRecipes.current = false
+        })
       }
 
       hydrate(data)
