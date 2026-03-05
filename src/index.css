@@ -79,6 +79,11 @@
     user-select: auto;
   }
 
+  /* iOS : force font-size ≥ 16px sur les inputs pour éviter le zoom automatique */
+  input, textarea, select {
+    font-size: max(16px, 1em);
+  }
+
   /* Masquer les scrollbars */
   * {
     scrollbar-width: none;
@@ -111,7 +116,7 @@
     margin-bottom: env(safe-area-inset-bottom);
   }
   .pb-nav-safe {
-    padding-bottom: calc(60px + env(safe-area-inset-bottom));
+    padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px));
   }
   /* Nav iOS PWA : fond qui s’étend sous le home indicator */
   .nav-ios-safe {

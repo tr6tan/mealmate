@@ -93,11 +93,11 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
         ref={ref}
         className={cn(
           'fixed left-0 right-0 bottom-0 z-50',
-          'bg-card rounded-t-[28px] max-h-[88dvh]',
+          'bg-card rounded-t-[28px] max-h-[92dvh]',
           noScroll
             ? 'flex flex-col overflow-hidden'
-            : 'overflow-y-auto no-scrollbar',
-          'transform transition-transform duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)]',
+            : 'overflow-y-auto overscroll-contain no-scrollbar',
+          'transform transition-transform duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)] will-change-transform',
           noScroll ? 'px-5 pt-3' : 'px-5 pt-3',
           isOpen ? '' : 'translate-y-full',
           className,
