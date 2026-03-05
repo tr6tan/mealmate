@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore'
+import { doc, onSnapshot, setDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { getFoyerId, isFoyerInvite } from '@/lib/foyer'
 import { useAppStore } from '@/store/useAppStore'
@@ -144,7 +144,7 @@ export function useFoyerSync() {
       data.recipes = [...updatedRecipes, ...missingDefaults]
       if (needsWrite) {
         isMergingRecipes.current = true
-        updateDoc(ref, { recipes: data.recipes }).finally(() => {
+        setDoc(ref, { recipes: data.recipes }, { merge: true }).finally(() => {
           isMergingRecipes.current = false
         })
       }
