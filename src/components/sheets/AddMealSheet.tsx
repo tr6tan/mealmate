@@ -175,7 +175,7 @@ export default function AddMealSheet() {
                   key={t.key}
                   onClick={() => setActiveTab(t.key)}
                   className={cn(
-                    'flex-1 py-1.5 text-center text-[11px] font-extrabold rounded-[9px] transition-all duration-200',
+                    'flex-1 py-1.5 text-center text-[11px] font-extrabold rounded-2xl transition-all duration-200',
                     activeTab === t.key
                       ? 'bg-white text-terra shadow-[0_1px_6px_rgba(0,0,0,0.10)]'
                       : 'text-muted',
