@@ -1,11 +1,9 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import SplashScreen from '@/components/ui/SplashScreen'
-import OnboardingPage from '@/components/ui/OnboardingPage'
 import ErrorBoundary from '@/components/ui/ErrorBoundary'
 import { useAppStore } from '@/store/useAppStore'
 import { getTodayIndex, getWeekMonday } from '@/lib/utils'
 import { useFoyerSync } from '@/hooks/useFoyerSync'
-import { hasFoyer } from '@/lib/foyer'
 import AppShell from '@/components/layout/AppShell'
 import Toast from '@/components/ui/Toast'
 import SyncBanner from '@/components/ui/SyncBanner'
@@ -23,13 +21,7 @@ const AddItemSheet      = lazy(() => import('@/components/sheets/AddItemSheet'))
 const NewRecipeSheet    = lazy(() => import('@/components/sheets/NewRecipeSheet'))
 const EditRecipeSheet   = lazy(() => import('@/components/sheets/EditRecipeSheet'))
 
-/** Gate : si aucun foyer n'est associé à cet appareil, affiche l'onboarding. */
 export default function App() {
-  if (!hasFoyer()) return <OnboardingPage />
-  return <MainApp />
-}
-
-function MainApp() {
   const [showSplash, setShowSplash] = useState(true)
   const hideSplash = useCallback(() => setShowSplash(false), [])
 
