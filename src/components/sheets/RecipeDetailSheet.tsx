@@ -25,6 +25,20 @@ const IcoTrash     = () => <svg className="w-4 h-4" viewBox="0 0 24 24" fill="no
 const IcoClock     = () => <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
 const IcoLightning = () => <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
 
+const PERIOD_META = {
+  pdej: { label: 'Petit-dej', cls: 'text-[#B8650A] bg-[#FEF3CD]', circleCls: 'bg-[#FEF3CD]' },
+  midi: { label: 'Déjeuner',  cls: 'text-terra bg-terra-light',   circleCls: 'bg-terra-light' },
+  soir: { label: 'Dîner',     cls: 'text-text2 bg-sep',            circleCls: 'bg-sep' },
+} as const
+
+const CATEGORY_DOT: Record<string, string> = {
+  legumes:  '#5A9E68',
+  viandes:  '#D43D3D',
+  cremerie: '#E8B84B',
+  epicerie: '#E89044',
+  maison:   '#8E7BB5',
+}
+
 export default function RecipeDetailSheet() {
   const sheetState      = useAppStore((s) => s.sheetState)
   const toggleFav       = useAppStore((s) => s.toggleFav)
@@ -94,22 +108,30 @@ export default function RecipeDetailSheet() {
             <h2 className="text-[22px] font-extrabold text-white leading-tight mb-2 drop-shadow">
               {recipe.name}
             </h2>
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-white/90 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
-              <IcoClock /> {recipe.time}
-            </span>
+            <div className="flex flex-wrap gap-1.5">
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-white/90 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                <IcoClock /> {recipe.time}
+              </span>
+              <span className="inline-flex items-center text-[11px] font-bold text-white/90 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full">
+                {PERIOD_META[recipe.period].label}
+              </span>
+            </div>
           </div>
         </div>
       ) : (
         /* Pas de photo — en-tête sobre */
         <div className="flex items-center gap-3.5 mb-5">
-          <div className="w-14 h-14 rounded-2xl bg-sep flex items-center justify-center flex-shrink-0">
-            <svg className="w-7 h-7 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v4M8 11v6M12 3v10M12 17v4M16 3v4M16 11v6"/></svg>
+          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 text-3xl ${PERIOD_META[recipe.period].circleCls}`}>
+            {recipe.emoji}
           </div>
           <div className="flex-1 min-w-0">
             <h2 className="text-[20px] font-extrabold text-text1 leading-tight mb-2">{recipe.name}</h2>
             <div className="flex flex-wrap gap-1.5">
               <span className="inline-flex items-center gap-1 text-[11px] font-bold text-terra bg-terra-light px-2.5 py-1 rounded-full">
                 <IcoClock /> {recipe.time}
+              </span>
+              <span className={`inline-flex items-center text-[11px] font-bold px-2.5 py-1 rounded-full ${PERIOD_META[recipe.period].cls}`}>
+                {PERIOD_META[recipe.period].label}
               </span>
               {recipe.fav && (
                 <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#C0304A] bg-[#FDE8F0] px-2.5 py-1 rounded-full">
@@ -129,49 +151,51 @@ export default function RecipeDetailSheet() {
       {/* ── CTA PRINCIPAL ── */}
       <button
         onClick={() => openSheet({ sheet: 'pick-day', pickDayContext: { recipe } })}
-        className="w-full py-3.5 mb-3 rounded-2xl bg-terra text-white text-[14px] font-extrabold shadow-terra active:scale-[0.97] transition-transform flex items-center justify-center gap-2"
+        className="w-full py-[15px] mb-2 rounded-2xl bg-terra text-white text-[15px] font-extrabold active:scale-[0.97] transition-transform flex items-center justify-center gap-2"
+        style={{ boxShadow: '0 6px 20px rgba(210,61,45,0.28)' }}
       >
         <IcoCalendar />
         Planifier cette recette
       </button>
 
       {/* ── ACTIONS SECONDAIRES ── */}
-      <div className="grid grid-cols-4 gap-2 mb-6">
+      <div className="flex gap-2 mb-2">
         <button
           onClick={() => toggleFav(recipe.id)}
-          className={`flex flex-col items-center justify-center gap-1.5 py-3.5 rounded-2xl text-[10px] font-extrabold transition-all active:scale-[0.95] ${
-            recipe.fav ? 'bg-[#FDE8F0] text-[#C0304A]' : 'bg-sep text-muted'
+          className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-2xl text-[12px] font-extrabold transition-all active:scale-[0.95] ${
+            recipe.fav ? 'bg-[#FDE8F0] text-[#C0304A]' : 'bg-sep text-text2'
           }`}
         >
           <IcoHeart filled={recipe.fav} />
           Favori
         </button>
-        {hasIngredients && (
-          <button
-            onClick={handleAddToCourses}
-            className="flex flex-col items-center justify-center gap-1.5 py-3.5 rounded-2xl bg-[#E4F0E6] text-[#31603D] text-[10px] font-extrabold active:scale-[0.95] transition-all"
-          >
-            <IcoCart />
-            Courses
-          </button>
-        )}
         <button
           onClick={handleEdit}
-          className={`flex flex-col items-center justify-center gap-1.5 py-3.5 rounded-2xl bg-sep text-muted text-[10px] font-extrabold active:scale-[0.95] transition-all ${
-            !hasIngredients ? 'col-span-2' : ''
-          }`}
+          className="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-2xl bg-sep text-text2 text-[12px] font-extrabold active:scale-[0.95] transition-all"
         >
           <IcoPen />
           Modifier
         </button>
         <button
           onClick={handleDuplicate}
-          className="flex flex-col items-center justify-center gap-1.5 py-3.5 rounded-2xl bg-sep text-muted text-[10px] font-extrabold active:scale-[0.95] transition-all"
+          className="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-2xl bg-sep text-text2 text-[12px] font-extrabold active:scale-[0.95] transition-all"
         >
           <IcoCopy />
           Dupliquer
         </button>
       </div>
+
+      {/* ── COURSES (séparé, proéminent) ── */}
+      {hasIngredients && (
+        <button
+          onClick={handleAddToCourses}
+          className="w-full py-3.5 mb-6 rounded-2xl bg-[#E4F0E6] text-[#2A5435] text-[13px] font-extrabold active:scale-[0.97] transition-all flex items-center justify-center gap-2"
+          style={{ boxShadow: '0 2px 10px rgba(49,96,61,0.13)' }}
+        >
+          <IcoCart />
+          Ajouter aux courses
+        </button>
+      )}
 
       {/* ── INGRÉDIENTS ── */}
       {hasIngredients && (
@@ -194,11 +218,15 @@ export default function RecipeDetailSheet() {
             {recipe.ingredients!.map((ing, i) => (
               <div
                 key={i}
-                className={`flex items-center justify-between px-4 py-3 ${
+                className={`flex items-center gap-3 px-4 py-3 ${
                   i !== recipe.ingredients!.length - 1 ? 'border-b border-border' : ''
                 }`}
               >
-                <span className="text-[13px] font-semibold text-text1 flex-1 pr-4">{ing.name}</span>
+                <span
+                  className="w-2 h-2 rounded-full flex-shrink-0"
+                  style={{ background: CATEGORY_DOT[ing.category] ?? '#aaa' }}
+                />
+                <span className="text-[13px] font-semibold text-text1 flex-1">{ing.name}</span>
                 <span className="text-[12px] font-extrabold text-terra bg-terra-light px-2.5 py-0.5 rounded-full shrink-0">
                   {scaleQty(ing.qty, portions / 2) || '—'}
                 </span>
@@ -211,16 +239,26 @@ export default function RecipeDetailSheet() {
       {/* ── ÉTAPES ── */}
       {hasSteps && (
         <>
-          <p className="text-[11px] font-extrabold tracking-[0.1em] uppercase text-muted mb-3">Préparation</p>
-          <div className="space-y-2.5 mb-6">
-            {recipe.steps!.map((step, i) => (
-              <div key={i} className="flex gap-3.5 bg-card border-[1.5px] border-border rounded-2xl p-3.5">
-                <span className="w-6 h-6 rounded-full bg-terra text-white text-[11px] font-extrabold flex items-center justify-center flex-shrink-0 mt-0.5">
-                  {i + 1}
-                </span>
-                <p className="text-[13px] text-text1 font-semibold leading-relaxed flex-1">{step}</p>
-              </div>
-            ))}
+          <p className="text-[11px] font-extrabold tracking-[0.1em] uppercase text-muted mb-4">Préparation</p>
+          <div className="mb-6">
+            {recipe.steps!.map((step, i) => {
+              const isLast = i === recipe.steps!.length - 1
+              return (
+                <div key={i} className="flex gap-4 relative">
+                  {!isLast && (
+                    <div className="absolute left-[11px] top-[26px] bottom-0 w-[2px] bg-border" />
+                  )}
+                  <div className="flex-shrink-0 z-10">
+                    <span className="w-6 h-6 rounded-full bg-terra text-white text-[11px] font-extrabold flex items-center justify-center">
+                      {i + 1}
+                    </span>
+                  </div>
+                  <div className={`flex-1 ${!isLast ? 'pb-5' : ''}`}>
+                    <p className="text-[13px] text-text1 font-semibold leading-relaxed pt-0.5">{step}</p>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </>
       )}
