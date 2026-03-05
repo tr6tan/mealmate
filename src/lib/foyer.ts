@@ -45,6 +45,21 @@ export function getInviteUrl(): string {
   return `${window.location.origin}?foyer=${getFoyerId()}`
 }
 
+/** Renvoie true si un foyer est déjà associé à cet appareil.
+ *  (ID en localStorage OU lien d'invitation dans l'URL) */
+export function hasFoyer(): boolean {
+  const params = new URLSearchParams(window.location.search)
+  return !!params.get('foyer') || !!localStorage.getItem(FOYER_KEY)
+}
+
+/** Crée explicitement un nouveau foyer (appelé depuis l'onboarding). */
+export function createNewFoyer(): void {
+  const newId = crypto.randomUUID()
+  localStorage.setItem(FOYER_KEY, newId)
+  localStorage.removeItem(FOYER_IS_INVITE)
+  window.location.reload()
+}
+
 export function resetFoyer(): void {
   const newId = crypto.randomUUID()
   localStorage.setItem(FOYER_KEY, newId)
