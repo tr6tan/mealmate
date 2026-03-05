@@ -55,9 +55,19 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
     const el = ref.current
     if (!el) return
     let startY = 0
-    const onStart = (e: TouchEvent) => (startY = e.touches[0].clientY)
+    let cancelClose = false
+    const onStart = (e: TouchEvent) => {
+      startY = e.touches[0].clientY
+      cancelClose = false
+      // Si le touch démarre dans un enfant scrollable déjà scrollé, on ne ferme pas
+      let node = e.target as HTMLElement | null
+      while (node && node !== el) {
+        if (node.scrollTop > 0) { cancelClose = true; break }
+        node = node.parentElement
+      }
+    }
     const onEnd = (e: TouchEvent) => {
-      if (e.changedTouches[0].clientY - startY > 80) closeSheet()
+      if (!cancelClose && e.changedTouches[0].clientY - startY > 80) closeSheet()
     }
     el.addEventListener('touchstart', onStart, { passive: true })
     el.addEventListener('touchend', onEnd, { passive: true })
