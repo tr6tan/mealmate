@@ -62,6 +62,9 @@ export function useFoyerSync() {
   const setSyncStatus = useAppStore((s) => s.setSyncStatus)
   const isRemoteUpdate = useRef(false)
   const isMergingRecipes = useRef(false)
+  // Empêche la réhydratation Zustand persist (localStorage) d'écraser Firestore
+  // avant que le premier snapshot distant n'ait été reçu.
+  const hasReceivedSnapshot = useRef(false)
 
   useEffect(() => {
     const ref = doc(db, COLLECTION, foyerId)
@@ -84,6 +87,7 @@ export function useFoyerSync() {
           shoppingItems: state.shoppingItems,
           settings:      settingsToWrite,
         }).catch(() => setSyncStatus('error'))
+        hasReceivedSnapshot.current = true
         return
       }
 
@@ -130,6 +134,7 @@ export function useFoyerSync() {
 
       hydrate(data)
       isRemoteUpdate.current = false
+      hasReceivedSnapshot.current = true
       // Bannière "mis à jour" seulement pour les vrais changements distants (pas le cache initial)
       if (!snap.metadata.fromCache) {
         setSyncStatus('updated')
@@ -141,6 +146,10 @@ export function useFoyerSync() {
     // On n'écrit que les champs qui ont effectivement changé
     const unsubStore = useAppStore.subscribe((state, prev) => {
       if (isRemoteUpdate.current) return
+      // Tant que le premier snapshot Firestore n'a pas été reçu, on ne
+      // pousse rien : la réhydratation Zustand persist (localStorage)
+      // pourrait écraser les données distantes avec un state local stale.
+      if (!hasReceivedSnapshot.current) return
 
       if (state.weekPlans !== prev.weekPlans) {
         scheduleFieldWrite(foyerId, { weekPlans: state.weekPlans },
