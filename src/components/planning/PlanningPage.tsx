@@ -48,8 +48,10 @@ export default function PlanningPage() {
   }, [weekOffset, todayIdx])
 
   const changeWeek = useCallback((delta: number) => {
+    const next = weekOffset + delta
+    if (next < -4 || next > 8) return
     setWeekSlideDir(delta > 0 ? 'left' : 'right')
-    setWeekOffset(weekOffset + delta)
+    setWeekOffset(next)
     setTimeout(() => setWeekSlideDir(null), 280)
   }, [weekOffset, setWeekOffset])
 

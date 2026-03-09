@@ -1,7 +1,8 @@
 ﻿import { useState, useEffect } from 'react'
 import { useAppStore, selectCurrentWeekPlan } from '@/store/useAppStore'
 import type { Period, SlotKey } from '@/types'
-import { haptic, getTodayIndex, getMondayByOffset } from '@/lib/utils'
+import { haptic, getTodayIndex, getMondayByOffset, DAY_SHORT, cn } from '@/lib/utils'
+import { showToast } from '@/components/ui/Toast'
 import MealCard from './MealCard'
 import MealAddSlot from './MealAddSlot'
 import OptionalSlot from './OptionalSlot'
@@ -32,9 +33,11 @@ interface Props { dayIdx: number }
 export default function DayView({ dayIdx }: Props) {
   const openSheet  = useAppStore((s) => s.openSheet)
   const setMeal    = useAppStore((s) => s.setMeal)
+  const copyDay    = useAppStore((s) => s.copyDay)
   const weekOffset = useAppStore((s) => s.weekOffset)
   const plan       = useAppStore((s) => selectCurrentWeekPlan(s)[dayIdx])
   const [pdejOpen, setPdejOpen] = useState(!!plan?.pdej)
+  const [showCopyPicker, setShowCopyPicker] = useState(false)
 
   // Sync pdejOpen quand on change de jour ou quand un repas pdej est ajouté/retiré
   useEffect(() => {
@@ -52,28 +55,6 @@ export default function DayView({ dayIdx }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-
-      {/* ── Banner "Ce soir" (aujourd'hui seulement) ──────────────────────── */}
-      {isToday && plan.soir && (
-        <button
-          className="flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-left active:scale-[0.98] transition-transform border-[1.5px]"
-          style={{ background: '#6E433D10', borderColor: '#6E433D30' }}
-          onClick={() =>
-            openSheet({ sheet: 'meal-actions', actionContext: { dayIdx, slotKey: 'soir', meal: plan.soir! } })
-          }
-        >
-          <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: '#6E433D' }} />
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-extrabold uppercase tracking-wide mb-0.5" style={{ color: '#6E433D' }}>Ce soir</p>
-            <p className="text-[13px] font-extrabold text-text1 truncate">{plan.soir.name}</p>
-          </div>
-          {plan.soir.time && (
-            <span className="text-[11px] font-bold text-muted bg-white/70 px-2 py-0.5 rounded-lg flex-shrink-0">
-              {plan.soir.time}
-            </span>
-          )}
-        </button>
-      )}
 
       {/* ── Empty state ────────────────────────────────────────────────────── */}
       {isEmpty && (
@@ -197,6 +178,53 @@ export default function DayView({ dayIdx }: Props) {
           </div>
         )
       })}
+
+      {/* ── Copier ce jour ─────────────────────────────────────────────────── */}
+      {!isEmpty && (
+        <div className="mt-2">
+          {!showCopyPicker ? (
+            <button
+              onClick={() => setShowCopyPicker(true)}
+              className="w-full py-2.5 border-2 border-dashed border-border rounded-2xl text-xs font-bold text-muted active:border-terra active:text-terra transition-colors flex items-center justify-center gap-1.5"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copier vers un autre jour
+            </button>
+          ) : (
+            <div className="bg-card rounded-2xl border-[1.5px] border-border p-3">
+              <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-2">Copier vers…</p>
+              <div className="flex gap-1.5">
+                {DAY_SHORT.map((d, i) => (
+                  <button
+                    key={i}
+                    disabled={i === dayIdx}
+                    onClick={() => {
+                      copyDay(dayIdx, i)
+                      setShowCopyPicker(false)
+                      haptic([10])
+                      showToast(`Copié vers ${DAY_SHORT[i]}`)
+                    }}
+                    className={cn(
+                      'flex-1 py-2 rounded-xl text-[11px] font-bold transition-all',
+                      i === dayIdx
+                        ? 'bg-sep text-muted/40'
+                        : 'bg-sep text-text1 active:bg-terra active:text-white',
+                    )}
+                  >
+                    {d}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setShowCopyPicker(false)}
+                className="w-full mt-2 text-[11px] font-bold text-muted"
+              >
+                Annuler
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }

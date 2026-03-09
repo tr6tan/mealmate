@@ -1,5 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
-import SplashScreen from '@/components/ui/SplashScreen'
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import ErrorBoundary from '@/components/ui/ErrorBoundary'
 import { useAppStore } from '@/store/useAppStore'
 import { getTodayIndex, getWeekMonday } from '@/lib/utils'
@@ -22,9 +21,6 @@ const NewRecipeSheet    = lazy(() => import('@/components/sheets/NewRecipeSheet'
 const EditRecipeSheet   = lazy(() => import('@/components/sheets/EditRecipeSheet'))
 
 export default function App() {
-  const [showSplash, setShowSplash] = useState(true)
-  const hideSplash = useCallback(() => setShowSplash(false), [])
-
   const activeTab = useAppStore((s) => s.activeTab)
   const setCurrentDayIdx = useAppStore((s) => s.setCurrentDayIdx)
   const darkMode = useAppStore((s) => s.settings.darkMode)
@@ -51,7 +47,6 @@ export default function App() {
   return (
     <ErrorBoundary>
     <>
-      {showSplash && <SplashScreen onDone={hideSplash} />}
       <AppShell
       nav={
         <>
@@ -63,6 +58,7 @@ export default function App() {
       }
     >
       {/* Sheets */}
+      <ErrorBoundary>
       <Suspense fallback={null}>
         <AddMealSheet />
         <MealActionsSheet />
@@ -72,6 +68,7 @@ export default function App() {
         <NewRecipeSheet />
         <EditRecipeSheet />
       </Suspense>
+      </ErrorBoundary>
       {/* Toast */}
       <Toast />
       <SyncBanner />

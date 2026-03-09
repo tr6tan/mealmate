@@ -20,6 +20,26 @@ import { nanoid } from '@/lib/nanoid'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
+/** Parse qty string into number + unit, e.g. "250g" → [250, "g"], "2 pièces" → [2, "pièces"] */
+function parseQty(qty: string): { num: number; unit: string } | null {
+  const m = qty.trim().match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/)
+  if (!m) return null
+  return { num: parseFloat(m[1].replace(',', '.')), unit: m[2].trim().toLowerCase() }
+}
+
+/** Merge two qty strings intelligently: "250g" + "100g" → "350g", incompatible → "250g + 100g" */
+function mergeQty(a: string, b: string): string {
+  if (!a) return b
+  if (!b) return a
+  const pa = parseQty(a)
+  const pb = parseQty(b)
+  if (pa && pb && pa.unit === pb.unit) {
+    const sum = Math.round((pa.num + pb.num) * 100) / 100
+    return pa.unit ? `${sum}${pa.unit.startsWith(' ') ? '' : ' '}${pa.unit}`.trim() : `${sum}`
+  }
+  return `${a} + ${b}`
+}
+
 function buildInitialWeek(): WeekPlan {
   const plan: WeekPlan = {}
   for (let i = 0; i < 7; i++) plan[i] = emptyDay()
@@ -57,6 +77,7 @@ interface AppState {
   setMeal: (dayIdx: number, slotKey: SlotKey, meal: Meal | null) => void
   clearWeek: () => void
   copyWeekFromOffset: (fromOffset: number) => void
+  copyDay: (fromDayIdx: number, toDayIdx: number) => void
   generateShoppingFromPlan: () => void
 
   // Actions — Recipes
@@ -146,6 +167,17 @@ export const useAppStore = create<AppState>()(
           return { weekPlans: { ...s.weekPlans, [toKey]: copy } }
         }),
 
+      copyDay: (fromDayIdx: number, toDayIdx: number) =>
+        set((s) => {
+          const key = getWeekKey(getMondayByOffset(s.weekOffset))
+          const currentWeek = s.weekPlans[key] ?? buildInitialWeek()
+          const source = currentWeek[fromDayIdx]
+          if (!source) return {}
+          return {
+            weekPlans: { ...s.weekPlans, [key]: { ...currentWeek, [toDayIdx]: { ...source } } },
+          }
+        }),
+
       generateShoppingFromPlan: () => {
         const { weekPlans, weekOffset, recipes } = get()
         const key = getWeekKey(getMondayByOffset(weekOffset))
@@ -179,17 +211,13 @@ export const useAppStore = create<AppState>()(
             })
           })
         }
-        // Déduplication par nom (case-insensitive)
+        // Déduplication par nom (case-insensitive) avec somme intelligente des quantités
         const merged = new Map<string, ShoppingItem>()
         for (const item of items) {
           const itemKey = item.name.toLowerCase().trim()
           if (merged.has(itemKey)) {
             const existing = merged.get(itemKey)!
-            if (item.qty && existing.qty) {
-              existing.qty = `${existing.qty} + ${item.qty}`
-            } else if (item.qty) {
-              existing.qty = item.qty
-            }
+            existing.qty = mergeQty(existing.qty, item.qty)
           } else {
             merged.set(itemKey, { ...item })
           }

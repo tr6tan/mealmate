@@ -79,3 +79,25 @@ export const CAT_LABELS: Record<string, string> = {
 export function haptic(pattern: number | number[] = 8) {
   try { navigator.vibrate?.(pattern) } catch { /* silencé si non supporté */ }
 }
+
+/** Redimensionne + compresse une image (File) en base64 JPEG */
+export function resizeToBase64(file: File, maxW = 800, quality = 0.72): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        const scale = Math.min(1, maxW / img.width)
+        const canvas = document.createElement('canvas')
+        canvas.width = img.width * scale
+        canvas.height = img.height * scale
+        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
+        resolve(canvas.toDataURL('image/jpeg', quality))
+      }
+      img.onerror = reject
+      img.src = e.target!.result as string
+    }
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}

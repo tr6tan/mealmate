@@ -20,12 +20,10 @@ export default function MealCard({ meal, onPress, period }: Props) {
         )}
       >
         <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-amber-50">
-          <svg className="w-5 h-5 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 11l19-9-9 19-2-8-8-2z" />
-          </svg>
+          <span className="text-xl leading-none">🍽️</span>
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-bold text-amber-800">Restaurant</div>
+          <div className="text-sm font-bold text-amber-800">{meal.name || 'Restaurant'}</div>
           <span className="text-[11px] font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-lg inline-block mt-1.5">
             On mange dehors
           </span>

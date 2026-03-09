@@ -1,8 +1,8 @@
 ﻿import { useState, useRef } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
-import type { Period, ShoppingCategory, Ingredient } from '@/types'
-import { PERIOD_LABEL, cn } from '@/lib/utils'
+import type { Period, ShoppingCategory, Ingredient, DietaryTag } from '@/types'
+import { PERIOD_LABEL, cn, resizeToBase64 } from '@/lib/utils'
 import { showToast } from '@/components/ui/Toast'
 
 const PERIODS: Period[] = ['pdej', 'midi', 'soir']
@@ -13,6 +13,12 @@ const CAT_OPTIONS: { id: ShoppingCategory; label: string }[] = [
   { id: 'cremerie', label: 'Crèm.' },
   { id: 'epicerie', label: 'Épic.' },
   { id: 'maison',   label: 'Mais.' },
+]
+const TAG_OPTIONS: { id: DietaryTag; label: string }[] = [
+  { id: 'vegetarien',   label: '🌿 Végé' },
+  { id: 'vegan',        label: '🌱 Vegan' },
+  { id: 'sans-gluten',  label: 'Sans gluten' },
+  { id: 'sans-lactose', label: 'Sans lactose' },
 ]
 
 // ── TheMealDB ────────────────────────────────────────────────────────────────
@@ -69,27 +75,7 @@ function parseMealIngredients(meal: MealDBMeal): Ingredient[] {
   return ingredients
 }
 
-// ── Resize photo ─────────────────────────────────────────────────────────────
-function resizeToBase64(file: File, maxW = 800, quality = 0.72): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const img = new Image()
-      img.onload = () => {
-        const scale = Math.min(1, maxW / img.width)
-        const canvas = document.createElement('canvas')
-        canvas.width = img.width * scale
-        canvas.height = img.height * scale
-        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
-        resolve(canvas.toDataURL('image/jpeg', quality))
-      }
-      img.onerror = reject
-      img.src = e.target!.result as string
-    }
-    reader.onerror = reject
-    reader.readAsDataURL(file)
-  })
-}
+
 
 // ── Composant ────────────────────────────────────────────────────────────────
 export default function NewRecipeSheet() {
@@ -116,7 +102,11 @@ export default function NewRecipeSheet() {
   const [photo,      setPhoto]      = useState<string | undefined>(undefined)
   const [photoUrl,   setPhotoUrl]   = useState<string | undefined>(undefined)
   const [ingredients, setIngredients] = useState<Ingredient[]>([])
+  const [tags,        setTags]        = useState<DietaryTag[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const toggleTag = (tag: DietaryTag) =>
+    setTags((prev) => prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag])
 
   // ── Import handlers ─────────────────────────────────────────────────────────
   const handleSearch = async () => {
@@ -192,11 +182,12 @@ export default function NewRecipeSheet() {
       steps:       cleanSteps.length       ? cleanSteps       : undefined,
       ingredients: cleanIngredients.length  ? cleanIngredients : undefined,
       photo: photo ?? photoUrl,
+      tags: tags.length ? tags : undefined,
     })
     // Reset
     setName(''); setTime(''); setTimeCustom(false)
     setPeriod('midi'); setFav(false); setRapide(false)
-    setSteps(['']); setPhoto(undefined); setPhotoUrl(undefined); setIngredients([])
+    setSteps(['']); setPhoto(undefined); setPhotoUrl(undefined); setIngredients([]); setTags([])
     setMode('create'); setImportQuery(''); setImportResults([]); setImportNoResult(false)
     closeSheet()
     showToast(`${name.trim()} ajoutée !`)
@@ -452,6 +443,23 @@ export default function NewRecipeSheet() {
               <input type="checkbox" checked={rapide} onChange={(e) => setRapide(e.target.checked)} className="w-4 h-4 accent-terra" />
               Rapide
             </label>
+          </div>
+
+          {/* Tags diététiques */}
+          <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-2">Régime</p>
+          <div className="flex flex-wrap gap-2 mb-4">
+            {TAG_OPTIONS.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => toggleTag(t.id)}
+                className={cn(
+                  'px-3 py-1.5 rounded-xl text-xs font-bold border-2 transition-all',
+                  tags.includes(t.id) ? 'bg-sage border-sage text-white' : 'bg-card border-border text-muted',
+                )}
+              >
+                {t.label}
+              </button>
+            ))}
           </div>
 
           {/* Ingrédients */}

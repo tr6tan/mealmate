@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import type { Period, Recipe } from '@/types'
@@ -26,12 +26,21 @@ export default function AddMealSheet() {
   const [freeEmoji, setFreeEmoji] = useState('')
   const [showFreeForm, setShowFreeForm] = useState(false)
   const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+  const searchTimer = useRef<ReturnType<typeof setTimeout>>()
+
+  const updateSearch = (val: string) => {
+    setSearch(val)
+    clearTimeout(searchTimer.current)
+    searchTimer.current = setTimeout(() => setDebouncedSearch(val), 200)
+  }
 
   // Reset à chaque ouverture du sheet
   useEffect(() => {
     if (isOpen) {
       setActiveTab(sheetState.addMealPeriod ?? 'midi')
       setSearch('')
+      setDebouncedSearch('')
       setShowFreeForm(false)
       setFreeName('')
       setFreeEmoji('')
@@ -61,7 +70,7 @@ export default function AddMealSheet() {
   // Tri : période correspondante en tête, puis popularité + favori
   const filtered = useMemo(() =>
     recipes
-      .filter((r) => r.name.toLowerCase().includes(search.toLowerCase()))
+      .filter((r) => r.name.toLowerCase().includes(debouncedSearch.toLowerCase()))
       .sort((a, b) => {
         const periodA = a.period === activeTab ? 1 : 0
         const periodB = b.period === activeTab ? 1 : 0
@@ -69,7 +78,7 @@ export default function AddMealSheet() {
         const sB = periodB * 10 + (planCounts[b.id] ?? 0) * 2 + (b.fav ? 1 : 0)
         return sB - sA
       })
-  , [recipes, activeTab, search, planCounts])
+  , [recipes, activeTab, debouncedSearch, planCounts])
 
   const handleSelect = (recipe: Recipe) => {
     if (!context) return
@@ -155,7 +164,7 @@ export default function AddMealSheet() {
                 type="text"
                 placeholder="Chercher une recette…"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => updateSearch(e.target.value)}
                 autoComplete="off"
                 autoCorrect="off"
                 autoCapitalize="off"
@@ -164,7 +173,7 @@ export default function AddMealSheet() {
                 className="flex-1 bg-transparent outline-none text-[13px] font-semibold text-text1 placeholder:text-muted"
               />
               {search && (
-                <button onClick={() => setSearch('')} className="text-muted flex items-center">
+                <button onClick={() => updateSearch('')} className="text-muted flex items-center">
                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
               )}

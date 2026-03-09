@@ -28,14 +28,23 @@ function scheduleFieldWrite(
   _timers[key] = setTimeout(async () => {
     delete _pendingFields[key]
     onSaving()
-    try {
-      const ref = doc(db, COLLECTION, foyerId)
-      await setDoc(ref, fields as Record<string, unknown>, { merge: true })
-      onSaved()
-    } catch (e) {
-      console.error('[MealMate] Erreur Firestore write:', e)
-      onError()
+    const ref = doc(db, COLLECTION, foyerId)
+    let attempts = 0
+    const maxRetries = 3
+    while (attempts < maxRetries) {
+      try {
+        await setDoc(ref, fields as Record<string, unknown>, { merge: true })
+        onSaved()
+        return
+      } catch (e) {
+        attempts++
+        console.error(`[MealMate] Firestore write attempt ${attempts}/${maxRetries}:`, e)
+        if (attempts < maxRetries) {
+          await new Promise((r) => setTimeout(r, 1000 * attempts))
+        }
+      }
     }
+    onError()
   }, 300) // 300ms debounce pour laisser les écritures groupées se stabiliser
 }
 

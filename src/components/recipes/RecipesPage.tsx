@@ -1,10 +1,10 @@
 import { useState, useMemo } from 'react'
 import { useAppStore } from '@/store/useAppStore'
-import type { Period } from '@/types'
+import type { Period, DietaryTag } from '@/types'
 import { cn } from '@/lib/utils'
 import RecipeCard from './RecipeCard'
 
-type FilterKey = 'all' | Period | 'fav' | 'rapide'
+type FilterKey = 'all' | Period | 'fav' | 'rapide' | DietaryTag
 
 const FILTERS: { key: FilterKey; label: string }[] = [
   { key: 'all',    label: 'Tout' },
@@ -13,6 +13,10 @@ const FILTERS: { key: FilterKey; label: string }[] = [
   { key: 'soir',  label: 'Soir' },
   { key: 'fav',   label: 'Favoris' },
   { key: 'rapide',label: 'Rapide' },
+  { key: 'vegetarien', label: '🌿 Végé' },
+  { key: 'vegan',      label: '🌱 Vegan' },
+  { key: 'sans-gluten', label: 'Sans gluten' },
+  { key: 'sans-lactose', label: 'Sans lactose' },
 ]
 
 export default function RecipesPage() {
@@ -43,6 +47,8 @@ export default function RecipesPage() {
     return counts
   }, [weekPlans, recipes])
 
+  const DIETARY_TAGS: DietaryTag[] = ['vegetarien', 'vegan', 'sans-gluten', 'sans-lactose']
+
   const filtered = useMemo(() => {
     let list = recipes.filter((r) => {
       if (!r || typeof r.name !== 'string') return false
@@ -50,7 +56,8 @@ export default function RecipesPage() {
         filter === 'all' ||
         filter === r.period ||
         (filter === 'fav' && r.fav) ||
-        (filter === 'rapide' && r.rapide)
+        (filter === 'rapide' && r.rapide) ||
+        (DIETARY_TAGS.includes(filter as DietaryTag) && r.tags?.includes(filter as DietaryTag))
       const matchSearch = r.name.toLowerCase().includes(search.toLowerCase())
       return matchFilter && matchSearch
     })
@@ -65,6 +72,10 @@ export default function RecipesPage() {
     soir: recipes.filter((r) => r.period === 'soir').length,
     fav: recipes.filter((r) => r.fav).length,
     rapide: recipes.filter((r) => r.rapide).length,
+    vegetarien: recipes.filter((r) => r.tags?.includes('vegetarien')).length,
+    vegan: recipes.filter((r) => r.tags?.includes('vegan')).length,
+    'sans-gluten': recipes.filter((r) => r.tags?.includes('sans-gluten')).length,
+    'sans-lactose': recipes.filter((r) => r.tags?.includes('sans-lactose')).length,
   }), [recipes])
 
   return (

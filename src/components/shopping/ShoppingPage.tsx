@@ -14,6 +14,29 @@ const CATEGORIES: { id: ShoppingCategory }[] = [
   { id: 'maison' },
 ]
 
+/* ── Cercle SVG pour la progress card ── */
+const CIRCLE_R = 28
+const CIRCLE_C = 2 * Math.PI * CIRCLE_R
+
+function ProgressRing({ pct, className }: { pct: number; className?: string }) {
+  const offset = CIRCLE_C - (pct / 100) * CIRCLE_C
+  return (
+    <svg className={className} viewBox="0 0 64 64" fill="none">
+      <circle cx="32" cy="32" r={CIRCLE_R} stroke="rgb(var(--c-sep))" strokeWidth="5" />
+      <circle
+        cx="32" cy="32" r={CIRCLE_R}
+        stroke={pct === 100 ? 'rgb(var(--c-sage))' : 'rgb(var(--c-terra))'}
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeDasharray={CIRCLE_C}
+        strokeDashoffset={offset}
+        className="transition-all duration-700 ease-out"
+        style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
+      />
+    </svg>
+  )
+}
+
 export default function ShoppingPage() {
   const openSheet           = useAppStore((s) => s.openSheet)
   const generateShoppingFromPlan = useAppStore((s) => s.generateShoppingFromPlan)
@@ -38,7 +61,7 @@ export default function ShoppingPage() {
   useEffect(() => {
     if (pct === 100 && total > 0 && prevPctRef.current < 100) {
       confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 }, colors: ['#D23D2D', '#F5C065', '#31603D', '#6E433D'] })
-      showToast('Liste complète !')
+      showToast('Liste complète ! 🎉')
     }
     prevPctRef.current = pct
   }, [pct, total])
@@ -50,6 +73,18 @@ export default function ShoppingPage() {
     () => CATEGORIES.filter((c) => shoppingItems.some((i) => i.category === c.id)),
     [shoppingItems],
   )
+
+  // Résumé par catégorie pour les pills
+  const catSummary = useMemo(() => {
+    const m = new Map<ShoppingCategory, { total: number; done: number }>()
+    for (const i of shoppingItems) {
+      const e = m.get(i.category) ?? { total: 0, done: 0 }
+      e.total++
+      if (i.checked) e.done++
+      m.set(i.category, e)
+    }
+    return m
+  }, [shoppingItems])
 
   const handleGenerate = () => {
     generateShoppingFromPlan()
@@ -102,74 +137,114 @@ export default function ShoppingPage() {
       >
       {total === 0 ? (
         /* ── Empty state ── */
-        <div className="px-5 pt-6 flex flex-col items-center gap-5">
-          <div className="w-20 h-20 rounded-full bg-terra-light flex items-center justify-center">
-            <svg className="w-9 h-9" style={{ color: '#D23D2D80' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <div className="px-5 pt-8 flex flex-col items-center gap-5">
+          <div className="relative">
+            <div className="w-24 h-24 rounded-[28px] bg-terra-light flex items-center justify-center">
+              <svg className="w-11 h-11 text-terra/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            </div>
+            <div className="absolute -top-1 -right-1 w-8 h-8 rounded-full bg-card border-2 border-border flex items-center justify-center">
+              <span className="text-sm">📝</span>
+            </div>
           </div>
-          <div className="text-center">
-            <p className="text-base font-extrabold text-text1 mb-1">Liste vide</p>
-            <p className="text-[13px] text-muted font-semibold">Génère ta liste depuis le planning ou ajoute des articles manuellement.</p>
+          <div className="text-center max-w-[260px]">
+            <p className="text-[17px] font-extrabold text-text1 mb-1.5">Ta liste est vide</p>
+            <p className="text-[13px] text-muted font-semibold leading-relaxed">Génère ta liste depuis le planning ou ajoute des articles manuellement.</p>
           </div>
-          <button
-            onClick={handleGenerate}
-            className="w-full bg-terra text-white rounded-2xl py-3.5 flex items-center justify-center gap-2 text-sm font-extrabold shadow-terra active:scale-[0.97] transition-transform"
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-              <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
-              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-            </svg>
-            Générer depuis le planning
-          </button>
-          <button
-            onClick={() => openSheet({ sheet: 'add-item' })}
-            className="w-full border-2 border-border rounded-2xl py-3 text-sm font-bold text-muted active:scale-[0.97] transition-transform"
-          >
-            + Article manuel
-          </button>
+          <div className="w-full space-y-2.5 mt-1">
+            <button
+              onClick={handleGenerate}
+              className="group w-full relative overflow-hidden rounded-2xl py-4 flex items-center justify-center gap-2.5 text-[15px] font-extrabold text-white active:scale-[0.97] transition-transform"
+              style={{ background: 'linear-gradient(135deg, #D23D2D 0%, #A32E20 50%, #D23D2D 100%)', boxShadow: '0 4px 20px -4px rgba(210,61,45,0.45), 0 1px 3px rgba(210,61,45,0.2)' }}
+            >
+              <div className="absolute inset-0 bg-white/10 opacity-0 group-active:opacity-100 transition-opacity" />
+              <svg className="w-[18px] h-[18px] relative" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M9 2H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 2v6a1 1 0 0 0 1 1h4"/>
+                <path d="M13 22H5a2 2 0 0 1-2-2v-6"/>
+                <path d="M21 13v6a2 2 0 0 1-2 2h-6"/>
+                <path d="M3 13l3-3 3 3"/>
+                <path d="M21 11l-3 3-3-3"/>
+              </svg>
+              <span className="relative">Générer depuis le planning</span>
+              <svg className="w-4 h-4 relative opacity-60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <button
+              onClick={() => openSheet({ sheet: 'add-item' })}
+              className="w-full border-2 border-border rounded-2xl py-3 text-sm font-bold text-muted active:scale-[0.97] transition-transform hover:bg-card"
+            >
+              + Article manuel
+            </button>
+          </div>
         </div>
       ) : (
         <>
-          {/* Progress card */}
-          <div className="mx-5 mb-4 bg-card border-[1.5px] border-border rounded-2xl px-4 py-3">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <span className={cn(
-                  'text-[22px] font-black tabular-nums transition-colors duration-300',
-                  pct === 100 ? 'text-sage' : 'text-terra'
-                )}>{pct}%</span>
-                <span className="text-[12px] font-bold text-muted">
-                  {remaining > 0 ? `${remaining} restant${remaining > 1 ? 's' : ''}` : 'Tout coché !'}
-                </span>
+          {/* Progress card améliorée */}
+          <div className="mx-5 mb-4 bg-card border-[1.5px] border-border rounded-2xl px-4 py-3.5">
+            <div className="flex items-center gap-4">
+              <ProgressRing pct={pct} className="w-14 h-14 flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline gap-1.5 mb-1">
+                  <span className={cn(
+                    'text-[26px] font-black tabular-nums leading-none transition-colors duration-300',
+                    pct === 100 ? 'text-sage' : 'text-terra'
+                  )}>{pct}%</span>
+                  <span className="text-[12px] font-bold text-muted">
+                    {pct === 100 ? 'Terminé !' : 'complété'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[12px] font-semibold text-muted">
+                  <span className="tabular-nums">{checked}/{total} articles</span>
+                  {remaining > 0 && (
+                    <>
+                      <span className="text-muted/40">•</span>
+                      <span>{remaining} restant{remaining > 1 ? 's' : ''}</span>
+                    </>
+                  )}
+                </div>
               </div>
-              <span className="text-[12px] font-bold text-muted">{checked}/{total}</span>
             </div>
-            <div className="bg-sep rounded-full h-2.5 overflow-hidden">
-              <div
-                className={cn(
-                  'h-full rounded-full transition-all duration-500',
-                  pct === 100 ? 'bg-sage' : ''
-                )}
-                style={pct !== 100 ? { background: 'linear-gradient(to right, #D23D2D, #A32E20)', width: `${pct}%` } : { width: `${pct}%` }}
-              />
-            </div>
+
+            {/* Mini-pills catégories */}
+            {filledCategories.length > 1 && (
+              <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-sep">
+                {filledCategories.map((cat) => {
+                  const s = catSummary.get(cat.id)
+                  if (!s) return null
+                  const done = s.done === s.total
+                  return (
+                    <span key={cat.id} className={cn(
+                      'inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg',
+                      done ? 'bg-sage/10 text-sage' : 'bg-sep text-muted',
+                    )}>
+                      {done && <svg className="w-2.5 h-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}
+                      {CAT_LABELS[cat.id]}
+                      <span className="opacity-60">{s.done}/{s.total}</span>
+                    </span>
+                  )
+                })}
+              </div>
+            )}
           </div>
 
-          {/* CTA générer */}
+          {/* CTA re-générer */}
           <div className="px-5 mb-5">
             <button
               onClick={handleGenerate}
-              className="w-full border-2 rounded-2xl py-3 flex items-center justify-center gap-2 text-sm font-extrabold active:scale-[0.97] transition-transform"
-              style={{ borderColor: '#D23D2D30', color: '#D23D2D', background: '#D23D2D08' }}
+              className="group w-full relative overflow-hidden rounded-2xl py-3 flex items-center justify-center gap-2 text-[13px] font-extrabold active:scale-[0.97] transition-all"
+              style={{ background: 'linear-gradient(135deg, rgba(210,61,45,0.08), rgba(210,61,45,0.03))', border: '1.5px solid rgba(210,61,45,0.2)', color: '#D23D2D' }}
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
-                <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
-                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+              <div className="absolute inset-0 bg-terra/5 opacity-0 group-active:opacity-100 transition-opacity" />
+              <svg className="w-4 h-4 relative" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M9 2H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 2v6a1 1 0 0 0 1 1h4"/>
+                <path d="M13 22H5a2 2 0 0 1-2-2v-6"/>
+                <path d="M21 13v6a2 2 0 0 1-2 2h-6"/>
+                <path d="M3 13l3-3 3 3"/>
+                <path d="M21 11l-3 3-3-3"/>
               </svg>
-              Regénérer depuis le planning
+              <span className="relative">Regénérer depuis le planning</span>
             </button>
           </div>
 
-          {/* Catégories — seulement celles qui ont des articles */}
+          {/* Catégories */}
           <div className="px-5 space-y-5">
             {filledCategories.map((cat) => (
               <ShoppingCategorySection
@@ -183,25 +258,35 @@ export default function ShoppingPage() {
       )}
       </div>{/* /scroll */}
 
-      {/* Barre d'actions en bas — élément flex statique */}
+      {/* Barre d'actions en bas */}
       {total > 0 && (
         <div className="flex-shrink-0 bg-card/98 backdrop-blur-xl border-t border-sep px-5 py-3 flex gap-2">
           {checked > 0 && (
             <button
               onClick={() => { clearCheckedItems(); showToast('Articles cochés supprimés') }}
-              className="flex-1 py-2.5 rounded-xl bg-sage/15 text-sage text-xs font-extrabold active:scale-95 transition-transform"
+              className="flex-1 py-2.5 rounded-xl bg-sage/15 text-sage text-xs font-extrabold active:scale-95 transition-transform flex items-center justify-center gap-1.5"
             >
-              Effacer les cochés ({checked})
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Effacer cochés ({checked})
             </button>
           )}
           <button
             onClick={handleClearAll}
-            className="flex-1 py-2.5 rounded-xl text-xs font-extrabold active:scale-95 transition-transform"
-            style={clearConfirm
-              ? { background: '#FDE8F0', color: '#C0304A' }
-              : { background: '#FDE8F0', color: '#C0304A' }}
+            className={cn(
+              'flex-1 py-2.5 rounded-xl text-xs font-extrabold active:scale-95 transition-all flex items-center justify-center gap-1.5',
+              clearConfirm
+                ? 'bg-terra text-white'
+                : 'bg-[#FDE8F0] text-[#C0304A]',
+            )}
           >
-            {clearConfirm ? 'Confirmer ?' : 'Vider la liste'}
+            {clearConfirm ? (
+              <>⚠️ Confirmer ?</>
+            ) : (
+              <>
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                Vider la liste
+              </>
+            )}
           </button>
         </div>
       )}

@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
-import type { Period, ShoppingCategory, Ingredient } from '@/types'
-import { PERIOD_LABEL, cn } from '@/lib/utils'
+import type { Period, ShoppingCategory, Ingredient, DietaryTag } from '@/types'
+import { PERIOD_LABEL, cn, resizeToBase64 } from '@/lib/utils'
 import { showToast } from '@/components/ui/Toast'
 
 const PERIODS: Period[] = ['pdej', 'midi', 'soir']
@@ -14,27 +14,14 @@ const CAT_OPTIONS: { id: ShoppingCategory; label: string }[] = [
   { id: 'epicerie', label: 'Épic.' },
   { id: 'maison',   label: 'Mais.' },
 ]
+const TAG_OPTIONS: { id: DietaryTag; label: string }[] = [
+  { id: 'vegetarien',   label: '🌿 Végé' },
+  { id: 'vegan',        label: '🌱 Vegan' },
+  { id: 'sans-gluten',  label: 'Sans gluten' },
+  { id: 'sans-lactose', label: 'Sans lactose' },
+]
 
-function resizeToBase64(file: File, maxW = 800, quality = 0.72): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const img = new Image()
-      img.onload = () => {
-        const scale = Math.min(1, maxW / img.width)
-        const canvas = document.createElement('canvas')
-        canvas.width = img.width * scale
-        canvas.height = img.height * scale
-        canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height)
-        resolve(canvas.toDataURL('image/jpeg', quality))
-      }
-      img.onerror = reject
-      img.src = e.target!.result as string
-    }
-    reader.onerror = reject
-    reader.readAsDataURL(file)
-  })
-}
+
 
 export default function EditRecipeSheet() {
   const updateRecipe = useAppStore((s) => s.updateRecipe)
@@ -52,7 +39,13 @@ export default function EditRecipeSheet() {
   const [steps,       setSteps]       = useState<string[]>([''])
   const [photo,       setPhoto]       = useState<string | undefined>(undefined)
   const [ingredients, setIngredients] = useState<Ingredient[]>([])
+  const [tags,         setTags]        = useState<DietaryTag[]>([])
+  const [notes,        setNotes]       = useState('')
+  const [rating,       setRating]      = useState<number | undefined>(undefined)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const toggleTag = (tag: DietaryTag) =>
+    setTags((prev) => prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag])
 
   // Pré-remplir les champs à chaque ouverture
   useEffect(() => {
@@ -66,6 +59,9 @@ export default function EditRecipeSheet() {
       setSteps(recipe.steps?.length ? recipe.steps : [''])
       setPhoto(recipe.photo)
       setIngredients(recipe.ingredients ?? [])
+      setTags(recipe.tags ?? [])
+      setNotes(recipe.notes ?? '')
+      setRating(recipe.rating)
     }
   }, [recipe?.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -106,6 +102,9 @@ export default function EditRecipeSheet() {
       steps:       cleanSteps.length       ? cleanSteps       : undefined,
       ingredients: cleanIngredients.length ? cleanIngredients : undefined,
       photo,
+      tags: tags.length ? tags : undefined,
+      notes: notes.trim() || undefined,
+      rating,
     })
     closeSheet()
     showToast(`${name.trim()} modifiée !`)
@@ -261,6 +260,50 @@ export default function EditRecipeSheet() {
           Rapide
         </label>
       </div>
+
+      {/* Tags diététiques */}
+      <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-2">Régime</p>
+      <div className="flex flex-wrap gap-2 mb-4">
+        {TAG_OPTIONS.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => toggleTag(t.id)}
+            className={cn(
+              'px-3 py-1.5 rounded-xl text-xs font-bold border-2 transition-all',
+              tags.includes(t.id) ? 'bg-sage border-sage text-white' : 'bg-card border-border text-muted',
+            )}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Note */}
+      <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-2">Note</p>
+      <div className="flex gap-1 mb-4">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            onClick={() => setRating(rating === star ? undefined : star)}
+            className="active:scale-110 transition-transform"
+          >
+            <svg className="w-7 h-7" viewBox="0 0 24 24" fill={(rating ?? 0) >= star ? '#F5C065' : 'none'} stroke={(rating ?? 0) >= star ? '#F5C065' : '#ccc'} strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+        ))}
+      </div>
+
+      {/* Notes */}
+      <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-2">Notes personnelles</p>
+      <textarea
+        rows={3}
+        placeholder="Ajouter des notes…"
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+        autoCorrect="off"
+        autoCapitalize="sentences"
+        spellCheck={false}
+        className="w-full px-3 py-2.5 bg-card border-[1.5px] border-border rounded-2xl text-sm text-text1 outline-none placeholder:text-muted focus:border-terra transition-colors resize-none leading-snug mb-4"
+      />
 
       {/* Ingrédients */}
       <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-2">Ingrédients</p>

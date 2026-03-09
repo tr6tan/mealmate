@@ -91,6 +91,8 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
       {/* Sheet */}
       <div
         ref={ref}
+        role="dialog"
+        aria-modal={isOpen}
         className={cn(
           'fixed left-0 right-0 bottom-0 z-50',
           'bg-card rounded-t-[28px] max-h-[92dvh]',

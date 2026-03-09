@@ -1,6 +1,13 @@
 import { cn } from '@/lib/utils'
-import type { Recipe } from '@/types'
+import type { Recipe, DietaryTag } from '@/types'
 import { PeriodIcon } from '@/components/ui/FoodIcons'
+
+const TAG_LABEL: Record<DietaryTag, string> = {
+  vegetarien: '🌿',
+  vegan: '🌱',
+  'sans-gluten': 'SG',
+  'sans-lactose': 'SL',
+}
 
 const PERIOD_COLOR: Record<string, string> = {
   pdej: 'text-[#B07A10] bg-[#F5C06520]',
@@ -50,6 +57,9 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
           <p className="text-[13px] font-extrabold text-text1 truncate">{recipe.name}</p>
           <div className="flex items-center gap-2 mt-0.5">
             <p className="text-[11px] text-muted font-semibold">{recipe.time}</p>
+            {recipe.tags?.map((t) => (
+              <span key={t} className="text-[9px] font-bold px-1 py-0.5 rounded bg-sep text-muted">{TAG_LABEL[t]}</span>
+            ))}
             {planCount > 0 && (
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md" style={{ color: '#D23D2D', background: '#D23D2D12' }}>
                 {planCount}×
@@ -75,6 +85,9 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
             {recipe.emoji || <PeriodIcon period={recipe.period} className="w-8 h-8 opacity-30" style={{ color: PERIOD_ICON_COLOR[recipe.period] }} />}
           </span>
           <div className="flex gap-0.5">
+            {recipe.tags?.map((t) => (
+              <span key={t} className="text-[8px] font-bold px-0.5">{TAG_LABEL[t]}</span>
+            ))}
             {recipe.fav && (
               <svg className="w-3 h-3" style={{ color: '#31603D' }} viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             )}

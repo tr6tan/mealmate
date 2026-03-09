@@ -37,6 +37,8 @@ export interface DayPlan {
 export type WeekPlan  = Record<number, DayPlan>   // 0=Lun … 6=Dim
 export type WeekPlans = Record<string, WeekPlan>  // weekKey (YYYY-MM-DD) → WeekPlan
 
+export type DietaryTag = 'vegetarien' | 'vegan' | 'sans-gluten' | 'sans-lactose'
+
 export interface Recipe {
   id: string
   name: string
@@ -48,6 +50,9 @@ export interface Recipe {
   photo?: string
   ingredients?: Ingredient[]
   steps?: string[]
+  tags?: DietaryTag[]
+  notes?: string
+  rating?: number // 1-5
 }
 
 export interface Ingredient {
