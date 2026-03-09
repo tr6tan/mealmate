@@ -1,5 +1,4 @@
 import { create } from 'zustand'
-import { persist, createJSONStorage } from 'zustand/middleware'
 import type {
   ActiveTab,
   AppSettings,
@@ -82,10 +81,17 @@ interface AppState {
   _hydrate: (data: FoyerData) => void
 }
 
+// ── Helpers darkMode (préférence locale uniquement) ──────────────────────────
+function loadDarkMode(): boolean {
+  try { return localStorage.getItem('mealmate-dark') === '1' } catch { return false }
+}
+function saveDarkMode(v: boolean) {
+  try { localStorage.setItem('mealmate-dark', v ? '1' : '0') } catch { /* silent */ }
+}
+
 // ── Store ─────────────────────────────────────────────────────────────────────
 
 export const useAppStore = create<AppState>()(
-  persist(
     (set, get) => ({
       // ── Initial state ──
       activeTab: 'planning',
@@ -100,7 +106,7 @@ export const useAppStore = create<AppState>()(
       settings: {
         personnes: 2,
         nomFoyer: 'Mon foyer',
-        darkMode: false,
+        darkMode: loadDarkMode(),
       },
 
       // ── UI ──
@@ -250,8 +256,10 @@ export const useAppStore = create<AppState>()(
       clearAllItems: () => set({ shoppingItems: [] }),
 
       // ── Settings ──
-      updateSettings: (patch) =>
-        set((s) => ({ settings: { ...s.settings, ...patch } })),
+      updateSettings: (patch) => {
+        if (patch.darkMode !== undefined) saveDarkMode(patch.darkMode)
+        set((s) => ({ settings: { ...s.settings, ...patch } }))
+      },
 
       // ── Hydratation Firestore ──
       _hydrate: (data) => {
@@ -285,38 +293,6 @@ export const useAppStore = create<AppState>()(
         })
       },
     }),
-    {
-      name: 'mealmate-store',
-      version: 2,
-      migrate: (persisted: unknown, version: number) => {
-        const state = persisted as Record<string, unknown>
-        // Sanitize recipes : assure que chaque recette a les champs obligatoires
-        if (Array.isArray(state.recipes)) {
-          state.recipes = state.recipes
-            .filter((r: unknown) => r && typeof r === 'object')
-            .map((r: Record<string, unknown>) => ({
-              ...r,
-              id:     r.id     ?? String(Math.random()),
-              name:   typeof r.name === 'string' && r.name ? r.name : 'Recette sans nom',
-              emoji:  r.emoji  ?? '🍽️',
-              period: r.period === 'pdej' || r.period === 'midi' || r.period === 'soir' ? r.period : 'midi',
-              time:   typeof r.time === 'string' ? r.time : '',
-              fav:    Boolean(r.fav),
-              rapide: Boolean(r.rapide),
-            }))
-        }
-        return state
-      },
-      storage: createJSONStorage(() => localStorage),
-      // Persister uniquement les données métier (pas l'UI)
-      partialize: (s) => ({
-        weekPlans:     s.weekPlans,
-        recipes:       s.recipes,
-        shoppingItems: s.shoppingItems,
-        settings:      s.settings,
-      }),
-    },
-  ),
 )
 
 // ── Selectors ─────────────────────────────────────────────────────────────────
