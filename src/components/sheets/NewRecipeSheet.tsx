@@ -260,9 +260,12 @@ export default function NewRecipeSheet() {
             <button
               onClick={handleSearch}
               disabled={importLoading || !importQuery.trim()}
-              className="px-4 py-3 bg-terra text-white rounded-2xl text-sm font-extrabold active:scale-95 transition-transform disabled:opacity-50 flex items-center justify-center"
+              className="px-4 py-3 bg-terra text-white rounded-2xl text-sm font-extrabold active:scale-95 transition-transform disabled:opacity-50 flex items-center justify-center min-w-[48px]"
+              aria-label="Rechercher"
             >
-              {importLoading ? '…' : (
+              {importLoading ? (
+                <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+              ) : (
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               )}
             </button>
@@ -285,7 +288,7 @@ export default function NewRecipeSheet() {
                 <button
                   key={meal.idMeal}
                   onClick={() => handleSelectMeal(meal)}
-                  className="w-full flex items-center gap-3 bg-card border-[1.5px] border-border rounded-2xl p-2.5 text-left active:scale-[0.98] transition-transform hover:border-terra"
+                  className="w-full flex items-center gap-3 bg-card border-[1.5px] border-border rounded-2xl p-2.5 text-left active:scale-[0.98] transition-transform active:border-terra"
                 >
                   <img
                     src={`${meal.strMealThumb}/preview`}
@@ -489,7 +492,7 @@ export default function NewRecipeSheet() {
                 </select>
                 <button
                   onClick={() => removeIngredient(idx)}
-                  className="text-muted hover:text-red-400 text-lg leading-none transition-colors"
+                  className="text-muted active:text-red-400 text-lg leading-none transition-colors"
                 >
                   ×
                 </button>
@@ -498,7 +501,7 @@ export default function NewRecipeSheet() {
           </div>
           <button
             onClick={addIngredient}
-            className="w-full py-2 border-2 border-dashed border-border rounded-2xl text-xs font-bold text-muted hover:border-terra hover:text-terra transition-colors mb-4"
+            className="w-full py-2 border-2 border-dashed border-border rounded-2xl text-xs font-bold text-muted active:border-terra active:text-terra transition-colors mb-4"
           >
             + Ajouter un ingrédient
           </button>
@@ -525,7 +528,7 @@ export default function NewRecipeSheet() {
                 {steps.length > 1 && (
                   <button
                     onClick={() => removeStep(idx)}
-                    className="mt-2 text-muted hover:text-red-400 text-lg leading-none transition-colors"
+                    className="mt-2 text-muted active:text-red-400 text-lg leading-none transition-colors"
                   >
                     ×
                   </button>
@@ -535,7 +538,7 @@ export default function NewRecipeSheet() {
           </div>
           <button
             onClick={addStep}
-            className="w-full py-2 border-2 border-dashed border-border rounded-2xl text-xs font-bold text-muted hover:border-terra hover:text-terra transition-colors mb-5"
+            className="w-full py-2 border-2 border-dashed border-border rounded-2xl text-xs font-bold text-muted active:border-terra active:text-terra transition-colors mb-5"
           >
             + Ajouter une étape
           </button>

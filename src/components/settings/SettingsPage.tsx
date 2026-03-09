@@ -21,7 +21,7 @@ function SettingsRow({ icon, iconBg, label, value, sub, onClick, danger, confirm
     <button
       onClick={onClick}
       className={`w-full flex items-center gap-3 px-4 py-3.5 text-left border-b border-sep last:border-0 transition-colors active:bg-sep ${
-        confirming ? 'bg-[#FDE8F0]' : 'hover:bg-sep'
+        confirming ? 'bg-[#FDE8F0]' : ''
       }`}
     >
       <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center text-lg flex-shrink-0 ${iconBg}`}>

@@ -300,7 +300,7 @@ export default function EditRecipeSheet() {
             </select>
             <button
               onClick={() => removeIngredient(idx)}
-              className="text-muted hover:text-red-400 text-lg leading-none transition-colors"
+              className="text-muted active:text-red-400 text-lg leading-none transition-colors"
             >
               ×
             </button>
@@ -309,7 +309,7 @@ export default function EditRecipeSheet() {
       </div>
       <button
         onClick={addIngredient}
-        className="w-full py-2 border-2 border-dashed border-border rounded-2xl text-xs font-bold text-muted hover:border-terra hover:text-terra transition-colors mb-4"
+        className="w-full py-2 border-2 border-dashed border-border rounded-2xl text-xs font-bold text-muted active:border-terra active:text-terra transition-colors mb-4"
       >
         + Ajouter un ingrédient
       </button>
@@ -336,7 +336,7 @@ export default function EditRecipeSheet() {
             {steps.length > 1 && (
               <button
                 onClick={() => removeStep(idx)}
-                className="mt-2 text-muted hover:text-red-400 text-lg leading-none transition-colors"
+                className="mt-2 text-muted active:text-red-400 text-lg leading-none transition-colors"
               >
                 ×
               </button>
@@ -346,7 +346,7 @@ export default function EditRecipeSheet() {
       </div>
       <button
         onClick={addStep}
-        className="w-full py-2 border-2 border-dashed border-border rounded-2xl text-xs font-bold text-muted hover:border-terra hover:text-terra transition-colors mb-5"
+        className="w-full py-2 border-2 border-dashed border-border rounded-2xl text-xs font-bold text-muted active:border-terra active:text-terra transition-colors mb-5"
       >
         + Ajouter une étape
       </button>

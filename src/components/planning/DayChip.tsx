@@ -13,36 +13,36 @@ export default function DayChip({ dayLabel, dayNum, isToday, isSelected, hasMeal
   return (
     <button
       onClick={onClick}
-      style={
+      className={cn(
+        'flex-shrink-0 flex flex-col items-center px-3.5 py-2.5 rounded-2xl cursor-pointer transition-all duration-200 border-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terra',
         isToday
-          ? { background: '#D23D2D', border: '2px solid #D23D2D', boxShadow: '0 4px 14px rgba(210,61,45,0.35)' }
+          ? 'bg-terra border-terra shadow-[0_4px_14px_rgba(210,61,45,0.35)]'
           : isSelected
-          ? { background: '#FFFCF0', border: '2px solid #D23D2D' }
-          : { background: '#FFFCF0', border: '2px solid transparent', opacity: 0.75 }
-      }
-      className="flex-shrink-0 flex flex-col items-center px-3.5 py-2.5 rounded-2xl cursor-pointer transition-all duration-200"
+          ? 'bg-card border-terra'
+          : 'bg-card border-transparent opacity-75',
+      )}
     >
       <span
-        className="text-[10px] font-black tracking-widest uppercase"
-        style={{ color: isToday ? 'rgba(255,255,255,0.75)' : isSelected ? '#D23D2D' : '#986C58' }}
+        className={cn(
+          'text-[10px] font-black tracking-widest uppercase',
+          isToday ? 'text-white/75' : isSelected ? 'text-terra' : 'text-muted',
+        )}
       >
         {dayLabel}
       </span>
       <span
-        className="text-xl font-black mt-0.5"
-        style={{ color: isToday ? '#fff' : isSelected ? '#281008' : '#986C58' }}
+        className={cn(
+          'text-xl font-black mt-0.5',
+          isToday ? 'text-white' : isSelected ? 'text-text1' : 'text-muted',
+        )}
       >
         {dayNum}
       </span>
       <span
-        className="w-1.5 h-1.5 rounded-full mt-0.5 transition-colors"
-        style={{
-          background: isToday
-            ? 'rgba(255,255,255,0.6)'
-            : hasMeal
-            ? '#31603D'
-            : 'transparent',
-        }}
+        className={cn(
+          'w-1.5 h-1.5 rounded-full mt-0.5 transition-colors',
+          isToday ? 'bg-white/60' : hasMeal ? 'bg-sage' : 'bg-transparent',
+        )}
       />
     </button>
   )

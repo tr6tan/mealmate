@@ -79,6 +79,17 @@
     user-select: auto;
   }
 
+  /* Focus visible rings pour l'accessibilité clavier */
+  button:focus-visible, a:focus-visible, [role="button"]:focus-visible {
+    outline: 2px solid rgb(var(--c-terra));
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+  input:focus-visible, textarea:focus-visible, select:focus-visible {
+    outline: 2px solid rgb(var(--c-terra));
+    outline-offset: 0px;
+  }
+
   /* iOS : force font-size ≥ 16px sur les inputs pour éviter le zoom automatique */
   input, textarea, select {
     font-size: max(16px, 1em);

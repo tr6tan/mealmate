@@ -83,6 +83,7 @@ export default function RecipesPage() {
           {/* Toggle favs en premier */}
           <button
             onClick={() => setFavFirst((v) => !v)}
+            aria-label={favFirst ? 'Désactiver favoris en premier' : 'Favoris en premier'}
             title="Favoris en premier"
             className={cn(
               'w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-90',
@@ -95,6 +96,7 @@ export default function RecipesPage() {
           {/* Toggle vue */}
           <button
             onClick={() => setViewMode((v) => v === 'grid' ? 'list' : 'grid')}
+            aria-label={viewMode === 'grid' ? 'Vue liste' : 'Vue grille'}
             title={viewMode === 'grid' ? 'Vue liste' : 'Vue grille'}
             className="w-9 h-9 rounded-full bg-card border-[1.5px] border-border text-muted flex items-center justify-center transition-all active:scale-90"
           >
@@ -126,7 +128,7 @@ export default function RecipesPage() {
           className="flex-1 bg-transparent border-none outline-none font-[Nunito] text-sm font-semibold text-text1 placeholder:text-muted"
         />
         {search && (
-          <button onClick={() => setSearch('')} className="text-muted flex items-center">
+          <button onClick={() => setSearch('')} className="text-muted flex items-center" aria-label="Effacer la recherche">
             <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         )}

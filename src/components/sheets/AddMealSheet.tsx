@@ -198,7 +198,7 @@ export default function AddMealSheet() {
               <button
                 key={recipe.id}
                 onClick={() => handleSelect(recipe)}
-                className="w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-[13px] text-left hover:bg-sep active:bg-sep transition-colors"
+                className="w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-[13px] text-left active:bg-sep transition-colors"
               >
                 <div className="w-9 h-9 rounded-xl bg-sep flex items-center justify-center flex-shrink-0">
                   {recipe.emoji
