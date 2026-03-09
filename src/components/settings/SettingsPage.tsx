@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useAppStore, selectCurrentWeekPlan } from '@/store/useAppStore'
 import { showToast } from '@/components/ui/Toast'
 import InviteCard from './InviteCard'

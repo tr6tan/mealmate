@@ -1,5 +1,3 @@
-import { createNewFoyer } from '@/lib/foyer'
-
 export default function OnboardingPage() {
   return (
     <div className="min-h-svh flex flex-col items-center justify-center gap-8 bg-bg px-6">
@@ -14,7 +12,7 @@ export default function OnboardingPage() {
 
       {/* Action principale */}
       <button
-        onClick={createNewFoyer}
+        onClick={() => {}}
         className="w-full max-w-xs py-4 rounded-xl bg-terra text-white font-bold text-base shadow-card active:scale-95 transition-transform"
       >
         Créer mon foyer
