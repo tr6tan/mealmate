@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const outDir    = resolve(__dirname, '../public/icons')
-const source    = resolve(__dirname, '../public/logo-source.png')
+const source    = resolve(__dirname, '../public/logo-source.svg')
 
 const icons = [
   // Icônes standard (favicon, apple touch icon)
@@ -16,7 +16,7 @@ const icons = [
 ]
 
 for (const { name, size } of icons) {
-  await sharp(source)
+  await sharp(source, { density: 300 })
     .resize(size, size)
     .png()
     .toFile(`${outDir}/${name}`)

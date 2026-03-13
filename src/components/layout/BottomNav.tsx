@@ -66,8 +66,8 @@ export default function BottomNav() {
       className="bg-card border-t border-sep flex flex-col flex-shrink-0"
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
-      {/* Rangée de boutons — paddingTop pour descendre vers le bas */}
-      <div className="flex justify-around items-stretch" style={{ paddingTop: '10px' }}>
+      {/* Rangée de boutons */}
+      <div className="flex justify-around items-stretch" style={{ paddingTop: '2px' }}>
         {navItems.map((item) => {
           const active = activeTab === item.id
           return (
@@ -75,7 +75,7 @@ export default function BottomNav() {
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               aria-label={item.label}
-              className="flex flex-col items-center gap-0.5 pt-1.5 pb-1 px-4 flex-1 border-none bg-transparent cursor-pointer relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terra focus-visible:ring-offset-2 rounded-lg"
+              className="flex flex-col items-center gap-0 pt-1 pb-0.5 px-4 flex-1 border-none bg-transparent cursor-pointer relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terra focus-visible:ring-offset-2 rounded-lg"
             >
               {/* Indicateur actif — barre en haut */}
               {active && (
