@@ -67,7 +67,7 @@ export default function BottomNav() {
       style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
     >
       {/* Rangée de boutons */}
-      <div className="flex justify-around items-stretch" style={{ paddingTop: '2px' }}>
+      <div className="flex justify-around items-stretch">
         {navItems.map((item) => {
           const active = activeTab === item.id
           return (
@@ -75,7 +75,7 @@ export default function BottomNav() {
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               aria-label={item.label}
-              className="flex flex-col items-center gap-0 pt-1 pb-0.5 px-4 flex-1 border-none bg-transparent cursor-pointer relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terra focus-visible:ring-offset-2 rounded-lg"
+              className="flex flex-col items-center gap-0 pt-0.5 pb-0 px-4 flex-1 border-none bg-transparent cursor-pointer relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terra focus-visible:ring-offset-2 rounded-lg"
             >
               {/* Indicateur actif — barre en haut */}
               {active && (
@@ -85,7 +85,7 @@ export default function BottomNav() {
               )}
               <span
                 className={cn(
-                  'relative flex items-center justify-center w-11 h-9 rounded-xl [&>svg]:w-5 [&>svg]:h-5 [&>svg]:stroke-current transition-all duration-200',
+                  'relative flex items-center justify-center w-10 h-7 rounded-xl [&>svg]:w-[18px] [&>svg]:h-[18px] [&>svg]:stroke-current transition-all duration-200',
                   active ? 'text-terra' : 'text-muted',
                 )}
               >
