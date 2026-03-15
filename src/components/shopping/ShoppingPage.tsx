@@ -11,6 +11,7 @@ const CATEGORIES: { id: ShoppingCategory }[] = [
   { id: 'viandes' },
   { id: 'cremerie' },
   { id: 'epicerie' },
+  { id: 'surgeles' },
   { id: 'maison' },
 ]
 

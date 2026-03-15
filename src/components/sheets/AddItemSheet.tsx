@@ -10,6 +10,7 @@ const CATEGORIES: { id: ShoppingCategory }[] = [
   { id: 'viandes' },
   { id: 'cremerie' },
   { id: 'epicerie' },
+  { id: 'surgeles' },
   { id: 'maison' },
 ]
 
@@ -64,6 +65,10 @@ const KEYWORDS: Record<ShoppingCategory, string[]> = {
     'vitamine','aspirine','lingette','aluminium','film alimentaire','bougie',
     'pile','ampoule','essuie',
   ],
+  surgeles: [
+    'surgele','glace','epinard surgele','pizza surgelee','cordon bleu',
+    'poisson pane','frite','legumes surgeles','sorbet','bac','nugget',
+  ],
 }
 
 
@@ -116,7 +121,7 @@ function guessCategory(input: string): ShoppingCategory | null {
   if (tokens.length === 0) return null
 
   const scores: Record<ShoppingCategory, number> = {
-    legumes: 0, viandes: 0, cremerie: 0, epicerie: 0, maison: 0,
+    legumes: 0, viandes: 0, cremerie: 0, epicerie: 0, surgeles: 0, maison: 0,
   }
 
   for (const [cat, words] of Object.entries(KEYWORDS) as [ShoppingCategory, string[]][]) {

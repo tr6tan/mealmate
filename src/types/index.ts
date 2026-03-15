@@ -13,6 +13,7 @@ export type ShoppingCategory =
   | 'viandes'
   | 'cremerie'
   | 'epicerie'
+  | 'surgeles'
   | 'maison'
 
 export interface Meal {

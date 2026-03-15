@@ -1,6 +1,6 @@
 /**
- * FoodIcons — Icônes SVG solid/filled pour MealMate
- * Style : chunky, géométrique, 100% fill (pas de stroke).
+ * FoodIcons ï¿½ Icï¿½nes SVG solid/filled pour MealMate
+ * Style : chunky, gï¿½omï¿½trique, 100% fill (pas de stroke).
  * viewBox="0 0 24 24", fill="currentColor" sur tous les chemins.
  */
 import type { ComponentProps } from 'react'
@@ -15,10 +15,10 @@ const Ico = ({ children, ...p }: P) => (
 )
 
 /* ---------------------------
-   CATÉGORIES DE COURSES
+   CATï¿½GORIES DE COURSES
 --------------------------- */
 
-/** Légumes – carotte */
+/** Lï¿½gumes ï¿½ carotte */
 export function IconCarrot(p: P) {
   return (
     <Ico {...p}>
@@ -30,7 +30,7 @@ export function IconCarrot(p: P) {
   )
 }
 
-/** Viandes – cuisse de poulet */
+/** Viandes ï¿½ cuisse de poulet */
 export function IconDrumstick(p: P) {
   return (
     <Ico {...p}>
@@ -41,7 +41,7 @@ export function IconDrumstick(p: P) {
   )
 }
 
-/** Crémerie – fromage wedge */
+/** Crï¿½merie ï¿½ fromage wedge */
 export function IconCheese(p: P) {
   return (
     <Ico {...p}>
@@ -53,7 +53,7 @@ export function IconCheese(p: P) {
   )
 }
 
-/** Épicerie – panier en osier */
+/** ï¿½picerie ï¿½ panier en osier */
 export function IconBasket(p: P) {
   return (
     <Ico {...p}>
@@ -73,10 +73,10 @@ export function IconHouse(p: P) {
 }
 
 /* ---------------------------
-   PÉRIODES DE REPAS
+   Pï¿½RIODES DE REPAS
 --------------------------- */
 
-/** Petit-déjeuner – tasse de café */
+/** Petit-dï¿½jeuner ï¿½ tasse de cafï¿½ */
 export function IconCoffee(p: P) {
   return (
     <Ico {...p}>
@@ -88,7 +88,7 @@ export function IconCoffee(p: P) {
   )
 }
 
-/** Déjeuner – fourchette + couteau */
+/** Dï¿½jeuner ï¿½ fourchette + couteau */
 export function IconPlate(p: P) {
   return (
     <Ico {...p}>
@@ -98,7 +98,7 @@ export function IconPlate(p: P) {
   )
 }
 
-/** Dîner – lune croissant */
+/** Dï¿½ner ï¿½ lune croissant */
 export function IconMoon(p: P) {
   return (
     <Ico {...p}>
@@ -111,7 +111,7 @@ export function IconMoon(p: P) {
    SLOTS REPAS
 --------------------------- */
 
-/** Entrée – bol salade */
+/** Entrï¿½e ï¿½ bol salade */
 export function IconSalad(p: P) {
   return (
     <Ico {...p}>
@@ -123,7 +123,7 @@ export function IconSalad(p: P) {
   )
 }
 
-/** Dessert – cupcake */
+/** Dessert ï¿½ cupcake */
 export function IconCupcake(p: P) {
   return (
     <Ico {...p}>
@@ -134,7 +134,7 @@ export function IconCupcake(p: P) {
   )
 }
 
-/** Générique – fourchette */
+/** Gï¿½nï¿½rique ï¿½ fourchette */
 export function IconFork(p: P) {
   return (
     <Ico {...p}>
@@ -148,18 +148,19 @@ export function IconFork(p: P) {
    COMPOSANTS UTILITAIRES
 --------------------------- */
 
-/** Icône automatique selon la période */
+/** Icï¿½ne automatique selon la pï¿½riode */
 export function PeriodIcon({ period, ...p }: { period: Period } & P) {
   if (period === 'pdej') return <IconCoffee {...p} />
   if (period === 'midi') return <IconPlate {...p} />
   return <IconMoon {...p} />
 }
 
-/** Icône automatique selon la catégorie de courses */
+/** Icï¿½ne automatique selon la catï¿½gorie de courses */
 export function CategoryIcon({ category, ...p }: { category: ShoppingCategory } & P) {
   if (category === 'legumes')  return <IconCarrot {...p} />
   if (category === 'viandes')  return <IconDrumstick {...p} />
   if (category === 'cremerie') return <IconCheese {...p} />
   if (category === 'epicerie') return <IconBasket {...p} />
+  if (category === 'surgeles') return <IconBasket {...p} />
   return <IconHouse {...p} />
 }

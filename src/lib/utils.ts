@@ -72,6 +72,7 @@ export const CAT_LABELS: Record<string, string> = {
   viandes: 'Viandes',
   cremerie: 'Crèmerie',
   epicerie: 'Épicerie',
+  surgeles: 'Surgelés',
   maison: 'Maison & Hygiène',
 }
 
