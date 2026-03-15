@@ -201,7 +201,10 @@ export default function AddMealSheet() {
 
       {/* ── Liste scrollable ──────────────────────────────────────────────── */}
       {!showFreeForm && (
-        <div className="flex-1 overflow-y-auto no-scrollbar pb-safe">
+        <div
+          className="flex-1 overflow-y-auto overscroll-contain no-scrollbar pb-safe"
+          style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}
+        >
           <div className="space-y-0.5 pb-4">
             {filtered.map((recipe) => (
               <button

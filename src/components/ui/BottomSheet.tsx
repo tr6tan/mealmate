@@ -49,26 +49,57 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
     }
   }, [isOpen])
 
-  // Swipe to close
+  // Swipe to close — ne ferme que si :
+  //  • le touch démarre depuis le handle/header (hors zone scrollable)
+  //  • OU depuis la zone scrollable qui est scroll-top=0 et swipe lent + long
   useEffect(() => {
     if (!isOpen) return
     const el = ref.current
     if (!el) return
+
     let startY = 0
-    let cancelClose = false
+    let startTime = 0
+    let touchInScrollable = false
+
     const onStart = (e: TouchEvent) => {
       startY = e.touches[0].clientY
-      cancelClose = false
-      // Si le touch démarre dans un enfant scrollable déjà scrollé, on ne ferme pas
+      startTime = Date.now()
+      touchInScrollable = false
+
+      // Vérifie si le touch démarre dans un enfant scrollable
       let node = e.target as HTMLElement | null
       while (node && node !== el) {
-        if (node.scrollTop > 0) { cancelClose = true; break }
+        if (
+          node.scrollHeight > node.clientHeight &&
+          window.getComputedStyle(node).overflowY !== 'hidden'
+        ) {
+          touchInScrollable = true
+          // Si le contenu est déjà scrollé vers le bas, on ne ferme jamais
+          if (node.scrollTop > 2) {
+            touchInScrollable = false // pas de close possible
+            startY = -9999 // neutralise le geste
+          }
+          break
+        }
         node = node.parentElement
       }
     }
+
     const onEnd = (e: TouchEvent) => {
-      if (!cancelClose && e.changedTouches[0].clientY - startY > 80) closeSheet()
+      const deltaY = e.changedTouches[0].clientY - startY
+      const elapsed = Date.now() - startTime
+
+      if (deltaY <= 0) return // swipe vers le haut → ignorer
+
+      if (touchInScrollable) {
+        // Dans la zone scrollable (scrollTop=0) : exige un grand geste lent
+        if (deltaY > 140 && elapsed > 250) closeSheet()
+      } else {
+        // Zone handle/header : seuil normal
+        if (deltaY > 80) closeSheet()
+      }
     }
+
     el.addEventListener('touchstart', onStart, { passive: true })
     el.addEventListener('touchend', onEnd, { passive: true })
     return () => {
