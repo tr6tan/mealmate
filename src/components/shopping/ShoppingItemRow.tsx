@@ -34,33 +34,34 @@ export default function ShoppingItemRow({ item }: Props) {
 
   return (
     <div
-      role="button"
-      tabIndex={0}
       className={cn(
-        'group w-full rounded-xl px-3 py-3 flex items-center gap-3 border-[1.5px] cursor-pointer select-none',
+        'group w-full rounded-xl px-3 py-3 flex items-center gap-3 border-[1.5px] select-none',
         'transition-all duration-200',
         item.checked
           ? 'border-sage/20 bg-sage/5 opacity-60'
-          : 'bg-card border-border shadow-sm active:scale-[0.98]',
+          : 'bg-card border-border shadow-sm',
       )}
       style={{ touchAction: 'manipulation', WebkitUserSelect: 'none' }}
-      onTouchEnd={handleToggleTouchEnd}
-      onClick={handleToggleClick}
     >
-      {/* Checkbox animée */}
-      <div
+      {/* Checkbox animée — seule zone qui toggle */}
+      <button
+        type="button"
         className={cn(
           'w-[22px] h-[22px] rounded-full border-2 flex items-center justify-center flex-shrink-0',
-          'transition-all duration-200',
+          'transition-all duration-200 cursor-pointer',
           item.checked ? 'bg-sage border-sage text-white scale-110' : 'border-border',
         )}
+        style={{ touchAction: 'manipulation' }}
+        onTouchEnd={handleToggleTouchEnd}
+        onClick={handleToggleClick}
+        aria-label={item.checked ? 'Décocher' : 'Cocher'}
       >
         {item.checked && (
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="20 6 9 17 4 12" />
           </svg>
         )}
-      </div>
+      </button>
 
       {/* Nom */}
       <span
