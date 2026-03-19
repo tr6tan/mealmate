@@ -114,7 +114,7 @@ export default function MealActionsSheet() {
 
       <button
         onClick={handleRemove}
-        className="w-full flex items-center justify-center gap-2.5 px-4 py-3.5 bg-[#FDE8F0] rounded-2xl text-sm font-extrabold text-[#C0304A]"
+        className="w-full flex items-center justify-center gap-2.5 px-4 py-3.5 bg-danger-light rounded-2xl text-sm font-extrabold text-danger"
       >
         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
         Retirer du planning

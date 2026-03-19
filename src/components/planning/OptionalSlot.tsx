@@ -15,7 +15,9 @@ export default function OptionalSlot({ label, meal, onPress }: Props) {
         onClick={onPress}
         className="w-full flex items-center gap-1.5 px-2 py-1 rounded-lg text-left active:bg-sep transition-colors"
       >
-        <MealAvatar name={meal.name} size="xs" />
+        {meal.emoji
+          ? <span className="text-sm leading-none">{meal.emoji}</span>
+          : <MealAvatar name={meal.name} size="xs" />}
         <span className="text-[11px] font-bold text-text2 truncate flex-1">{meal.name}</span>
         <span className="text-[10px] font-extrabold uppercase tracking-widest text-muted opacity-60">{label}</span>
       </button>

@@ -36,14 +36,16 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
         className="w-full bg-card rounded-2xl border-[1.5px] border-border flex items-center gap-3 px-3 py-2.5 text-left active:scale-[0.98] transition-transform"
       >
         {/* Icône */}
-        <MealAvatar name={recipe.name} size="lg" className="w-11 h-11" />
+        {recipe.emoji
+          ? <div className="w-11 h-11 rounded-xl flex-shrink-0 bg-gradient-to-br from-terra-light to-sep flex items-center justify-center"><span className="text-2xl leading-none">{recipe.emoji}</span></div>
+          : <MealAvatar name={recipe.name} size="lg" className="w-11 h-11" />}
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-0.5">
             <span className={cn('text-[9px] font-extrabold tracking-[0.07em] uppercase px-1.5 py-0.5 rounded-md', PERIOD_COLOR[recipe.period])}>
               {PERIOD_LABEL[recipe.period]}
             </span>
-            {recipe.rapide && <svg className="w-3 h-3 text-[#B07A10]" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>}
+            {recipe.rapide && <svg className="w-3 h-3 text-morning" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>}
           </div>
           <p className="text-[13px] font-extrabold text-text1 truncate">{recipe.name}</p>
           <div className="flex items-center gap-2 mt-0.5">
@@ -52,14 +54,14 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
               <span key={t} className="text-[9px] font-bold px-1 py-0.5 rounded bg-sep text-muted">{TAG_LABEL[t]}</span>
             ))}
             {planCount > 0 && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md" style={{ color: '#D23D2D', background: '#D23D2D12' }}>
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md text-terra bg-terra/[0.07]">
                 {planCount}×
               </span>
             )}
           </div>
         </div>
         {/* Fav */}
-          {recipe.fav && <svg className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#31603D' }} viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>}
+          {recipe.fav && <svg className="w-3.5 h-3.5 flex-shrink-0 text-sage" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>}
       </button>
     )
   }
@@ -72,16 +74,18 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
       {/* Icône + infos */}
       <div className={`w-full bg-gradient-to-br ${PERIOD_GRADIENT[recipe.period] ?? 'from-terra-light to-sep'} px-2.5 pt-2.5 pb-2 flex flex-col flex-1`}>
         <div className="flex items-start justify-between mb-1.5">
-          <MealAvatar name={recipe.name} size="card" />
+          {recipe.emoji
+            ? <span className="text-3xl leading-none">{recipe.emoji}</span>
+            : <MealAvatar name={recipe.name} size="card" />}
           <div className="flex gap-0.5">
             {recipe.tags?.map((t) => (
               <span key={t} className="text-[8px] font-bold px-0.5">{TAG_LABEL[t]}</span>
             ))}
             {recipe.fav && (
-              <svg className="w-3 h-3" style={{ color: '#31603D' }} viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              <svg className="w-3 h-3 text-sage" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             )}
             {recipe.rapide && (
-              <svg className="w-3 h-3 text-[#B07A10]" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <svg className="w-3 h-3 text-morning" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             )}
           </div>
         </div>

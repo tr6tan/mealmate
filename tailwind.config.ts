@@ -30,6 +30,14 @@ const config: Config = {
         },
         morning: 'rgb(var(--c-morning) / <alpha-value>)',
         evening: 'rgb(var(--c-evening) / <alpha-value>)',
+        danger: {
+          DEFAULT: 'rgb(var(--c-danger)       / <alpha-value>)',
+          light:   'rgb(var(--c-danger-light) / <alpha-value>)',
+        },
+        success: {
+          DEFAULT: 'rgb(var(--c-success)       / <alpha-value>)',
+          light:   'rgb(var(--c-success-light) / <alpha-value>)',
+        },
       },
       borderRadius: {
         xl: '18px',

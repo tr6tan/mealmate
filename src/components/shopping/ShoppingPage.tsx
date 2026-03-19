@@ -277,7 +277,7 @@ export default function ShoppingPage() {
               'flex-1 py-2.5 rounded-xl text-xs font-extrabold active:scale-95 transition-all flex items-center justify-center gap-1.5',
               clearConfirm
                 ? 'bg-terra text-white'
-                : 'bg-[#FDE8F0] text-[#C0304A]',
+                : 'bg-danger-light text-danger',
             )}
           >
             {clearConfirm ? (

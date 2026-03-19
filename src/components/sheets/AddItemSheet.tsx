@@ -221,7 +221,7 @@ export default function AddItemSheet() {
       <div className="flex items-center justify-between mb-2">
         <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted">Catégorie</p>
         {autoDetected && (
-          <span className="text-[10px] font-bold text-[#2E7D32] bg-[#E8F5E9] px-2 py-0.5 rounded-full">
+          <span className="text-[10px] font-bold text-success bg-success-light px-2 py-0.5 rounded-full">
             Détectée auto
           </span>
         )}

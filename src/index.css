@@ -19,6 +19,10 @@
   --c-sage-light:  185 215 190; /* #B9D7BE — vert sauge clair */
   --c-morning:     245 192 101; /* #F5C065 — saffron (petit-déj) */
   --c-evening:     110  67  61; /* #6E433D — russet (dîner) */
+  --c-danger:      192  48  74; /* #C0304A — rouge erreur/suppression */
+  --c-danger-light:253 232 240; /* #FDE8F0 — fond danger clair */
+  --c-success:      46 125  50; /* #2E7D32 — vert succès */
+  --c-success-light:232 245 233; /* #E8F5E9 — fond succès clair */
 }
 
 /* ── Design tokens — Dark ── */
@@ -30,6 +34,10 @@
   --c-text1:  242 242 247; /* #F2F2F7 */
   --c-text2:  199 199 204; /* #C7C7CC */
   --c-muted:  142 142 147; /* #8E8E93 */
+  --c-danger:      255  69  58; /* #FF453A — danger iOS dark */
+  --c-danger-light: 50  20  25; /* dark bg danger */
+  --c-success:      48 209  88; /* #30D158 — success iOS dark */
+  --c-success-light: 20  50  30; /* dark bg success */
 }
 
 /* ── Design tokens — Ocean (thème alternatif) ── */

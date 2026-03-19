@@ -212,7 +212,9 @@ export default function AddMealSheet() {
                 onClick={() => handleSelect(recipe)}
                 className="w-full flex items-center gap-2.5 px-2.5 py-2.5 rounded-[13px] text-left active:bg-sep transition-colors"
               >
-                <MealAvatar name={recipe.name} size="md" />
+                {recipe.emoji
+                  ? <div className="w-9 h-9 rounded-xl bg-sep flex items-center justify-center flex-shrink-0"><span className="text-xl leading-none">{recipe.emoji}</span></div>
+                  : <MealAvatar name={recipe.name} size="md" />}
                 <div className="flex-1 min-w-0">
                   <p className="text-[13px] font-bold text-text1 truncate">{recipe.name}</p>
                   <div className="flex gap-1.5 mt-0.5 flex-wrap">
@@ -222,8 +224,8 @@ export default function AddMealSheet() {
                         {PERIOD_LABEL[recipe.period]}
                       </span>
                     )}
-                    {recipe.fav && <svg className="w-3 h-3" style={{ color: '#E91E63' }} viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>}
-                    {recipe.rapide && <span className="text-[11px] text-[#2E7D32] font-bold flex items-center gap-0.5"><svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Rapide</span>}
+                    {recipe.fav && <svg className="w-3 h-3 text-sage" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>}
+                    {recipe.rapide && <span className="text-[11px] text-morning font-bold flex items-center gap-0.5"><svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Rapide</span>}
                     {(planCounts[recipe.id] ?? 0) > 0 && (
                       <span className="text-[10px] font-extrabold text-terra bg-terra-light px-1.5 py-0.5 rounded-[6px]">
                         {planCounts[recipe.id]}×

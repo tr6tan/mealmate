@@ -21,14 +21,14 @@ function SettingsRow({ icon, iconBg, label, value, sub, onClick, danger, confirm
     <button
       onClick={onClick}
       className={`w-full flex items-center gap-3 px-4 py-3.5 text-left border-b border-sep last:border-0 transition-colors active:bg-sep ${
-        confirming ? 'bg-[#FDE8F0]' : ''
+        confirming ? 'bg-danger-light' : ''
       }`}
     >
       <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center text-lg flex-shrink-0 ${iconBg}`}>
         {icon}
       </div>
       <div className="flex-1">
-        <p className={`text-sm font-bold ${danger ? 'text-[#C0304A]' : 'text-text1'}`}>
+        <p className={`text-sm font-bold ${danger ? 'text-danger' : 'text-text1'}`}>
           {confirming ? (confirmLabel ?? label) : label}
         </p>
         {sub && !confirming && <p className="text-[11px] text-muted font-medium mt-0.5">{sub}</p>}
@@ -36,7 +36,7 @@ function SettingsRow({ icon, iconBg, label, value, sub, onClick, danger, confirm
       {value && !confirming && (
         <span className="text-[13px] font-bold text-muted mr-1">{value}</span>
       )}
-      <span className={`text-lg ${confirming ? 'text-[#C0304A]' : 'text-muted'}`}>›</span>
+      <span className={`text-lg ${confirming ? 'text-danger' : 'text-muted'}`}>›</span>
     </button>
   )
 }
@@ -64,8 +64,8 @@ export default function SettingsPage() {
 
   // Sync badge
   const syncLabel = syncStatus === 'synced' ? 'Synchronisé' : syncStatus === 'error' ? 'Hors ligne' : 'Connexion…'
-  const syncBg    = syncStatus === 'synced' ? 'bg-[#E8F5E9] text-[#2E7D32]' : syncStatus === 'error' ? 'bg-[#FDE8F0] text-[#C0304A]' : 'bg-[#FFFDE7] text-[#F57F17]'
-  const syncDot   = syncStatus === 'synced' ? 'bg-[#4CAF50]' : syncStatus === 'error' ? 'bg-[#C0304A]' : 'bg-[#FFC107] animate-pulse'
+  const syncBg    = syncStatus === 'synced' ? 'bg-success-light text-success' : syncStatus === 'error' ? 'bg-danger-light text-danger' : 'bg-[#FFFDE7] text-[#F57F17]'
+  const syncDot   = syncStatus === 'synced' ? 'bg-success' : syncStatus === 'error' ? 'bg-danger' : 'bg-[#FFC107] animate-pulse'
 
   // Handlers danger (2-tap — 1er tap = demande confirm, 2e tap = exécute)
   const handleDanger = (field: DangerField) => {
@@ -93,8 +93,8 @@ export default function SettingsPage() {
             <p className="text-[12px] text-muted font-semibold mt-0.5">
               {onlineCount > 0 ? (
                 <span className="inline-flex items-center gap-1">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#4CAF50] animate-pulse" />
-                  <span className="text-[#2E7D32]">Partenaire en ligne</span>
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                  <span className="text-success">Partenaire en ligne</span>
                 </span>
               ) : 'Votre planning repas partagé'}
             </p>
@@ -158,8 +158,8 @@ export default function SettingsPage() {
         <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-2.5 pl-1">Données</p>
         <div className="bg-card rounded-xl border-[1.5px] border-border overflow-hidden">
           <SettingsRow
-          icon={<svg className="w-5 h-5 text-[#C0304A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>}
-            iconBg="bg-[#FDE8F0]"
+          icon={<svg className="w-5 h-5 text-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>}
+            iconBg="bg-danger-light"
             label="Effacer la semaine"
             sub="Remet tous les repas à zéro"
             onClick={() => handleDanger('week')}
@@ -168,8 +168,8 @@ export default function SettingsPage() {
             confirmLabel="Appuyer à nouveau pour confirmer"
           />
           <SettingsRow
-          icon={<svg className="w-5 h-5 text-[#C0304A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>}
-            iconBg="bg-[#FDE8F0]"
+          icon={<svg className="w-5 h-5 text-danger" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>}
+            iconBg="bg-danger-light"
             label="Réinitialiser les recettes"
             sub="Supprime vos recettes personnalisées"
             onClick={() => handleDanger('recipes')}
@@ -182,7 +182,7 @@ export default function SettingsPage() {
 
       {/* ── Footer ── */}
       <div className="px-5 text-center mt-2 pb-6">
-        <p className="text-[11px] font-semibold text-muted">MealMate v1.0 · Fait avec <svg className="w-3 h-3 inline text-[#C0304A]" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></p>
+        <p className="text-[11px] font-semibold text-muted">MealMate v1.0 · Fait avec <svg className="w-3 h-3 inline text-danger" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></p>
       </div>
       </div>{/* /scroll */}
 

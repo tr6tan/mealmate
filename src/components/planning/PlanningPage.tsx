@@ -214,7 +214,7 @@ export default function PlanningPage() {
               onClick={handleClearWeek}
               className={cn(
                 'text-[10px] font-bold px-2 py-1 rounded-full active:scale-90 transition-all',
-                clearWeekConfirm ? 'bg-[#FDE8F0] text-[#C0304A]' : 'text-muted',
+                clearWeekConfirm ? 'bg-danger-light text-danger' : 'text-muted',
               )}
             >
               {clearWeekConfirm ? 'Confirmer ?' : 'Vider'}

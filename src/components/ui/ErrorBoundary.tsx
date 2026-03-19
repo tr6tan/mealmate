@@ -34,7 +34,7 @@ export default class ErrorBoundary extends Component<Props, State> {
           <button
             onClick={() => { this.setState({ error: null }); window.location.reload() }}
             className="px-6 py-3 rounded-2xl text-white text-sm font-extrabold"
-            style={{ background: '#D23D2D' }}
+            style={{ background: 'rgb(var(--c-terra))' }}
           >
             Recharger l'app
           </button>

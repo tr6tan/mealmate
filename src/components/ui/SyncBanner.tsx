@@ -14,8 +14,8 @@ export default function SyncBanner() {
         'fixed top-0 left-0 right-0 z-[300] flex items-center justify-center gap-2 py-2 text-[12px] font-bold text-white',
         'transition-all duration-400 ease-in-out',
         visible ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0 pointer-events-none',
-        isError   && 'bg-[#C0304A]',
-        isSaving  && 'bg-[#D23D2D]',
+        isError   && 'bg-danger',
+        isSaving  && 'bg-terra',
       )}
       style={{ paddingTop: 'calc(env(safe-area-inset-top) + 8px)' }}
     >

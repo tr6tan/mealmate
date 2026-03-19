@@ -25,13 +25,13 @@ export default function InviteCard({ onlineCount }: InviteCardProps) {
           Partager l’app
         </p>
         <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${
-          onlineCount > 0 ? 'bg-[#E8F5E9]' : 'bg-sep'
+          onlineCount > 0 ? 'bg-success-light' : 'bg-sep'
         }`}>
           <div className={`w-1.5 h-1.5 rounded-full ${
-            onlineCount > 0 ? 'bg-[#4CAF50] animate-pulse' : 'bg-muted'
+            onlineCount > 0 ? 'bg-success animate-pulse' : 'bg-muted'
           }`} />
           <span className={`text-[10px] font-extrabold ${
-            onlineCount > 0 ? 'text-[#2E7D32]' : 'text-muted'
+            onlineCount > 0 ? 'text-success' : 'text-muted'
           }`}>
             {onlineCount > 0 ? 'Partenaire connecté' : 'Seul sur ce foyer'}
           </span>

@@ -117,7 +117,9 @@ export default function WeekOverview({ onSelectDay, selectedIdx }: Props) {
                   )}
                 >
                   {meal ? (
-                    <MealAvatar name={meal.name} size="sm" />
+                    meal.emoji
+                      ? <span className="text-[18px] leading-none" title={meal.name}>{meal.emoji}</span>
+                      : <MealAvatar name={meal.name} size="sm" />
                   ) : (
                     <span className={cn('w-2 h-2 rounded-full', isToday ? 'bg-terra/20' : 'bg-sep')} />
                   )}

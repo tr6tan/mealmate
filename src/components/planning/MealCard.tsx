@@ -44,18 +44,22 @@ export default function MealCard({ meal, onPress, period }: Props) {
         'active:scale-[0.98] transition-transform duration-150 text-left',
       )}
     >
-      <MealAvatar name={meal.name} size="lg" />
+      <div className="w-10 h-10 rounded-[10px] flex-shrink-0 flex items-center justify-center bg-sep">
+        {meal.emoji
+          ? <span className="text-xl leading-none">{meal.emoji}</span>
+          : <MealAvatar name={meal.name} size="lg" />}
+      </div>
       <div className="flex-1 min-w-0">
         <div className="text-sm font-bold text-text1 truncate">{meal.name}</div>
         <div className="flex gap-1.5 mt-1.5 flex-wrap">
           {meal.time && (
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg flex items-center gap-1" style={{ color: '#986C58', background: '#6E433D12' }}>
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg flex items-center gap-1 text-muted bg-evening/[0.07]">
               <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               {meal.time}
             </span>
           )}
           {meal.fav && (
-            <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg flex items-center gap-1" style={{ color: '#31603D', background: '#31603D14' }}>
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-lg flex items-center gap-1 text-sage bg-sage/[0.08]">
               <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
               Favori
             </span>
