@@ -2,9 +2,9 @@ import { useMemo } from 'react'
 import { useAppStore, selectCurrentWeekPlan } from '@/store/useAppStore'
 import { DAY_SHORT, getMondayByOffset, getDayFromMonday, MONTHS, getTodayIndex, cn } from '@/lib/utils'
 
-const SLOTS = ['midi', 'soir'] as const
-const DOT_COLOR = { midi: 'bg-terra', soir: 'bg-evening' } as const
-const SLOT_LABEL = { midi: 'Midi', soir: 'Soir' } as const
+const ROWS = ['midi', 'soir'] as const
+const ROW_LABEL = { midi: 'Déj', soir: 'Dîner' } as const
+const ROW_DOT   = { midi: 'bg-terra', soir: 'bg-evening' } as const
 
 interface Props {
   onSelectDay: (idx: number) => void
@@ -12,95 +12,178 @@ interface Props {
 }
 
 export default function WeekOverview({ onSelectDay, selectedIdx }: Props) {
-  const weekPlan  = useAppStore(selectCurrentWeekPlan)
+  const weekPlan   = useAppStore(selectCurrentWeekPlan)
   const weekOffset = useAppStore((s) => s.weekOffset)
-  const monday    = getMondayByOffset(weekOffset)
-  const todayIdx  = getTodayIndex(monday)
+  const monday     = getMondayByOffset(weekOffset)
+  const todayIdx   = getTodayIndex(monday)
 
   const counts = useMemo(() => {
-    const c = { midi: 0, soir: 0, total: 0 }
+    let total = 0
     for (let i = 0; i < 7; i++) {
       const day = weekPlan[i]
       if (!day) continue
-      if (day.midi) { c.midi++; c.total++ }
-      if (day.soir) { c.soir++; c.total++ }
+      if (day.midi) total++
+      if (day.soir) total++
     }
-    return c
+    return total
   }, [weekPlan])
 
-  const pct = Math.round((counts.total / 14) * 100)
+  const pct = Math.round((counts / 14) * 100)
 
   return (
-    <div className="px-5 pb-4 flex flex-col gap-1.5">
-      {/* Résumé semaine */}
-      <div className="bg-card rounded-2xl px-4 py-3 mb-2 border-[1.5px] border-border">
+    <div className="px-5 pb-4 flex flex-col gap-3">
+
+      {/* ── Résumé compact ── */}
+      <div className="bg-card rounded-2xl px-4 py-3 border-[1.5px] border-border">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-[13px] font-extrabold text-text1">{counts.total} / 14 repas planifiés</span>
-          <span className="text-[12px] font-bold text-terra">{pct} %</span>
+          <span className="text-[13px] font-extrabold text-text1">{counts} / 14 repas</span>
+          <span className="text-[12px] font-bold text-terra">{pct}%</span>
         </div>
-        <div className="bg-sep rounded-full h-2 overflow-hidden mb-2.5">
+        <div className="bg-sep rounded-full h-1.5 overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-terra to-[#F4A67A] rounded-full transition-all duration-500"
             style={{ width: `${pct}%` }}
           />
         </div>
-        <div className="flex gap-3">
-          {SLOTS.map((slot) => (
-            <div key={slot} className="flex items-center gap-1.5">
-              <span className={cn('w-2 h-2 rounded-full flex-shrink-0', DOT_COLOR[slot])} />
-              <span className="text-[11px] font-bold text-muted">{SLOT_LABEL[slot]} : <span className="text-text1">{counts[slot]}/7</span></span>
-            </div>
-          ))}
-        </div>
       </div>
-      {Array.from({ length: 7 }).map((_, i) => {
-        const d = getDayFromMonday(monday, i)
-        const plan = weekPlan[i]
-        const isToday = i === todayIdx
-        const isSelected = i === selectedIdx
 
-        return (
-          <button
-            key={i}
-            onClick={() => onSelectDay(i)}
+      {/* ── Grille calendrier ── */}
+      <div className="bg-card rounded-2xl border-[1.5px] border-border overflow-hidden">
+
+        {/* En-tête jours */}
+        <div className="grid grid-cols-[40px_repeat(7,1fr)] border-b border-sep">
+          <div /> {/* cellule vide coin haut-gauche */}
+          {Array.from({ length: 7 }).map((_, i) => {
+            const d = getDayFromMonday(monday, i)
+            const isToday = i === todayIdx
+            return (
+              <button
+                key={i}
+                onClick={() => onSelectDay(i)}
+                className={cn(
+                  'flex flex-col items-center py-2 transition-colors',
+                  isToday && 'bg-terra/10',
+                )}
+              >
+                <span className={cn(
+                  'text-[9px] font-black tracking-wider uppercase leading-none',
+                  isToday ? 'text-terra' : 'text-muted',
+                )}>
+                  {DAY_SHORT[i]}
+                </span>
+                <span className={cn(
+                  'text-[13px] font-black leading-tight mt-0.5',
+                  isToday ? 'text-terra' : 'text-text1',
+                )}>
+                  {d.getDate()}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Lignes Déj / Dîner */}
+        {ROWS.map((row) => (
+          <div
+            key={row}
             className={cn(
-              'flex items-center gap-3 px-3.5 py-2.5 rounded-2xl border-2 text-left transition-all duration-150 active:scale-[0.98]',
-              isSelected ? 'bg-terra-light border-terra' : 'bg-card border-transparent',
-              isToday && !isSelected && 'border-terra/40',
+              'grid grid-cols-[40px_repeat(7,1fr)]',
+              row === 'midi' && 'border-b border-sep',
             )}
           >
-            {/* Jour */}
-            <div className="flex-shrink-0 w-14">
-              <p className={cn('text-[10px] font-black tracking-widest uppercase', isToday || isSelected ? 'text-terra' : 'text-muted')}>
-                {DAY_SHORT[i]}
-              </p>
-              <p className={cn('text-sm font-extrabold', isToday || isSelected ? 'text-terra' : 'text-text1')}>
-                {d.getDate()} {MONTHS[d.getMonth()]}
-              </p>
+            {/* Label ligne */}
+            <div className="flex items-center justify-center">
+              <span className={cn(
+                'text-[9px] font-black tracking-wider uppercase text-muted leading-none',
+              )}>
+                {ROW_LABEL[row]}
+              </span>
             </div>
 
-            {/* Repas */}
-            <div className="flex-1 flex flex-col gap-1">
-              {SLOTS.map((slot) => {
-                const meal = slot === 'midi' ? plan?.midi : plan?.soir
-                return meal ? (
-                  <div key={slot} className="flex items-center gap-1.5">
-                    <span className={cn('w-1.5 h-1.5 rounded-full flex-shrink-0', DOT_COLOR[slot])} />
-                    <span className="text-[12px] font-semibold text-text1 truncate">
-                      {meal.emoji} {meal.name}
+            {/* Cellules repas */}
+            {Array.from({ length: 7 }).map((_, i) => {
+              const plan = weekPlan[i]
+              const meal = row === 'midi' ? plan?.midi : plan?.soir
+              const isToday = i === todayIdx
+
+              return (
+                <button
+                  key={i}
+                  onClick={() => onSelectDay(i)}
+                  className={cn(
+                    'flex items-center justify-center py-3 transition-colors active:bg-sep/60',
+                    isToday && 'bg-terra/5',
+                  )}
+                >
+                  {meal ? (
+                    <span className="text-[18px] leading-none" title={meal.name}>
+                      {meal.emoji || (meal.isRestaurant ? '🍽️' : '✅')}
                     </span>
-                  </div>
-                ) : (
-                  <div key={slot} className="flex items-center gap-1.5">
-                    <span className={cn('w-1.5 h-1.5 rounded-full flex-shrink-0 opacity-25', DOT_COLOR[slot])} />
-                    <span className="text-[11px] text-muted italic">—</span>
-                  </div>
-                )
-              })}
-            </div>
-          </button>
-        )
-      })}
+                  ) : (
+                    <span className={cn('w-2 h-2 rounded-full', isToday ? 'bg-terra/20' : 'bg-sep')} />
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        ))}
+      </div>
+
+      {/* ── Liste détaillée par jour ── */}
+      <div className="flex flex-col gap-1">
+        {Array.from({ length: 7 }).map((_, i) => {
+          const d = getDayFromMonday(monday, i)
+          const plan = weekPlan[i]
+          const isToday = i === todayIdx
+          const hasMidi = !!plan?.midi
+          const hasSoir = !!plan?.soir
+          const hasAny = hasMidi || hasSoir
+
+          return (
+            <button
+              key={i}
+              onClick={() => onSelectDay(i)}
+              className={cn(
+                'flex items-center gap-2.5 px-3 py-2 rounded-xl text-left transition-all active:scale-[0.98]',
+                isToday ? 'bg-terra/8 border border-terra/25' : 'bg-card/60',
+              )}
+            >
+              {/* Jour */}
+              <div className="flex-shrink-0 w-11">
+                <p className={cn('text-[9px] font-black tracking-widest uppercase', isToday ? 'text-terra' : 'text-muted')}>
+                  {DAY_SHORT[i]}
+                </p>
+                <p className={cn('text-[12px] font-extrabold leading-tight', isToday ? 'text-terra' : 'text-text1')}>
+                  {d.getDate()} {MONTHS[d.getMonth()]}
+                </p>
+              </div>
+
+              {/* Repas */}
+              {hasAny ? (
+                <div className="flex-1 flex items-center gap-2 min-w-0">
+                  {hasMidi && (
+                    <span className="flex items-center gap-1 text-[11px] font-semibold text-text1 truncate">
+                      <span className="w-1.5 h-1.5 rounded-full bg-terra flex-shrink-0" />
+                      {plan!.midi!.emoji} {plan!.midi!.name}
+                    </span>
+                  )}
+                  {hasMidi && hasSoir && <span className="text-sep font-bold">·</span>}
+                  {hasSoir && (
+                    <span className="flex items-center gap-1 text-[11px] font-semibold text-text1 truncate">
+                      <span className="w-1.5 h-1.5 rounded-full bg-evening flex-shrink-0" />
+                      {plan!.soir!.emoji} {plan!.soir!.name}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <span className="text-[11px] text-muted italic">Aucun repas</span>
+              )}
+
+              <span className="text-muted text-sm">›</span>
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 }

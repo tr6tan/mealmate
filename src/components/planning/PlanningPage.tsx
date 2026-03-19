@@ -104,7 +104,7 @@ export default function PlanningPage() {
 
   const planCount = useMemo(() =>
     Object.values(weekPlan).reduce((acc, day) =>
-      acc + (['pdej', 'midi', 'soir'] as const).filter((s) => day[s] !== null).length, 0
+      acc + (['midi', 'soir'] as const).filter((s) => day[s] !== null).length, 0
     ), [weekPlan])
 
   const hasPrevWeek = useMemo(() => {
@@ -192,7 +192,7 @@ export default function PlanningPage() {
             <p className="text-[12px] text-muted font-semibold truncate">{weekLabel}</p>
             {planCount > 0 && (
               <span className="text-[10px] font-black px-2 py-0.5 rounded-full flex-shrink-0" style={{ color: '#D23D2D', background: '#D23D2D12', border: '1px solid #D23D2D25' }}>
-                {planCount}/21
+                {planCount}/14
               </span>
             )}
             {weekOffset < 0 && (
