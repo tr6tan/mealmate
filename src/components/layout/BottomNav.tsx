@@ -1,4 +1,4 @@
-﻿import { useAppStore } from '@/store/useAppStore'
+import { useAppStore } from '@/store/useAppStore'
 import type { ActiveTab } from '@/types'
 import { cn } from '@/lib/utils'
 
@@ -9,10 +9,10 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { id: 'planning',  label: 'Semaine',  emoji: '📅' },
-  { id: 'recettes',  label: 'Recettes', emoji: '📖' },
-  { id: 'courses',   label: 'Courses',  emoji: '🛒' },
-  { id: 'settings',  label: 'Réglages', emoji: '⚙️' },
+  { id: 'planning',  label: 'Semaine',  emoji: '\u{1F4C5}' },
+  { id: 'recettes',  label: 'Recettes', emoji: '\u{1F4D6}' },
+  { id: 'courses',   label: 'Courses',  emoji: '\u{1F6D2}' },
+  { id: 'settings',  label: 'Réglages', emoji: '\u2699\uFE0F' },
 ]
 
 export default function BottomNav() {
