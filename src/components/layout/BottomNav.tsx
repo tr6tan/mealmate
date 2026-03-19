@@ -36,13 +36,15 @@ export default function BottomNav() {
               {/* Pill background actif */}
               <span
                 className={cn(
-                  'relative flex items-center justify-center rounded-2xl transition-all duration-250 text-sm leading-none',
+                  'relative flex items-center justify-center rounded-2xl transition-all duration-250',
                   active
                     ? 'w-12 h-7 bg-terra-light'
                     : 'w-9 h-6 grayscale opacity-60',
                 )}
               >
-                {item.emoji}
+                <span className="text-[18px] leading-none" style={{ fontFamily: '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif' }}>
+                  {item.emoji}
+                </span>
                 {item.id === 'courses' && remaining > 0 && (
                   <span className="absolute -top-1.5 -right-0.5 min-w-[18px] h-[18px] bg-terra text-white text-[9px] font-black rounded-full flex items-center justify-center px-1 leading-none shadow-sm">
                     {remaining}
