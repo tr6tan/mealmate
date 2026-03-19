@@ -20,7 +20,7 @@ export default function MealCard({ meal, onPress, period }: Props) {
         )}
       >
         <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-white/60">
-          <span className="text-xl leading-none">{"\u{1F354}"}</span>
+          <span className="text-xl leading-none">{"\u{1F374}"}</span>
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-bold text-terra-dark">{meal.name || 'Restaurant'}</div>

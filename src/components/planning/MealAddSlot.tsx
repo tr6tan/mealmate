@@ -30,7 +30,7 @@ export default function MealAddSlot({ period, onClick, onRestaurant }: Props) {
         aria-label="Ajouter un restaurant"
         className="bg-card rounded-xl px-3.5 py-2.5 flex flex-col items-center justify-center gap-1 border-2 border-dashed border-border active:border-terra active:bg-terra-light active:scale-[0.98] transition-all duration-200 flex-shrink-0 min-w-[52px]"
       >
-        <span className="text-lg leading-none">{"\u{1F354}"}</span>
+        <span className="text-lg leading-none">{"\u{1F374}"}</span>
         <span className="text-[9px] font-bold text-muted">Resto</span>
       </button>
     </div>
