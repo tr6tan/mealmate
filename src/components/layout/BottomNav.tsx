@@ -36,10 +36,10 @@ export default function BottomNav() {
               {/* Pill background actif */}
               <span
                 className={cn(
-                  'relative flex items-center justify-center rounded-2xl transition-all duration-250 text-xl leading-none',
+                  'relative flex items-center justify-center rounded-2xl transition-all duration-250 text-sm leading-none',
                   active
-                    ? 'w-14 h-8 bg-terra-light'
-                    : 'w-10 h-7 grayscale opacity-60',
+                    ? 'w-12 h-7 bg-terra-light'
+                    : 'w-9 h-6 grayscale opacity-60',
                 )}
               >
                 {item.emoji}
