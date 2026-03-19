@@ -14,21 +14,21 @@ export default function MealCard({ meal, onPress, period }: Props) {
       <button
         onClick={onPress}
         className={cn(
-          'w-full rounded-xl px-3.5 py-3 flex items-center gap-2.5',
-          'border-[1.5px] border-amber-200 bg-amber-50',
+          'w-full rounded-xl px-3.5 py-3 flex items-center gap-3',
+          'border-[1.5px] border-terra/20 bg-terra-light',
           'active:scale-[0.98] transition-transform duration-150 text-left',
         )}
       >
-        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-amber-50">
-          <span className="text-xl leading-none">🍽️</span>
+        <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-white/60">
+          <span className="text-xl leading-none">{"\u{1F37D}\uFE0F"}</span>
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-bold text-amber-800">{meal.name || 'Restaurant'}</div>
-          <span className="text-[11px] font-bold text-amber-600 bg-amber-100 px-2 py-0.5 rounded-lg inline-block mt-1.5">
+          <div className="text-sm font-bold text-terra-dark">{meal.name || 'Restaurant'}</div>
+          <span className="text-[11px] font-bold text-terra/80 mt-0.5 block">
             On mange dehors
           </span>
         </div>
-        <svg className="w-4 h-4 text-amber-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <svg className="w-4 h-4 text-terra/40 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <polyline points="9 18 15 12 9 6" />
         </svg>
       </button>
