@@ -1,1 +1,1 @@
-﻿// SplashScreen supprimé : l'app démarre directement sur la page principale
+// SplashScreen supprimé : l'app démarre directement sur la page principale

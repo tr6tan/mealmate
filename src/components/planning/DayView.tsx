@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { useAppStore, selectCurrentWeekPlan } from '@/store/useAppStore'
 import type { Period, SlotKey } from '@/types'
 import { haptic, getTodayIndex, getMondayByOffset, DAY_SHORT, cn } from '@/lib/utils'
