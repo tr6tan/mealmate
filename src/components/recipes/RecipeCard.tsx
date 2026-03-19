@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 import type { Recipe, DietaryTag } from '@/types'
-import { PeriodIcon } from '@/components/ui/FoodIcons'
+import MealAvatar from '@/components/ui/MealAvatar'
 
 const TAG_LABEL: Record<DietaryTag, string> = {
   vegetarien: '🌿',
@@ -13,11 +13,6 @@ const PERIOD_COLOR: Record<string, string> = {
   pdej: 'text-[#B07A10] bg-[#F5C06520]',
   midi: 'text-[#D23D2D] bg-[#D23D2D15]',
   soir: 'text-[#5A3832] bg-[#6E433D20]',
-}
-const PERIOD_ICON_COLOR: Record<string, string> = {
-  pdej: '#B07A10',
-  midi: '#D23D2D',
-  soir: '#6E433D',
 }
 const PERIOD_LABEL: Record<string, string> = { pdej: 'Petit-dej', midi: 'Midi', soir: 'Soir' }
 const PERIOD_GRADIENT: Record<string, string> = {
@@ -41,11 +36,7 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
         className="w-full bg-card rounded-2xl border-[1.5px] border-border flex items-center gap-3 px-3 py-2.5 text-left active:scale-[0.98] transition-transform"
       >
         {/* Icône */}
-        <div className="w-11 h-11 rounded-xl flex-shrink-0 bg-gradient-to-br from-terra-light to-sep flex items-center justify-center">
-          {recipe.emoji
-            ? <span className="text-2xl leading-none">{recipe.emoji}</span>
-            : <PeriodIcon period={recipe.period} className="w-6 h-6 opacity-50" style={{ color: PERIOD_ICON_COLOR[recipe.period] }} />}
-        </div>
+        <MealAvatar name={recipe.name} size="lg" className="w-11 h-11" />
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-0.5">
@@ -81,9 +72,7 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
       {/* Icône + infos */}
       <div className={`w-full bg-gradient-to-br ${PERIOD_GRADIENT[recipe.period] ?? 'from-terra-light to-sep'} px-2.5 pt-2.5 pb-2 flex flex-col flex-1`}>
         <div className="flex items-start justify-between mb-1.5">
-          <span className="text-3xl leading-none">
-            {recipe.emoji || <PeriodIcon period={recipe.period} className="w-8 h-8 opacity-30" style={{ color: PERIOD_ICON_COLOR[recipe.period] }} />}
-          </span>
+          <MealAvatar name={recipe.name} size="card" />
           <div className="flex gap-0.5">
             {recipe.tags?.map((t) => (
               <span key={t} className="text-[8px] font-bold px-0.5">{TAG_LABEL[t]}</span>

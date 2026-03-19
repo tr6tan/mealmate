@@ -1,6 +1,6 @@
 import type { Meal, Period } from '@/types'
 import { cn } from '@/lib/utils'
-import { PeriodIcon } from '@/components/ui/FoodIcons'
+import MealAvatar from '@/components/ui/MealAvatar'
 
 interface Props {
   meal: Meal
@@ -44,11 +44,7 @@ export default function MealCard({ meal, onPress, period }: Props) {
         'active:scale-[0.98] transition-transform duration-150 text-left',
       )}
     >
-      <div className="w-10 h-10 rounded-[10px] flex-shrink-0 flex items-center justify-center bg-sep">
-        {meal.emoji
-          ? <span className="text-xl leading-none">{meal.emoji}</span>
-          : <PeriodIcon period={period ?? 'midi'} className="w-5 h-5 text-muted" />}
-      </div>
+      <MealAvatar name={meal.name} size="lg" />
       <div className="flex-1 min-w-0">
         <div className="text-sm font-bold text-text1 truncate">{meal.name}</div>
         <div className="flex gap-1.5 mt-1.5 flex-wrap">

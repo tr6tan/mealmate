@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useAppStore, selectCurrentWeekPlan } from '@/store/useAppStore'
 import { DAY_SHORT, getMondayByOffset, getDayFromMonday, MONTHS, getTodayIndex, cn } from '@/lib/utils'
+import MealAvatar from '@/components/ui/MealAvatar'
 
 const ROWS = ['midi', 'soir'] as const
 const ROW_LABEL = { midi: 'Déj', soir: 'Dîner' } as const
@@ -116,9 +117,7 @@ export default function WeekOverview({ onSelectDay, selectedIdx }: Props) {
                   )}
                 >
                   {meal ? (
-                    <span className="text-[18px] leading-none" title={meal.name}>
-                      {meal.emoji || (meal.isRestaurant ? '🍽️' : '✅')}
-                    </span>
+                    <MealAvatar name={meal.name} size="sm" />
                   ) : (
                     <span className={cn('w-2 h-2 rounded-full', isToday ? 'bg-terra/20' : 'bg-sep')} />
                   )}
@@ -164,14 +163,14 @@ export default function WeekOverview({ onSelectDay, selectedIdx }: Props) {
                   {hasMidi && (
                     <span className="flex items-center gap-1 text-[11px] font-semibold text-text1 truncate">
                       <span className="w-1.5 h-1.5 rounded-full bg-terra flex-shrink-0" />
-                      {plan!.midi!.emoji} {plan!.midi!.name}
+                      {plan!.midi!.name}
                     </span>
                   )}
                   {hasMidi && hasSoir && <span className="text-sep font-bold">·</span>}
                   {hasSoir && (
                     <span className="flex items-center gap-1 text-[11px] font-semibold text-text1 truncate">
                       <span className="w-1.5 h-1.5 rounded-full bg-evening flex-shrink-0" />
-                      {plan!.soir!.emoji} {plan!.soir!.name}
+                      {plan!.soir!.name}
                     </span>
                   )}
                 </div>

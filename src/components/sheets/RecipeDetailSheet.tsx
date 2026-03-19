@@ -3,6 +3,7 @@ import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import { showToast } from '@/components/ui/Toast'
 import { cn } from '@/lib/utils'
+import MealAvatar from '@/components/ui/MealAvatar'
 
 function scaleQty(qty: string, factor: number): string {
   if (!qty || factor === 1) return qty
@@ -152,9 +153,7 @@ export default function RecipeDetailSheet() {
         /* Pas de photo — header card amélioré */
         <div className="relative -mx-5 -mt-5 mb-0 px-5 pt-8 pb-5 rounded-t-[28px]" style={{ background: `linear-gradient(135deg, ${meta.bg}, ${meta.bg}80)` }}>
           <div className="flex items-start gap-4">
-            <div className="w-[72px] h-[72px] rounded-[20px] bg-white/70 backdrop-blur flex items-center justify-center text-[36px] flex-shrink-0 shadow-sm border border-white/40">
-              {recipe.emoji}
-            </div>
+            <MealAvatar name={recipe.name} size="xl" className="shadow-sm border border-white/40" />
             <div className="flex-1 min-w-0 pt-0.5">
               <h2 className="text-[22px] font-black text-text1 leading-tight mb-2.5">{recipe.name}</h2>
               <div className="flex flex-wrap gap-1.5">
