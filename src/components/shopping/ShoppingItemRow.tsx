@@ -11,7 +11,6 @@ export default function ShoppingItemRow({ item }: Props) {
   const toggleShoppingItem = useAppStore((s) => s.toggleShoppingItem)
   const removeShoppingItem = useAppStore((s) => s.removeShoppingItem)
 
-  // Évite le double-fire touchEnd + click sur iOS
   const didToggle = useRef(false)
 
   const handleToggleTouchEnd = (e: React.TouchEvent) => {
@@ -35,15 +34,15 @@ export default function ShoppingItemRow({ item }: Props) {
   return (
     <div
       className={cn(
-        'group w-full rounded-xl px-3 py-3 flex items-center gap-3 border-[1.5px] select-none',
+        'group w-full rounded-xl px-3 py-2.5 flex items-center gap-3 select-none',
         'transition-all duration-200',
         item.checked
-          ? 'border-sage/20 bg-sage/5 opacity-60'
-          : 'bg-card border-border shadow-sm',
+          ? 'bg-sage/5 opacity-50'
+          : 'bg-bg',
       )}
       style={{ touchAction: 'manipulation', WebkitUserSelect: 'none' }}
     >
-      {/* Checkbox animée — seule zone qui toggle */}
+      {/* Checkbox */}
       <button
         type="button"
         className={cn(
@@ -54,7 +53,7 @@ export default function ShoppingItemRow({ item }: Props) {
         style={{ touchAction: 'manipulation' }}
         onTouchEnd={handleToggleTouchEnd}
         onClick={handleToggleClick}
-        aria-label={item.checked ? 'Décocher' : 'Cocher'}
+        aria-label={item.checked ? 'D\u00e9cocher' : 'Cocher'}
       >
         {item.checked && (
           <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">

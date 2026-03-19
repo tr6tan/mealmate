@@ -2,8 +2,16 @@ import { useMemo, useState } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import type { ShoppingCategory } from '@/types'
 import ShoppingItemRow from './ShoppingItemRow'
-import { CategoryIcon } from '@/components/ui/FoodIcons'
 import { cn } from '@/lib/utils'
+
+const CAT_EMOJI: Record<ShoppingCategory, string> = {
+  legumes: '\u{1F966}',
+  viandes: '\u{1F969}',
+  cremerie: '\u{1F9C0}',
+  epicerie: '\u{1F36A}',
+  surgeles: '\u{2744}\uFE0F',
+  maison: '\u{1F9F9}',
+}
 
 interface Props {
   category: ShoppingCategory
@@ -19,7 +27,6 @@ export default function ShoppingCategorySection({ category, label }: Props) {
     [shoppingItems, category],
   )
 
-  // Tri : non-cochés d'abord, cochés ensuite
   const sorted = useMemo(() => {
     const unchecked = items.filter((i) => !i.checked)
     const checked   = items.filter((i) => i.checked)
@@ -34,36 +41,25 @@ export default function ShoppingCategorySection({ category, label }: Props) {
   if (total === 0) return null
 
   return (
-    <div>
-      {/* Header catégorie — cliquable pour replier */}
+    <div className="bg-card rounded-2xl border-[1.5px] border-border overflow-hidden">
+      {/* Header catégorie */}
       <button
         type="button"
         onClick={() => setCollapsed((v) => !v)}
-        className="w-full flex items-center justify-between pb-2.5 mb-2 border-b-[1.5px] border-border cursor-pointer select-none"
+        className="w-full flex items-center justify-between px-3.5 py-3 cursor-pointer select-none"
       >
         <div className="flex items-center gap-2.5">
-          <div className={cn(
-            'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
-            allDone ? 'bg-sage/15' : 'bg-terra-light',
-          )}>
-            <CategoryIcon
-              category={category}
-              className={cn('w-4 h-4 flex-shrink-0', allDone ? 'text-sage' : 'text-terra')}
-            />
-          </div>
+          <span className="text-base leading-none">{CAT_EMOJI[category]}</span>
           <span className={cn(
-            'text-[12px] font-extrabold tracking-[0.04em] uppercase transition-colors',
-            allDone ? 'text-sage' : 'text-text2',
+            'text-[13px] font-extrabold transition-colors',
+            allDone ? 'text-sage' : 'text-text1',
           )}>
             {label}
           </span>
         </div>
         <div className="flex items-center gap-2">
           {allDone ? (
-            <span className="text-sage font-extrabold text-[11px] flex items-center gap-1">
-              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-              Terminé
-            </span>
+            <span className="text-sage font-extrabold text-[11px]">{'\u2705'}</span>
           ) : (
             <span className="text-[11px] font-bold text-muted tabular-nums">
               {remaining}<span className="opacity-50">/{total}</span>
@@ -81,16 +77,15 @@ export default function ShoppingCategorySection({ category, label }: Props) {
         </div>
       </button>
 
-      {/* Contenu — animé */}
+      {/* Contenu */}
       <div className={cn(
         'grid transition-[grid-template-rows] duration-300 ease-in-out',
         collapsed ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]',
       )}>
         <div className="overflow-hidden">
-          <div className="space-y-1.5 pb-1">
+          <div className="px-3 pb-3 space-y-1.5">
             {sorted.map((item, i) => (
               <div key={item.id}>
-                {/* Séparateur discret entre non-cochés et cochés */}
                 {i > 0 && !sorted[i - 1].checked && item.checked && checked > 0 && (
                   <div className="flex items-center gap-2 py-2 px-1">
                     <div className="flex-1 h-px bg-border/60" />
