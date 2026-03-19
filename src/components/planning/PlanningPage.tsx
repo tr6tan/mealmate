@@ -248,15 +248,10 @@ export default function PlanningPage() {
       ) : (
         <>
         {/* Day chips */}
-        <div className="flex gap-2.5 px-5 pb-4 overflow-x-auto no-scrollbar">
+        <div className="flex gap-1.5 px-5 pb-4">
           {Array.from({ length: 7 }).map((_, i) => {
             const d = getDayFromMonday(monday, i)
             const day = weekPlan[i]
-            const hasMeal = day != null && (
-              day.pdej !== null || day.midi !== null || day.soir !== null ||
-              day.midi_entree !== null || day.midi_dessert !== null ||
-              day.soir_entree !== null || day.soir_dessert !== null
-            )
             return (
               <DayChip
                 key={i}
@@ -264,7 +259,8 @@ export default function PlanningPage() {
                 dayNum={d.getDate()}
                 isToday={i === todayIdx}
                 isSelected={i === selectedIdx}
-                hasMeal={hasMeal}
+                hasMidi={!!day?.midi}
+                hasSoir={!!day?.soir}
                 onClick={() => goToDay(i)}
               />
             )

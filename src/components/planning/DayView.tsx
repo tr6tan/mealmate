@@ -51,8 +51,10 @@ export default function DayView({ dayIdx }: Props) {
 
       {/* ── Empty state ────────────────────────────────────────────────────── */}
       {isEmpty && (
-        <div className="flex items-center gap-2 py-3 px-1">
-          <span className="text-xs text-muted">Rien de planifié — appuie sur un slot ci-dessous</span>
+        <div className="bg-card rounded-2xl border-[1.5px] border-dashed border-border px-4 py-5 flex flex-col items-center gap-1">
+          <span className="text-2xl">📋</span>
+          <span className="text-xs font-semibold text-muted">Rien de planifié</span>
+          <span className="text-[10px] text-muted/70">Ajoute un repas ci-dessous</span>
         </div>
       )}
 
