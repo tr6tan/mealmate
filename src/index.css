@@ -5,10 +5,10 @@
 /* ── Design tokens — Light ── */
 /* Palette : fire red #D23D2D · vanilla cream #F8EECB · retro green #31603D · saffron #F5C065 · russet #6E433D */
 :root {
-  --c-bg:          248 238 203; /* #F8EECB — vanilla cream */
-  --c-card:        255 252 240; /* #FFFCF0 — ivoire chaud, contraste net sur bg */
-  --c-sep:         237 224 168; /* #EDE0A8 — séparateur doré doux */
-  --c-border:      216 200 128; /* #D8C880 — bordure dorée lisible */
+  --c-bg:          245 240 225; /* #F5F0E1 — beige chaud neutre */
+  --c-card:        255 253 245; /* #FFFDF5 — ivoire légèrement plus chaud */
+  --c-sep:         229 217 160; /* #E5D9A0 — séparateur doré, un chouïa plus contrasté */
+  --c-border:      201 185 122; /* #C9B97A — bordure dorée plus affirmée */
   --c-text1:        40  16   8; /* #281008 — brun très foncé */
   --c-text2:       110  67  61; /* #6E433D — russet */
   --c-muted:       152 108  88; /* #986C58 — brun moyen léger */

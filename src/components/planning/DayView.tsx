@@ -51,10 +51,9 @@ export default function DayView({ dayIdx }: Props) {
 
       {/* ── Empty state ────────────────────────────────────────────────────── */}
       {isEmpty && (
-        <div className="bg-card rounded-2xl border-[1.5px] border-dashed border-border px-4 py-5 flex flex-col items-center gap-1">
-          <span className="text-2xl">📋</span>
-          <span className="text-xs font-semibold text-muted">Rien de planifié</span>
-          <span className="text-[10px] text-muted/70">Ajoute un repas ci-dessous</span>
+        <div className="flex items-center gap-3 py-3 px-1">
+          <span className="text-lg">📋</span>
+          <span className="text-xs font-semibold text-muted">Rien de planifié pour ce jour</span>
         </div>
       )}
 
@@ -65,31 +64,23 @@ export default function DayView({ dayIdx }: Props) {
         const dessertMeal = dessertKey === 'midi_dessert' ? plan.midi_dessert : plan.soir_dessert
 
         return (
-          <div key={period}>
+          <div key={period} className="bg-card rounded-2xl border-[1.5px] border-border p-3 flex flex-col gap-1">
             {/* En-tête période */}
-            <div className="flex items-center gap-3 mb-3">
-              <span
-                className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-black flex-shrink-0 border"
-                style={{ background: PERIOD_STYLE[period].bg, color: PERIOD_STYLE[period].label, borderColor: PERIOD_STYLE[period].label + '30' }}
-              >
-                <span className="w-1.5 h-1.5 rounded-full" style={{ background: PERIOD_STYLE[period].dot }} />
-                <span>{label}</span>
-              </span>
-              <span className="flex-1 h-px opacity-15" style={{ background: PERIOD_STYLE[period].label }} />
+            <div className="flex items-center gap-2 mb-1">
+              <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: PERIOD_STYLE[period].dot }} />
+              <span className="text-[12px] font-black uppercase tracking-wide" style={{ color: PERIOD_STYLE[period].label }}>{label}</span>
             </div>
 
             {/* Entrée */}
-            <div className="mb-0.5">
-              <OptionalSlot
-                label="Entrée"
-                meal={entreeMeal ?? null}
-                onPress={() =>
-                  entreeMeal
-                    ? openSheet({ sheet: 'meal-actions', actionContext: { dayIdx, slotKey: entreeKey, meal: entreeMeal } })
-                    : openSheet({ sheet: 'add-meal', addMealPeriod: period, mealContext: { dayIdx, slotKey: entreeKey } })
-                }
-              />
-            </div>
+            <OptionalSlot
+              label="Entrée"
+              meal={entreeMeal ?? null}
+              onPress={() =>
+                entreeMeal
+                  ? openSheet({ sheet: 'meal-actions', actionContext: { dayIdx, slotKey: entreeKey, meal: entreeMeal } })
+                  : openSheet({ sheet: 'add-meal', addMealPeriod: period, mealContext: { dayIdx, slotKey: entreeKey } })
+              }
+            />
 
             {/* Slot principal */}
             {mainMeal ? (
@@ -114,17 +105,15 @@ export default function DayView({ dayIdx }: Props) {
             )}
 
             {/* Dessert */}
-            <div className="mt-0.5">
-              <OptionalSlot
-                label="Dessert"
-                meal={dessertMeal ?? null}
-                onPress={() =>
-                  dessertMeal
-                    ? openSheet({ sheet: 'meal-actions', actionContext: { dayIdx, slotKey: dessertKey, meal: dessertMeal } })
-                    : openSheet({ sheet: 'add-meal', addMealPeriod: period, mealContext: { dayIdx, slotKey: dessertKey } })
-                }
-              />
-            </div>
+            <OptionalSlot
+              label="Dessert"
+              meal={dessertMeal ?? null}
+              onPress={() =>
+                dessertMeal
+                  ? openSheet({ sheet: 'meal-actions', actionContext: { dayIdx, slotKey: dessertKey, meal: dessertMeal } })
+                  : openSheet({ sheet: 'add-meal', addMealPeriod: period, mealContext: { dayIdx, slotKey: dessertKey } })
+              }
+            />
           </div>
         )
       })}

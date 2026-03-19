@@ -151,72 +151,71 @@ export default function PlanningPage() {
       {/* Safe-area top */}
       <div className="flex-shrink-0 pt-safe" />
       {/* Header */}
-      <div className="flex-shrink-0 px-5 pt-5 pb-3">
-        {/* Titre + nav semaine */}
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <p className="text-[10px] font-black tracking-[0.12em] uppercase text-muted">Mon planning</p>
-            <h1 className="text-[26px] font-black text-text1 leading-tight">{weekTitle}</h1>
+      <div className="flex-shrink-0 px-5 pt-4 pb-2">
+        {/* Ligne 1 : Titre + actions */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-[22px] font-black text-text1 leading-tight">{weekTitle}</h1>
+            <p className="text-[11px] font-semibold text-muted mt-0.5">{weekLabel}</p>
           </div>
           <div className="flex items-center gap-1.5">
+            {weekOffset !== 0 && (
+              <button
+                onClick={() => { setWeekOffset(0); setWeekSlideDir(null) }}
+                className="h-8 px-3 rounded-full text-[11px] font-black flex-shrink-0 active:scale-90 transition-transform bg-terra text-white"
+              >
+                Aujourd'hui
+              </button>
+            )}
             <button
               onClick={handleShare}
-              className="w-10 h-10 flex items-center justify-center rounded-full border border-border text-muted active:scale-90 transition-transform"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-card border border-border text-muted active:scale-90 transition-transform"
               aria-label="Partager le planning"
             >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
             </button>
             <button
               onClick={() => setViewMode(v => v === 'day' ? 'week' : 'day')}
-              className="w-10 h-10 flex items-center justify-center rounded-full text-base transition-all active:scale-90 border"
+              className={cn(
+                'w-8 h-8 flex items-center justify-center rounded-full text-sm transition-all active:scale-90 border',
+                viewMode === 'week'
+                  ? 'bg-terra text-white border-terra'
+                  : 'bg-card text-muted border-border',
+              )}
               aria-label={viewMode === 'week' ? 'Vue journalière' : 'Vue hebdomadaire'}
-              style={viewMode === 'week'
-                ? { background: '#D23D2D', color: '#fff', borderColor: '#D23D2D' }
-                : { background: 'transparent', color: '#986C58', borderColor: '#D8C880' }}
             >
               {viewMode === 'week' ? '▤' : '▦'}
             </button>
           </div>
         </div>
 
-        {/* Barre de navigation semaine */}
-        <div className="flex items-center gap-2">
+        {/* Ligne 2 : Nav semaine + compteur */}
+        <div className="flex items-center gap-1">
           <button
             onClick={() => changeWeek(-1)}
             aria-label="Semaine précédente"
-            className="w-10 h-10 flex items-center justify-center rounded-full border border-border text-muted text-lg font-bold leading-none active:scale-90 transition-transform"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-card border border-border text-muted text-base font-bold leading-none active:scale-90 transition-transform"
           >
             ‹
           </button>
-          <div className="flex-1 flex items-center gap-2 min-w-0">
-            <p className="text-[12px] text-muted font-semibold truncate">{weekLabel}</p>
-            {planCount > 0 && (
-              <span className="text-[10px] font-black px-2 py-0.5 rounded-full flex-shrink-0" style={{ color: '#D23D2D', background: '#D23D2D12', border: '1px solid #D23D2D25' }}>
-                {planCount}/14
-              </span>
-            )}
-            {weekOffset < 0 && (
-              <span className="text-[10px] font-bold text-muted bg-sep px-2 py-0.5 rounded-full flex-shrink-0">
-                Passé
-              </span>
-            )}
-          </div>
-          {weekOffset !== 0 && (
-            <button
-              onClick={() => { setWeekOffset(0); setWeekSlideDir(null) }}
-              className="text-[10px] font-black px-2.5 py-1 rounded-full flex-shrink-0 active:scale-90 transition-transform"
-              style={{ color: '#D23D2D', background: '#D23D2D14' }}
-            >
-              Auj.
-            </button>
+          <div className="flex-1" />
+          {planCount > 0 && (
+            <div className="flex items-center gap-1.5 mr-1">
+              <div className="flex items-center gap-0.5">
+                <div className="w-6 h-1.5 rounded-full bg-sep overflow-hidden">
+                  <div className="h-full bg-terra rounded-full transition-all duration-500" style={{ width: `${Math.round((planCount / 14) * 100)}%` }} />
+                </div>
+              </div>
+              <span className="text-[10px] font-black text-muted">{planCount}/14</span>
+            </div>
           )}
           {planCount > 0 && (
             <button
               onClick={handleClearWeek}
-              className="text-[10px] font-black px-2.5 py-1 rounded-full flex-shrink-0 active:scale-90 transition-transform"
-              style={clearWeekConfirm
-                ? { color: '#C0304A', background: '#FDE8F0' }
-                : { color: '#986C58', background: '#6E433D10' }}
+              className={cn(
+                'text-[10px] font-bold px-2 py-1 rounded-full active:scale-90 transition-all',
+                clearWeekConfirm ? 'bg-[#FDE8F0] text-[#C0304A]' : 'text-muted',
+              )}
             >
               {clearWeekConfirm ? 'Confirmer ?' : 'Vider'}
             </button>
@@ -224,7 +223,7 @@ export default function PlanningPage() {
           <button
             onClick={() => changeWeek(1)}
             aria-label="Semaine suivante"
-            className="w-10 h-10 flex items-center justify-center rounded-full border border-border text-muted text-lg font-bold leading-none active:scale-90 transition-transform"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-card border border-border text-muted text-base font-bold leading-none active:scale-90 transition-transform"
           >
             ›
           </button>
@@ -248,7 +247,7 @@ export default function PlanningPage() {
       ) : (
         <>
         {/* Day chips */}
-        <div className="flex gap-1.5 px-5 pb-4">
+        <div className="flex gap-1 px-5 pb-2">
           {Array.from({ length: 7 }).map((_, i) => {
             const d = getDayFromMonday(monday, i)
             const day = weekPlan[i]
@@ -265,6 +264,11 @@ export default function PlanningPage() {
               />
             )
           })}
+        </div>
+
+        {/* Label jour sélectionné */}
+        <div className="px-5 pb-3 pt-1">
+          <p className="text-[13px] font-extrabold text-text1 capitalize">{selectedLabel}</p>
         </div>
 
         {/* Day view avec swipe */}
