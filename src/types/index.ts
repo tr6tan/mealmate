@@ -72,10 +72,13 @@ export interface ShoppingItem {
 
 export type ActiveTab = 'planning' | 'recettes' | 'courses' | 'settings'
 
+export type ThemeName = 'classic' | 'ocean'
+
 export interface AppSettings {
   personnes: number
   nomFoyer: string
   darkMode?: boolean
+  theme?: ThemeName
 }
 
 // Sheets

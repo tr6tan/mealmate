@@ -24,15 +24,20 @@ export default function App() {
   const activeTab = useAppStore((s) => s.activeTab)
   const setCurrentDayIdx = useAppStore((s) => s.setCurrentDayIdx)
   const darkMode = useAppStore((s) => s.settings.darkMode)
+  const theme = useAppStore((s) => s.settings.theme)
 
   // Appliquer/retirer la classe dark sur <html>
   useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
+    document.documentElement.classList.toggle('dark', !!darkMode)
   }, [darkMode])
+
+  // Appliquer la classe du thème sur <html>
+  useEffect(() => {
+    document.documentElement.classList.remove('theme-ocean')
+    if (theme === 'ocean') {
+      document.documentElement.classList.add('theme-ocean')
+    }
+  }, [theme])
 
   // Synchronisation Firestore ↔ store
   useFoyerSync()

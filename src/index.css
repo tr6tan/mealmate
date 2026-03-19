@@ -32,6 +32,34 @@
   --c-muted:  142 142 147; /* #8E8E93 */
 }
 
+/* ── Design tokens — Ocean (thème alternatif) ── */
+/* Palette : ocean blue #2563EB · soft gray #F1F5F9 · teal #0D9488 · coral #F97316 · slate #475569 */
+.theme-ocean {
+  --c-bg:          241 245 249; /* #F1F5F9 — soft gray */
+  --c-card:        255 255 255; /* #FFFFFF — blanc pur */
+  --c-sep:         226 232 240; /* #E2E8F0 — séparateur gris clair */
+  --c-border:      203 213 225; /* #CBD5E1 — bordure slate */
+  --c-text1:        15  23  42; /* #0F172A — slate 900 */
+  --c-text2:        71  85 105; /* #475569 — slate 600 */
+  --c-muted:       148 163 184; /* #94A3B8 — slate 400 */
+  --c-terra:        37  99 235; /* #2563EB — ocean blue */
+  --c-terra-light: 219 234 254; /* #DBEAFE — blue 100 */
+  --c-terra-dark:   29  78 216; /* #1D4ED8 — blue 700 */
+  --c-sage:         13 148 136; /* #0D9488 — teal */
+  --c-sage-light:  204 251 241; /* #CCFBF1 — teal 100 */
+  --c-morning:     251 191  36; /* #FBBF24 — amber */
+  --c-evening:      71  85 105; /* #475569 — slate 600 */
+}
+.theme-ocean.dark {
+  --c-bg:          15  23  42;  /* #0F172A — slate 900 */
+  --c-card:        30  41  59;  /* #1E293B — slate 800 */
+  --c-sep:         51  65  85;  /* #334155 — slate 700 */
+  --c-border:      71  85 105;  /* #475569 — slate 600 */
+  --c-text1:       248 250 252; /* #F8FAFC — slate 50 */
+  --c-text2:       203 213 225; /* #CBD5E1 — slate 300 */
+  --c-muted:       148 163 184; /* #94A3B8 — slate 400 */
+}
+
 @layer base {
   * {
     box-sizing: border-box;

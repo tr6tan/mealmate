@@ -8,7 +8,6 @@ import { showToast } from '@/components/ui/Toast'
 type MealTab = Period
 
 const TABS: { key: MealTab; label: string }[] = [
-  { key: 'pdej', label: 'Petit-dej' },
   { key: 'midi', label: 'Midi' },
   { key: 'soir', label: 'Soir' },
 ]

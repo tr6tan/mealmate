@@ -110,6 +110,13 @@ function saveDarkMode(v: boolean) {
   try { localStorage.setItem('mealmate-dark', v ? '1' : '0') } catch { /* silent */ }
 }
 
+function loadTheme(): 'classic' | 'ocean' {
+  try { return (localStorage.getItem('mealmate-theme') as 'classic' | 'ocean') || 'classic' } catch { return 'classic' }
+}
+function saveTheme(v: string) {
+  try { localStorage.setItem('mealmate-theme', v) } catch { /* silent */ }
+}
+
 // ── Store ─────────────────────────────────────────────────────────────────────
 
 export const useAppStore = create<AppState>()(
@@ -128,6 +135,7 @@ export const useAppStore = create<AppState>()(
         personnes: 2,
         nomFoyer: 'Mon foyer',
         darkMode: loadDarkMode(),
+        theme: loadTheme(),
       },
 
       // ── UI ──
@@ -286,6 +294,7 @@ export const useAppStore = create<AppState>()(
       // ── Settings ──
       updateSettings: (patch) => {
         if (patch.darkMode !== undefined) saveDarkMode(patch.darkMode)
+        if (patch.theme !== undefined) saveTheme(patch.theme)
         set((s) => ({ settings: { ...s.settings, ...patch } }))
       },
 

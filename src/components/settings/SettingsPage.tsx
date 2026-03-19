@@ -59,7 +59,7 @@ export default function SettingsPage() {
 
   // Comptage repas semaine courante
   const mealsCount = Object.values(weekPlan).reduce((acc, day) => {
-    return acc + (['pdej', 'midi', 'soir'] as const).filter(s => !!day[s]).length
+    return acc + (['midi', 'soir'] as const).filter(s => !!day[s]).length
   }, 0)
 
   // Sync badge
@@ -136,6 +136,13 @@ export default function SettingsPage() {
             label="Mode sombre"
             value={settings.darkMode ? 'Actif' : 'Désactivé'}
             onClick={() => updateSettings({ darkMode: !settings.darkMode })}
+          />
+          <SettingsRow
+          icon={<svg className="w-5 h-5 text-text2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>}
+            iconBg={settings.theme === 'ocean' ? 'bg-[#DBEAFE]' : 'bg-[#FDE8D4]'}
+            label="Thème"
+            value={settings.theme === 'ocean' ? '🌊 Ocean' : '🍅 Classique'}
+            onClick={() => updateSettings({ theme: settings.theme === 'ocean' ? 'classic' : 'ocean' })}
           />
         </div>
       </div>
