@@ -112,14 +112,13 @@ export default function ShoppingPage() {
           <div className="w-full space-y-2.5 mt-2">
             <button
               onClick={handleGenerate}
-              className="w-full rounded-2xl py-4 flex items-center justify-center gap-2.5 text-[15px] font-extrabold text-white bg-terra shadow-terra active:scale-[0.97] transition-transform"
+              className="w-full rounded-xl py-3.5 text-sm font-bold text-terra bg-terra-light/60 active:bg-terra-light active:scale-[0.98] transition-all"
             >
-              <span>{'\u2728'}</span>
-              <span>Générer depuis le planning</span>
+              Générer depuis le planning
             </button>
             <button
               onClick={() => openSheet({ sheet: 'add-item' })}
-              className="w-full border-2 border-border rounded-2xl py-3 text-sm font-bold text-muted active:scale-[0.97] transition-transform"
+              className="w-full rounded-xl py-3.5 text-sm font-bold text-muted bg-bg active:bg-border/20 active:scale-[0.98] transition-all"
             >
               + Article manuel
             </button>
