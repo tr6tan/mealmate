@@ -19,7 +19,7 @@ export default function MealCard({ meal, onPress, period }: Props) {
           'active:scale-[0.98] transition-transform duration-150 text-left',
         )}
       >
-        <div className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-[10px] bg-card">
+        <div className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-[10px]">
           <span className="text-lg leading-none">{"\u{1F468}\u200D\u{1F373}"}</span>
         </div>
         <div className="flex-1 min-w-0">
@@ -44,7 +44,7 @@ export default function MealCard({ meal, onPress, period }: Props) {
         'active:scale-[0.98] transition-transform duration-150 text-left',
       )}
     >
-      <div className="w-9 h-9 rounded-[10px] flex-shrink-0 flex items-center justify-center bg-card">
+      <div className="w-9 h-9 rounded-[10px] flex-shrink-0 flex items-center justify-center">
         {meal.emoji
           ? <span className="text-lg leading-none">{meal.emoji}</span>
           : <MealAvatar name={meal.name} size="md" />}
