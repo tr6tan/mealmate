@@ -49,14 +49,6 @@ export default function DayView({ dayIdx }: Props) {
   return (
     <div className="flex flex-col gap-4">
 
-      {/* ── Empty state ────────────────────────────────────────────────────── */}
-      {isEmpty && (
-        <div className="flex items-center gap-3 py-3 px-1">
-          <span className="text-lg">📋</span>
-          <span className="text-xs font-semibold text-muted">Rien de planifié pour ce jour</span>
-        </div>
-      )}
-
       {/* ── Périodes ───────────────────────────────────────────────────────── */}
       {PERIODS.map(({ period, label, slotKey, entreeKey, dessertKey }) => {
         const mainMeal    = slotKey === 'midi' ? plan.midi : plan.soir
