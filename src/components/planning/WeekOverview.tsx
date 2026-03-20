@@ -40,7 +40,7 @@ export default function WeekOverview({ onSelectDay, selectedIdx }: Props) {
           <span className="text-[13px] font-extrabold text-text1">{counts} / 14 repas</span>
           <span className="text-[12px] font-bold text-terra">{pct}%</span>
         </div>
-        <div className="bg-sep rounded-full h-1.5 overflow-hidden">
+        <div className="bg-border/30 rounded-full h-1.5 overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-terra to-[#F4A67A] rounded-full transition-all duration-500"
             style={{ width: `${pct}%` }}
@@ -112,7 +112,7 @@ export default function WeekOverview({ onSelectDay, selectedIdx }: Props) {
                   key={i}
                   onClick={() => onSelectDay(i)}
                   className={cn(
-                    'flex items-center justify-center py-3 transition-colors active:bg-sep/60',
+                    'flex items-center justify-center py-3 transition-colors active:bg-terra-light/40',
                     isToday && 'bg-terra/5',
                   )}
                 >
@@ -121,7 +121,7 @@ export default function WeekOverview({ onSelectDay, selectedIdx }: Props) {
                       ? <span className="text-[18px] leading-none" title={meal.name}>{meal.emoji}</span>
                       : <MealAvatar name={meal.name} size="sm" />
                   ) : (
-                    <span className={cn('w-2 h-2 rounded-full', isToday ? 'bg-terra/20' : 'bg-sep')} />
+                    <span className={cn('w-2 h-2 rounded-full', isToday ? 'bg-terra/20' : 'bg-border')} />
                   )}
                 </button>
               )

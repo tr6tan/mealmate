@@ -146,8 +146,8 @@ export default function DayView({ dayIdx }: Props) {
                     className={cn(
                       'flex-1 py-2 rounded-xl text-[11px] font-bold transition-all',
                       i === dayIdx
-                        ? 'bg-sep text-muted/40'
-                        : 'bg-sep text-text1 active:bg-terra active:text-white',
+                        ? 'bg-bg text-muted/40'
+                        : 'bg-bg text-text1 active:bg-terra active:text-white',
                     )}
                   >
                     {d}

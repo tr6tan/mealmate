@@ -232,7 +232,7 @@ export default function RecipeDetailSheet() {
       {/* ── TABS Ingrédients / Étapes ── */}
       {(hasIngredients || hasSteps) && (
         <>
-          <div className="flex bg-sep/60 rounded-xl p-1 mb-4">
+          <div className="flex bg-bg rounded-xl p-1 mb-4">
             {hasIngredients && (
               <button
                 onClick={() => setActiveSection('ingredients')}
@@ -270,7 +270,7 @@ export default function RecipeDetailSheet() {
                   <IcoUsers />
                   <span>Portions</span>
                 </div>
-                <div className="flex items-center bg-sep rounded-full overflow-hidden">
+                <div className="flex items-center bg-bg rounded-full overflow-hidden">
                   <button
                     onClick={() => setPortions((p) => Math.max(1, p - 1))}
                     className="w-9 h-9 flex items-center justify-center text-text2 font-extrabold text-base active:bg-border transition-colors"
@@ -419,7 +419,7 @@ function ActionButton({ icon, label, active, activeColor, activeBg, onClick }: {
       <div
         className={cn(
           'w-11 h-11 rounded-[14px] flex items-center justify-center transition-colors',
-          active ? '' : 'bg-sep text-muted',
+          active ? '' : 'bg-bg text-muted',
         )}
         style={active ? { background: activeBg, color: activeColor } : undefined}
       >

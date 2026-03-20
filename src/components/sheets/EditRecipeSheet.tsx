@@ -177,7 +177,7 @@ export default function EditRecipeSheet() {
           />
           <button
             onClick={() => setTimeCustom(false)}
-            className="px-3 py-3 rounded-2xl bg-sep text-muted text-xs font-bold"
+            className="px-3 py-3 rounded-2xl bg-bg text-muted text-xs font-bold"
           >
             ← Retour
           </button>

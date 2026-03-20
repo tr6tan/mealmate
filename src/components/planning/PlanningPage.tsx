@@ -202,7 +202,7 @@ export default function PlanningPage() {
           {planCount > 0 && (
             <div className="flex items-center gap-1.5 mr-1">
               <div className="flex items-center gap-0.5">
-                <div className="w-6 h-1.5 rounded-full bg-sep overflow-hidden">
+                <div className="w-6 h-1.5 rounded-full bg-border/30 overflow-hidden">
                   <div className="h-full bg-terra rounded-full transition-all duration-500" style={{ width: `${Math.round((planCount / 14) * 100)}%` }} />
                 </div>
               </div>

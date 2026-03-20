@@ -25,7 +25,7 @@ export default function InviteCard({ onlineCount }: InviteCardProps) {
           Partager l’app
         </p>
         <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${
-          onlineCount > 0 ? 'bg-success-light' : 'bg-sep'
+          onlineCount > 0 ? 'bg-success-light' : 'bg-bg'
         }`}>
           <div className={`w-1.5 h-1.5 rounded-full ${
             onlineCount > 0 ? 'bg-success animate-pulse' : 'bg-muted'
@@ -56,7 +56,7 @@ export default function InviteCard({ onlineCount }: InviteCardProps) {
 
       {/* Lien */}
       <div className="flex items-center gap-2">
-        <div className="flex-1 px-3 py-2.5 bg-sep rounded-xl border border-border overflow-hidden">
+        <div className="flex-1 px-3 py-2.5 bg-bg rounded-xl border border-border overflow-hidden">
           <p className="text-[11px] font-bold text-muted truncate">{url}</p>
         </div>
         <button

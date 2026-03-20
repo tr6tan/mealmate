@@ -76,7 +76,7 @@ export default function ShoppingItemRow({ item }: Props) {
       {item.qty && (
         <span className={cn(
           'text-[11px] font-bold px-2 py-0.5 rounded-lg whitespace-nowrap transition-all duration-200',
-          item.checked ? 'bg-sep/50 text-muted/40' : 'bg-terra-light text-terra font-extrabold',
+          item.checked ? 'bg-border/30 text-muted/40' : 'bg-terra-light text-terra font-extrabold',
         )}>
           {item.qty}
         </span>

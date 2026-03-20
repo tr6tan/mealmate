@@ -124,7 +124,7 @@ export default function AddMealSheet() {
             className={cn(
               'text-xs font-extrabold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-all active:scale-95',
               showFreeForm
-                ? 'bg-sep text-muted'
+                ? 'bg-bg text-muted'
                 : 'bg-terra-light text-terra',
             )}
           >
@@ -156,7 +156,7 @@ export default function AddMealSheet() {
                 'w-full py-2.5 rounded-xl text-sm font-extrabold transition-all active:scale-[0.97]',
                 freeName.trim()
                   ? 'bg-terra text-white shadow-terra-sm'
-                  : 'bg-sep text-muted cursor-not-allowed',
+                  : 'bg-bg text-muted cursor-not-allowed',
               )}
             >
               Ajouter ce repas
@@ -187,7 +187,7 @@ export default function AddMealSheet() {
                 </button>
               )}
             </div>
-            <div className="flex bg-sep rounded-xl p-0.5 mb-3 gap-0.5">
+            <div className="flex bg-bg rounded-xl p-0.5 mb-3 gap-0.5">
               {TABS.map((t) => (
                 <button
                   key={t.key}
@@ -231,7 +231,7 @@ export default function AddMealSheet() {
                   <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                     <span className="text-[11px] text-muted font-semibold">{recipe.time}</span>
                     {recipe.period !== activeTab && (
-                      <span className="text-[10px] font-bold text-muted bg-sep px-1.5 py-0.5 rounded-md">
+                      <span className="text-[10px] font-bold text-muted bg-border/20 px-1.5 py-0.5 rounded-md">
                         {PERIOD_LABEL[recipe.period]}
                       </span>
                     )}

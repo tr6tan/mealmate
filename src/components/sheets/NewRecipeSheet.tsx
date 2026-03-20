@@ -205,7 +205,7 @@ export default function NewRecipeSheet() {
       </div>
 
       {/* Onglets Créer / Importer */}
-      <div className="flex gap-2 mb-5 p-1 bg-sep rounded-2xl">
+      <div className="flex gap-2 mb-5 p-1 bg-bg rounded-2xl">
         <button
           onClick={() => setMode('create')}
           className={cn(
@@ -284,7 +284,7 @@ export default function NewRecipeSheet() {
                   <img
                     src={`${meal.strMealThumb}/preview`}
                     alt={meal.strMeal}
-                    className="w-14 h-14 rounded-xl object-cover flex-shrink-0 bg-sep"
+                    className="w-14 h-14 rounded-xl object-cover flex-shrink-0 bg-bg"
                     loading="lazy"
                   />
                   <div className="flex-1 min-w-0">
@@ -387,7 +387,7 @@ export default function NewRecipeSheet() {
               />
               <button
                 onClick={() => setTimeCustom(false)}
-                className="px-3 py-3 rounded-2xl bg-sep text-muted text-xs font-bold"
+                className="px-3 py-3 rounded-2xl bg-bg text-muted text-xs font-bold"
               >
                 ← Retour
               </button>

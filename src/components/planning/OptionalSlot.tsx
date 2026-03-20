@@ -13,7 +13,7 @@ export default function OptionalSlot({ label, meal, onPress }: Props) {
     return (
       <button
         onClick={onPress}
-        className="w-full flex items-center gap-1.5 px-2 py-1 rounded-lg text-left active:bg-sep transition-colors"
+        className="w-full flex items-center gap-1.5 px-2 py-1 rounded-lg text-left active:bg-terra-light/40 transition-colors"
       >
         {meal.emoji
           ? <span className="text-sm leading-none">{meal.emoji}</span>

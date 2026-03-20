@@ -143,7 +143,7 @@ export default function ShoppingPage() {
                 {remaining > 0 ? `${remaining} restant${remaining > 1 ? 's' : ''}` : ''}
               </span>
             </div>
-            <div className="w-full h-2 bg-sep rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-border/30 rounded-full overflow-hidden">
               <div
                 className={cn(
                   'h-full rounded-full transition-all duration-700 ease-out',

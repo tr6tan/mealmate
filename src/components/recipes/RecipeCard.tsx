@@ -51,7 +51,7 @@ export default function RecipeCard({ recipe, view, onClick, planCount = 0 }: Pro
           <div className="flex items-center gap-2 mt-0.5">
             <p className="text-[11px] text-muted font-semibold">{recipe.time}</p>
             {recipe.tags?.map((t) => (
-              <span key={t} className="text-[9px] font-bold px-1 py-0.5 rounded bg-sep text-muted">{TAG_LABEL[t]}</span>
+              <span key={t} className="text-[9px] font-bold px-1 py-0.5 rounded bg-border/20 text-muted">{TAG_LABEL[t]}</span>
             ))}
             {planCount > 0 && (
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md text-terra bg-terra/[0.07]">
