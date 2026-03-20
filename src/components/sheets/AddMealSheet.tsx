@@ -8,9 +8,9 @@ import MealAvatar from '@/components/ui/MealAvatar'
 
 type MealTab = Period
 
-const TABS: { key: MealTab; label: string }[] = [
-  { key: 'midi', label: 'Midi' },
-  { key: 'soir', label: 'Soir' },
+const TABS: { key: MealTab; label: string; emoji: string }[] = [
+  { key: 'midi', label: 'Midi', emoji: '☀️' },
+  { key: 'soir', label: 'Soir', emoji: '🌙' },
 ]
 
 export default function AddMealSheet() {
@@ -187,18 +187,19 @@ export default function AddMealSheet() {
                 </button>
               )}
             </div>
-            <div className="flex bg-bg rounded-xl p-0.5 mb-3 gap-0.5">
+            <div className="flex bg-border/20 rounded-2xl p-1 mb-3 gap-1">
               {TABS.map((t) => (
                 <button
                   key={t.key}
                   onClick={() => setActiveTab(t.key)}
                   className={cn(
-                    'flex-1 py-1.5 text-center text-[11px] font-extrabold rounded-[10px] transition-all duration-200',
+                    'flex-1 py-2 text-center text-xs font-extrabold rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5',
                     activeTab === t.key
                       ? 'bg-card text-terra shadow-sm'
                       : 'text-muted',
                   )}
                 >
+                  <span className="text-sm leading-none">{t.emoji}</span>
                   {t.label}
                 </button>
               ))}
