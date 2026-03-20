@@ -44,7 +44,7 @@ export default function MealCard({ meal, onPress, period }: Props) {
         'active:scale-[0.98] transition-transform duration-150 text-left',
       )}
     >
-      <div className="w-10 h-10 rounded-[10px] flex-shrink-0 flex items-center justify-center bg-sep">
+      <div className="w-10 h-10 rounded-[10px] flex-shrink-0 flex items-center justify-center bg-white">
         {meal.emoji
           ? <span className="text-xl leading-none">{meal.emoji}</span>
           : <MealAvatar name={meal.name} size="lg" />}
