@@ -40,7 +40,6 @@ export default function MealCard({ meal, onPress, period }: Props) {
       onClick={onPress}
       className={cn(
         'w-full rounded-xl px-3 py-2.5 flex items-center gap-3',
-        'bg-bg',
         'active:scale-[0.98] transition-transform duration-150 text-left',
       )}
     >
