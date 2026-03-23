@@ -100,6 +100,7 @@ export const RECIPE_PHOTOS: Record<string, string> = {
   'Bowl quinoa poulet provençal': 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&q=80',
   'Pâtes courgette carbo parmesan': 'https://images.unsplash.com/photo-1612874742237-6526221588e3?w=400&q=80',
   'Crevettes quinoa aubergines': 'https://images.unsplash.com/photo-1559314809-0d155014e29e?w=400&q=80',
+  'Pad thai poulet': 'https://images.unsplash.com/photo-1559314809-0d155014e29e?w=400&q=80',
 }
 
 export const DEFAULT_RECIPES: Recipe[] = [
@@ -2260,6 +2261,36 @@ export const DEFAULT_RECIPES: Recipe[] = [
       'Ajouter les tomates en dés aux aubergines les 5 dernières minutes.',
       'Sauter les crevettes à la poêle avec l\'ail 3-4 min.',
       'Dresser le quinoa, les légumes rôtis et les crevettes.',
+    ],
+  },
+  {
+    id: 'pad-thai-poulet',
+    name: 'Pad thai poulet',
+    emoji: '🍜',
+    period: 'soir',
+    time: '25 min',
+    fav: false,
+    rapide: true,
+    photo: RECIPE_PHOTOS['Pad thai poulet'],
+    ingredients: [
+      { name: 'Nouilles de riz', qty: '250g', category: 'epicerie' },
+      { name: 'Filets de poulet', qty: '300g', category: 'viandes' },
+      { name: 'Cacahuètes', qty: '50g', category: 'epicerie' },
+      { name: 'Œufs', qty: '2', category: 'cremerie' },
+      { name: 'Germes de soja', qty: '100g', category: 'legumes' },
+      { name: 'Citron vert', qty: '1', category: 'legumes' },
+      { name: 'Sauce soja', qty: '3 c.à.s', category: 'epicerie' },
+      { name: 'Sauce poisson (nuoc-mâm)', qty: '2 c.à.s', category: 'epicerie' },
+      { name: 'Sucre', qty: '1 c.à.s', category: 'epicerie' },
+      { name: 'Huile', qty: '2 c.à.s', category: 'epicerie' },
+    ],
+    steps: [
+      'Tremper les nouilles de riz dans l\'eau chaude 10 min, égoutter.',
+      'Mélanger sauce soja, nuoc-mâm et sucre pour la sauce.',
+      'Sauter le poulet coupé en lanières au wok à feu vif.',
+      'Pousser sur le côté, brouiller les œufs dans le wok.',
+      'Ajouter les nouilles et la sauce, mélanger 2 min.',
+      'Servir avec les germes de soja, cacahuètes concassées et citron vert.',
     ],
   },
 ]
