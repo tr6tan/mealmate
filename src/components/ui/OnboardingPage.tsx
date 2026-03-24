@@ -2,7 +2,7 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-svh flex flex-col items-center justify-center gap-8 bg-bg px-6">
       {/* Logo */}
-      <img src="/favicon.svg" alt="MealMate" className="w-24 h-24 rounded-2xl shadow-card" />
+      <img src="/logo-source.png" alt="MealMate" className="w-24 h-24 rounded-2xl shadow-card" />
 
       {/* Titre */}
       <div className="text-center">

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const outDir    = resolve(__dirname, '../public/icons')
-const source    = resolve(__dirname, '../public/logo-source.svg')
+const source    = resolve(__dirname, '../public/logo-source.png')
 
 const icons = [
   // Icônes standard (favicon, apple touch icon)

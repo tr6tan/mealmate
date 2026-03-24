@@ -1,25 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#EF514A"/>
-      <stop offset="100%" stop-color="#C42A1C"/>
-    </linearGradient>
-  </defs>
-
   <!-- Background (full bleed — OS applies its own mask) -->
-  <rect width="512" height="512" fill="url(#bg)"/>
+  <rect width="512" height="512" fill="#EDE0C8"/>
 
-  <!-- Fork -->
-  <g fill="#F8EECB">
-    <rect x="162" y="82" width="14" height="92" rx="7"/>
-    <rect x="184" y="82" width="14" height="92" rx="7"/>
-    <rect x="206" y="82" width="14" height="92" rx="7"/>
-    <path d="M 162,165 L 220,165 L 220,192 Q 220,212 198,212 L 198,422 Q 198,432 191,432 Q 184,432 184,422 L 184,212 Q 162,212 162,192 Z"/>
-  </g>
+  <!-- Basket with groceries -->
+  <g fill="#2B3A67">
+    <!-- Basket handle -->
+    <path d="M 210,140 A 92,92 0 0 1 302,140 L 302,160 A 72,72 0 0 0 210,160 Z"/>
 
-  <!-- Knife -->
-  <g fill="#F8EECB">
-    <path d="M 322,82 Q 350,82 350,115 L 350,206 Q 350,218 338,218 L 306,218 Q 294,218 294,206 L 294,115 Q 294,82 322,82 Z"/>
-    <rect x="312" y="216" width="20" height="216" rx="10"/>
+    <!-- Bottle (left side, sticking out of basket) -->
+    <rect x="190" y="130" width="32" height="70" rx="6"/>
+    <rect x="198" y="108" width="16" height="30" rx="4"/>
+    <rect x="194" y="104" width="24" height="10" rx="3"/>
+
+    <!-- Round item / apple (right side, sticking out) -->
+    <circle cx="310" cy="170" r="30"/>
+    <!-- Apple stem -->
+    <rect x="307" y="138" width="6" height="14" rx="2"/>
+
+    <!-- Basket body -->
+    <path d="M 140,200 L 372,200 L 352,370 Q 348,390 328,390 L 184,390 Q 164,390 160,370 Z"/>
+
+    <!-- Basket horizontal lines -->
+    <rect x="148" y="240" width="216" height="4" rx="2" fill="#EDE0C8" opacity="0.3"/>
+    <rect x="155" y="290" width="202" height="4" rx="2" fill="#EDE0C8" opacity="0.3"/>
+    <rect x="160" y="340" width="190" height="4" rx="2" fill="#EDE0C8" opacity="0.3"/>
   </g>
 </svg>

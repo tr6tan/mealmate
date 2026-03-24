@@ -87,7 +87,7 @@ export default function SettingsPage() {
       {/* ── Hero ── */}
       <div className="px-5 pt-5 pb-4">
         <div className="bg-card rounded-2xl border-[1.5px] border-border p-4 flex items-center gap-4">
-          <img src="/favicon.svg" alt="MealMate" className="w-12 h-12 rounded-xl flex-shrink-0" />
+          <img src="/logo-source.png" alt="MealMate" className="w-12 h-12 rounded-xl flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <h2 className="text-[17px] font-black text-text1">MealMate</h2>
             <p className="text-[12px] text-muted font-semibold mt-0.5">
