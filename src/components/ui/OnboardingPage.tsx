@@ -1,8 +1,17 @@
 export default function OnboardingPage() {
   return (
     <div className="min-h-svh flex flex-col items-center justify-center gap-8 bg-bg px-6">
-      {/* Logo */}
-      <img src="/logo-source.png" alt="MealMate" className="w-24 h-24 rounded-2xl shadow-card" />
+      {/* Logo – liquid glass */}
+      <div className="relative w-28 h-28 flex items-center justify-center">
+        {/* Glow derrière */}
+        <div className="absolute inset-0 rounded-[26px] bg-terra/30 blur-xl scale-110" />
+        {/* Glass container */}
+        <div className="relative w-24 h-24 rounded-[22px] bg-white/20 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.12)] flex items-center justify-center overflow-hidden">
+          {/* Reflet brillant */}
+          <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/50 to-transparent rounded-t-[22px] pointer-events-none" />
+          <img src="/logo-source.png" alt="MealMate" className="relative w-[72px] h-[72px] drop-shadow-sm" />
+        </div>
+      </div>
 
       {/* Titre */}
       <div className="text-center">
