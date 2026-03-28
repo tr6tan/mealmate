@@ -139,15 +139,16 @@ export default function AddMealSheet() {
           <div className="mb-3.5 bg-terra-light/50 rounded-2xl p-3.5">
             <input
               type="text"
+              inputMode="text"
               placeholder="Nom du repas…"
               value={freeName}
               onChange={(e) => setFreeName(e.target.value)}
-              autoComplete="off"
-              autoCorrect="off"
+              autoComplete="on"
+              autoCorrect="on"
               autoCapitalize="sentences"
-              spellCheck={false}
+              spellCheck={true}
               enterKeyHint="done"
-              className="w-full px-3.5 py-2.5 rounded-xl bg-card text-sm font-semibold text-text1 border-[1.5px] border-border outline-none placeholder:text-muted mb-2.5"
+              className="w-full px-3.5 py-2.5 rounded-xl bg-card text-base font-semibold text-text1 border-[1.5px] border-border focus:border-terra/40 outline-none placeholder:text-muted mb-2.5 transition-colors"
             />
             <button
               onClick={handleFree}
@@ -167,19 +168,20 @@ export default function AddMealSheet() {
         {/* Recherche + Onglets (figés) */}
         {!showFreeForm && (
           <>
-            <div className="flex items-center gap-2 px-3 py-2.5 mb-2.5 rounded-xl bg-bg border-[1.5px] border-border">
+            <div className="flex items-center gap-2 px-3 py-2.5 mb-2.5 rounded-xl bg-bg border-[1.5px] border-border focus-within:border-terra/40 transition-colors">
               <svg className="w-3.5 h-3.5 text-muted flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input
-                type="text"
+                type="search"
+                inputMode="search"
                 placeholder="Chercher une recette…"
                 value={search}
                 onChange={(e) => updateSearch(e.target.value)}
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="off"
-                spellCheck={false}
+                autoComplete="on"
+                autoCorrect="on"
+                autoCapitalize="sentences"
+                spellCheck={true}
                 enterKeyHint="search"
-                className="flex-1 bg-transparent outline-none text-[13px] font-semibold text-text1 placeholder:text-muted"
+                className="flex-1 bg-transparent outline-none text-base font-semibold text-text1 placeholder:text-muted"
               />
               {search && (
                 <button onClick={() => updateSearch('')} className="text-muted flex items-center active:scale-90 transition-transform">

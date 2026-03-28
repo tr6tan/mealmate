@@ -126,17 +126,23 @@ export default function RecipesPage() {
       </div>
 
       {/* Search */}
-      <div className="mx-5 mb-3.5 bg-card rounded-2xl px-3.5 py-3 flex items-center gap-2.5 border-[1.5px] border-border">
+      <div className="mx-5 mb-3.5 bg-card rounded-2xl px-3.5 py-3 flex items-center gap-2.5 border-[1.5px] border-border focus-within:border-terra/40 transition-colors">
         <svg className="w-4 h-4 text-muted flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <circle cx="11" cy="11" r="8"/>
           <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
         <input
-          type="text"
+          type="search"
+          inputMode="search"
           placeholder="Chercher une recette…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 bg-transparent border-none outline-none font-[Nunito] text-sm font-semibold text-text1 placeholder:text-muted"
+          autoComplete="on"
+          autoCorrect="on"
+          autoCapitalize="sentences"
+          spellCheck={true}
+          enterKeyHint="search"
+          className="flex-1 bg-transparent border-none outline-none text-base font-semibold text-text1 placeholder:text-muted"
         />
         {search && (
           <button onClick={() => setSearch('')} className="text-muted flex items-center" aria-label="Effacer la recherche">

@@ -115,20 +115,20 @@
     user-select: auto;
   }
 
-  /* Focus visible rings pour l'accessibilité clavier */
+  /* Focus visible rings pour l'accessibilité clavier (boutons uniquement) */
   button:focus-visible, a:focus-visible, [role="button"]:focus-visible {
     outline: 2px solid rgb(var(--c-terra));
     outline-offset: 2px;
     border-radius: 8px;
   }
+  /* Inputs : pas d'outline rouge, on utilise un ring subtil via border */
   input:focus-visible, textarea:focus-visible, select:focus-visible {
-    outline: 2px solid rgb(var(--c-terra));
-    outline-offset: 0px;
+    outline: none;
   }
 
   /* iOS : force font-size ≥ 16px sur les inputs pour éviter le zoom automatique */
   input, textarea, select {
-    font-size: max(16px, 1em);
+    font-size: 16px !important;
   }
 
   /* Masquer les scrollbars */
