@@ -81,6 +81,81 @@ export function haptic(pattern: number | number[] = 8) {
   try { navigator.vibrate?.(pattern) } catch { /* silencé si non supporté */ }
 }
 
+// ── Recherche floue (fuzzy search) ──────────────────────────────────────────
+
+/** Retire accents + minuscules */
+function normalizeStr(s: string): string {
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
+}
+
+/** Distance de Levenshtein bornée */
+function levenshtein(a: string, b: string): number {
+  if (Math.abs(a.length - b.length) > 3) return 99
+  const m = a.length, n = b.length
+  const dp: number[][] = Array.from({ length: m + 1 }, (_, i) =>
+    Array.from({ length: n + 1 }, (_, j) => i === 0 ? j : j === 0 ? i : 0)
+  )
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = a[i - 1] === b[j - 1]
+        ? dp[i - 1][j - 1]
+        : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
+  return dp[m][n]
+}
+
+/**
+ * Recherche floue : retourne un score > 0 si `query` matche `target`.
+ * Tolère fautes de frappe, accents manquants, sous-chaînes.
+ * Score plus élevé = meilleur match.
+ */
+export function fuzzyScore(query: string, target: string): number {
+  const q = normalizeStr(query)
+  const t = normalizeStr(target)
+  if (!q) return 1 // query vide → tout match
+  if (t === q) return 100 // exact
+  if (t.includes(q)) return 80 // sous-chaîne exacte
+  if (q.length >= 3 && t.startsWith(q)) return 90 // préfixe
+
+  // Recherche par mots du query dans le target
+  const qWords = q.split(/\s+/).filter(w => w.length >= 2)
+  const tWords = t.split(/\s+/)
+  if (qWords.length === 0) return 1
+
+  let totalScore = 0
+  for (const qw of qWords) {
+    let bestWord = 0
+    for (const tw of tWords) {
+      if (tw.includes(qw)) { bestWord = 60; break }
+      if (qw.length >= 3 && tw.startsWith(qw)) { bestWord = Math.max(bestWord, 55); continue }
+      const d = levenshtein(qw, tw)
+      if (d <= 1 && qw.length >= 3) bestWord = Math.max(bestWord, 40)
+      else if (d <= 2 && qw.length >= 5) bestWord = Math.max(bestWord, 20)
+    }
+    // Aussi tester contre le target entier (ex: "bolo" dans "bolognaise")
+    if (bestWord < 60 && t.includes(qw)) bestWord = Math.max(bestWord, 50)
+    totalScore += bestWord
+  }
+
+  return totalScore / qWords.length
+}
+
+/**
+ * Filtre + trie une liste par pertinence fuzzy.
+ * Retourne uniquement les éléments avec un score suffisant.
+ */
+export function fuzzyFilter<T>(
+  items: T[],
+  query: string,
+  getText: (item: T) => string,
+  minScore = 15,
+): (T & { _fuzzyScore: number })[] {
+  if (!query.trim()) return items.map(item => ({ ...item, _fuzzyScore: 1 }))
+  return items
+    .map(item => ({ ...item, _fuzzyScore: fuzzyScore(query, getText(item)) }))
+    .filter(item => item._fuzzyScore >= minScore)
+    .sort((a, b) => b._fuzzyScore - a._fuzzyScore)
+}
+
 /** Redimensionne + compresse une image (File) en base64 JPEG */
 export function resizeToBase64(file: File, maxW = 800, quality = 0.72): Promise<string> {
   return new Promise((resolve, reject) => {

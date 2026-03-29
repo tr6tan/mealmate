@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import type { Period, DietaryTag } from '@/types'
-import { cn } from '@/lib/utils'
+import { cn, fuzzyScore } from '@/lib/utils'
 import RecipeCard from './RecipeCard'
 
 type FilterKey = 'all' | Period | 'fav' | 'rapide' | DietaryTag
@@ -58,7 +58,7 @@ export default function RecipesPage() {
         (filter === 'fav' && r.fav) ||
         (filter === 'rapide' && r.rapide) ||
         (DIETARY_TAGS.includes(filter as DietaryTag) && r.tags?.includes(filter as DietaryTag))
-      const matchSearch = r.name.toLowerCase().includes(search.toLowerCase())
+      const matchSearch = search ? fuzzyScore(search, r.name) >= 15 : true
       return matchFilter && matchSearch
     })
     if (favFirst) list = [...list.filter((r) => r.fav), ...list.filter((r) => !r.fav)]

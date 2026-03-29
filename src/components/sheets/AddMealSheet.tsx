@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import type { Period, Recipe } from '@/types'
-import { cn, PERIOD_LABEL, haptic } from '@/lib/utils'
+import { cn, PERIOD_LABEL, haptic, fuzzyScore } from '@/lib/utils'
 import { showToast } from '@/components/ui/Toast'
 import MealAvatar from '@/components/ui/MealAvatar'
 
@@ -68,17 +68,23 @@ export default function AddMealSheet() {
   }, [weekPlans, recipes])
 
   // Tri : période correspondante en tête, puis popularité + favori
-  const filtered = useMemo(() =>
-    recipes
-      .filter((r) => r.name.toLowerCase().includes(debouncedSearch.toLowerCase()))
-      .sort((a, b) => {
-        const periodA = a.period === activeTab ? 1 : 0
-        const periodB = b.period === activeTab ? 1 : 0
-        const sA = periodA * 10 + (planCounts[a.id] ?? 0) * 2 + (a.fav ? 1 : 0)
-        const sB = periodB * 10 + (planCounts[b.id] ?? 0) * 2 + (b.fav ? 1 : 0)
-        return sB - sA
-      })
-  , [recipes, activeTab, debouncedSearch, planCounts])
+  const filtered = useMemo(() => {
+    const base = recipes.map(r => ({
+      ...r,
+      _fuzzy: fuzzyScore(debouncedSearch, r.name),
+    })).filter(r => r._fuzzy >= (debouncedSearch ? 15 : 1))
+
+    return base.sort((a, b) => {
+      // Si recherche active, prioriser le score fuzzy
+      if (debouncedSearch) return b._fuzzy - a._fuzzy
+      // Sinon tri par période + popularité + favori
+      const periodA = a.period === activeTab ? 1 : 0
+      const periodB = b.period === activeTab ? 1 : 0
+      const sA = periodA * 10 + (planCounts[a.id] ?? 0) * 2 + (a.fav ? 1 : 0)
+      const sB = periodB * 10 + (planCounts[b.id] ?? 0) * 2 + (b.fav ? 1 : 0)
+      return sB - sA
+    })
+  }, [recipes, activeTab, debouncedSearch, planCounts])
 
   const handleSelect = (recipe: Recipe) => {
     if (!context) return

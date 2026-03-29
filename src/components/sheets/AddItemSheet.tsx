@@ -196,12 +196,12 @@ export default function AddItemSheet() {
           value={name}
           onChange={(e) => handleNameChange(e.target.value)}
           onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 300)}
-          autoComplete="off"
-          autoCorrect="off"
+          autoComplete="on"
+          autoCorrect="on"
           autoCapitalize="sentences"
-          spellCheck={false}
+          spellCheck={true}
           enterKeyHint="next"
-          className="w-full px-3.5 py-3 bg-card border-[1.5px] border-border rounded-2xl text-sm font-semibold text-text1 outline-none placeholder:text-muted focus:border-terra transition-colors"
+          className="w-full px-3.5 py-3 bg-card border-[1.5px] border-border rounded-2xl text-base font-semibold text-text1 outline-none placeholder:text-muted focus:border-terra transition-colors"
         />
         <input
           type="text"
@@ -209,12 +209,12 @@ export default function AddItemSheet() {
           value={qty}
           onChange={(e) => setQty(e.target.value)}
           onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 300)}
-          autoComplete="off"
-          autoCorrect="off"
+          autoComplete="on"
+          autoCorrect="on"
           autoCapitalize="off"
-          spellCheck={false}
+          spellCheck={true}
           enterKeyHint="done"
-          className="w-full px-3.5 py-3 bg-card border-[1.5px] border-border rounded-2xl text-sm font-semibold text-text1 outline-none placeholder:text-muted focus:border-terra transition-colors"
+          className="w-full px-3.5 py-3 bg-card border-[1.5px] border-border rounded-2xl text-base font-semibold text-text1 outline-none placeholder:text-muted focus:border-terra transition-colors"
         />
       </div>
 
