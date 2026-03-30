@@ -60,11 +60,13 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
     let startY = 0
     let startTime = 0
     let touchInScrollable = false
+    let gestureDisabled = false
 
     const onStart = (e: TouchEvent) => {
       startY = e.touches[0].clientY
       startTime = Date.now()
       touchInScrollable = false
+      gestureDisabled = false
 
       // Vérifie si le touch démarre dans un enfant scrollable
       let node = e.target as HTMLElement | null
@@ -74,10 +76,9 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
           window.getComputedStyle(node).overflowY !== 'hidden'
         ) {
           touchInScrollable = true
-          // Si le contenu est déjà scrollé vers le bas, on ne ferme jamais
+          // Si le contenu est déjà scrollé (pas en haut), on bloque le geste de fermeture
           if (node.scrollTop > 2) {
-            touchInScrollable = false // pas de close possible
-            startY = -9999 // neutralise le geste
+            gestureDisabled = true
           }
           break
         }
@@ -86,6 +87,8 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
     }
 
     const onEnd = (e: TouchEvent) => {
+      if (gestureDisabled) return // touch dans zone scrollée → on ne ferme jamais
+
       const deltaY = e.changedTouches[0].clientY - startY
       const elapsed = Date.now() - startTime
 

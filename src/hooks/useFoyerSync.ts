@@ -137,9 +137,12 @@ export function useFoyerSync() {
       hydrate(data)
       remoteUpdateDepth.current--
 
-      // Seul un snapshot serveur (pas cache) débloque les écritures
+      // Débloque les écritures Store→Firestore dès qu'on a reçu des données
+      // (y compris depuis le cache) pour éviter de perdre les modifications
+      // locales faites entre le snapshot cache et le snapshot serveur.
+      hasServerData.current = true
+
       if (!snap.metadata.fromCache) {
-        hasServerData.current = true
         setSyncStatus('updated')
         setTimeout(() => setSyncStatus('synced'), 2500)
       }
