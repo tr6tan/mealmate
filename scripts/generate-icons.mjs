@@ -4,7 +4,9 @@ import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const outDir    = resolve(__dirname, '../public/icons')
-const source    = resolve(__dirname, '../public/logo-source.png')
+const publicDir = resolve(__dirname, '../public')
+const logoSvg   = resolve(publicDir, 'logo-source.svg')
+const ogSvg     = resolve(publicDir, 'og-image-source.svg')
 
 const icons = [
   // Icônes standard (favicon, apple touch icon)
@@ -15,13 +17,21 @@ const icons = [
   { name: 'manifest-icon-512.maskable.png', size: 512 },
 ]
 
+// Icônes app depuis logo-source.svg
 for (const { name, size } of icons) {
-  await sharp(source, { density: 300 })
+  await sharp(logoSvg, { density: 300 })
     .resize(size, size)
     .png()
     .toFile(`${outDir}/${name}`)
   console.log(`✓ ${name} (${size}px)`)
 }
 
-console.log('\nTous les icônes générés avec succès.')
+// OG image depuis og-image-source.svg
+await sharp(ogSvg, { density: 150 })
+  .resize(1200, 630)
+  .png()
+  .toFile(resolve(publicDir, 'og-image.png'))
+console.log('✓ og-image.png (1200×630)')
+
+console.log('\nTous les assets générés avec succès.')
 
