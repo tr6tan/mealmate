@@ -9,7 +9,14 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Nunito', 'system-ui', 'sans-serif'],
+        sans: [
+          'Plus Jakarta Sans',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'SF Pro Text',
+          'system-ui',
+          'sans-serif',
+        ],
       },
       colors: {
         bg:     'rgb(var(--c-bg)     / <alpha-value>)',
@@ -46,8 +53,8 @@ const config: Config = {
       },
       boxShadow: {
         card: '0 2px 16px rgba(0,0,0,0.07)',
-        terra: '0 8px 24px rgba(224,123,84,0.45)',
-        'terra-sm': '0 4px 12px rgba(224,123,84,0.4)',
+        terra: '0 8px 24px rgba(0,24,168,0.35)',
+        'terra-sm': '0 4px 12px rgba(0,24,168,0.28)',
       },
     },
   },

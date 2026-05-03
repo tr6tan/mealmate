@@ -94,6 +94,7 @@ interface AppState {
   removeShoppingItem: (id: string) => void
   clearCheckedItems: () => void
   clearAllItems: () => void
+  setAllChecked: (checked: boolean) => void
 
   // Actions — Settings
   updateSettings: (patch: Partial<AppSettings>) => void
@@ -290,6 +291,9 @@ export const useAppStore = create<AppState>()(
         set((s) => ({ shoppingItems: s.shoppingItems.filter((i) => !i.checked) })),
 
       clearAllItems: () => set({ shoppingItems: [] }),
+
+      setAllChecked: (checked) =>
+        set((s) => ({ shoppingItems: s.shoppingItems.map((i) => ({ ...i, checked })) })),
 
       // ── Settings ──
       updateSettings: (patch) => {

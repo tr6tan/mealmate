@@ -3,18 +3,18 @@
 @tailwind utilities;
 
 /* ── Design tokens — Light ── */
-/* Palette : fire red #D23D2D · vanilla cream #F8EECB · retro green #31603D · saffron #F5C065 · russet #6E433D */
+/* Palette : ios blue #0018A8 · warm beige #F4F1EA · retro green #31603D · saffron #F5C065 */
 :root {
-  --c-bg:          245 240 225; /* #F5F0E1 — beige chaud neutre */
-  --c-card:        255 253 245; /* #FFFDF5 — ivoire légèrement plus chaud */
-  --c-sep:         229 217 160; /* #E5D9A0 — séparateur doré, un chouïa plus contrasté */
-  --c-border:      201 185 122; /* #C9B97A — bordure dorée plus affirmée */
-  --c-text1:        40  16   8; /* #281008 — brun très foncé */
-  --c-text2:       110  67  61; /* #6E433D — russet */
-  --c-muted:       152 108  88; /* #986C58 — brun moyen léger */
-  --c-terra:       210  61  45; /* #D23D2D — fire red */
-  --c-terra-light: 250 220 215; /* #FADCD7 — fire red très clair */
-  --c-terra-dark:  155  30  18; /* #9B1E12 */
+  --c-bg:          244 241 234; /* #F4F1EA — beige chaud */
+  --c-card:        255 255 255; /* #FFFFFF */
+  --c-sep:         224 228 240; /* #E0E4F0 — bleu-gris doux */
+  --c-border:      200 205 223; /* #C8CDDF — bleu-gris medium */
+  --c-text1:        13  17  23; /* #0D1117 — quasi-noir cool */
+  --c-text2:        61  74 110; /* #3D4A6E — bleu slate */
+  --c-muted:       123 132 163; /* #7B84A3 — bleu muted */
+  --c-terra:         0  24 168; /* #0018A8 — ios blue */
+  --c-terra-light: 220 224 255; /* #DCE0FF — bleu très clair */
+  --c-terra-dark:    0  18 140; /* #00128C — bleu foncé */
   --c-sage:         49  96  61; /* #31603D — retro green */
   --c-sage-light:  185 215 190; /* #B9D7BE — vert sauge clair */
   --c-morning:     245 192 101; /* #F5C065 — saffron (petit-déj) */
@@ -98,13 +98,30 @@
   }
 
   body {
-    font-family: 'Nunito', system-ui, sans-serif;
-    /* Pas de background sur le body : le beige vient du AppShell.
-       Le fond html (ivoire = couleur nav) bouche la zone safe-area du bas sur iOS PWA. */
+    /*
+     * ── MealMate type stack ─────────────────────────────────
+     * Display : Plus Jakarta Sans variable (Google Fonts)
+     *   — variable wght 200–800, alternate cv01/cv04 actifs
+     *   — tracking négatif sur les gros titres (signature iOS SF Pro)
+     * Fallback : -apple-system → SF Pro sur iOS/macOS
+     *            BlinkMacSystemFont → SF Pro sur Chrome macOS
+     * ────────────────────────────────────────────────────────
+     */
+    font-family:
+      'Plus Jakarta Sans',
+      -apple-system,
+      BlinkMacSystemFont,
+      'SF Pro Text',
+      'SF Pro Display',
+      system-ui,
+      sans-serif;
+    font-optical-sizing: auto;
+    /* Active les formes alternatives (a, g, y single-story) */
+    font-feature-settings: 'cv01' 1, 'cv04' 1, 'ss01' 1;
     background-color: transparent;
     color: rgb(var(--c-text1));
     -webkit-font-smoothing: antialiased;
-    /* Évite la sélection de texte accidentelle sur tap-hold iOS */
+    -moz-osx-font-smoothing: grayscale;
     -webkit-user-select: none;
     user-select: none;
   }
@@ -163,12 +180,186 @@
     margin-bottom: env(safe-area-inset-bottom);
   }
   .pb-nav-safe {
-    padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
   }
   /* Nav iOS PWA : fond qui s’étend sous le home indicator */
   .nav-ios-safe {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
+}
+
+/* ── MealMate Typography system ──────────────────────
+   Inspiré SF Pro : tracking négatif sur poids ≥ 600,
+   optical sizing, single-story 'a' et 'g' via cv01/cv04.
+   ─────────────────────────────────────────────────── */
+
+/* Display — chiffres héroïques, splash, logo */
+.type-display {
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.0;
+  letter-spacing: -0.045em;
+  font-feature-settings: 'cv01' 1, 'cv04' 1, 'ss01' 1, 'tnum' 0;
+}
+
+/* Title 1 — H1 de page */
+.type-title1 {
+  font-size: 1.625rem;   /* 26px */
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.032em;
+}
+
+/* Title 2 — section header, carte principale */
+.type-title2 {
+  font-size: 1.25rem;    /* 20px */
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.026em;
+}
+
+/* Headline — titre de card, sheet */
+.type-headline {
+  font-size: 1.0625rem;  /* 17px */
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.018em;
+}
+
+/* Body — texte courant */
+.type-body {
+  font-size: 1rem;       /* 16px */
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+/* Callout — info secondaire importante */
+.type-callout {
+  font-size: 0.9375rem;  /* 15px */
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.012em;
+}
+
+/* Subhead — sous-titre, label de section */
+.type-subhead {
+  font-size: 0.875rem;   /* 14px */
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.008em;
+}
+
+/* Footnote — compteurs, méta, secondary info */
+.type-footnote {
+  font-size: 0.8125rem;  /* 13px */
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+/* Caption — labels très petits, badges */
+.type-caption {
+  font-size: 0.6875rem;  /* 11px */
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+/* Numeric — chiffres tabulaires (stats, timers) */
+.type-numeric {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'cv01' 1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* ── Glass utilities ──────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 6px 20px rgba(0, 29, 193, 0.07),
+    0 2px 6px rgba(0, 0, 0, 0.04);
+}
+.glass-strong {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 10px 28px rgba(0, 29, 193, 0.09),
+    0 2px 6px rgba(0, 0, 0, 0.04);
+}
+.glass-subtle {
+  background: rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(14px) saturate(130%);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+}
+
+/* ── Button utilities ─────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgb(0, 29, 193);
+  color: #fff;
+  border-radius: 16px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 29, 193, 0.28), 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s;
+}
+.btn-primary:active {
+  transform: scale(0.97);
+  opacity: 0.92;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  color: rgb(61, 74, 110);
+  border-radius: 16px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset, 0 4px 14px rgba(0, 29, 193, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn-secondary:active {
+  transform: scale(0.97);
+}
+.dark .glass {
+  background: rgba(15, 30, 80, 0.55);
+  border: 1px solid rgba(100, 140, 255, 0.12);
+  box-shadow:
+    0 1px 0 rgba(100, 140, 255, 0.08) inset,
+    0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.dark .glass-strong {
+  background: rgba(15, 30, 80, 0.78);
+  border: 1px solid rgba(100, 140, 255, 0.15);
+}
+.dark .glass-subtle {
+  background: rgba(15, 30, 80, 0.38);
+  border: 1px solid rgba(100, 140, 255, 0.08);
 }
 
 /* Animations */

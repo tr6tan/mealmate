@@ -74,11 +74,14 @@ export type ActiveTab = 'planning' | 'recettes' | 'courses' | 'settings'
 
 export type ThemeName = 'classic' | 'ocean'
 
+export type DietFilter = 'all' | 'vege' | 'vegan'
+
 export interface AppSettings {
   personnes: number
   nomFoyer: string
   darkMode?: boolean
   theme?: ThemeName
+  diet?: DietFilter
 }
 
 // Sheets
@@ -90,6 +93,7 @@ export type SheetName =
   | 'add-item'
   | 'new-recipe'
   | 'edit-recipe'
+  | 'cook-mode'
   | null
 
 export interface SheetState {

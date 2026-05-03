@@ -1,106 +1,75 @@
-import { useMemo, useState, useEffect, useRef, useCallback } from 'react'
+import { useMemo, useState, useEffect, useCallback, useRef } from 'react'
 import { useAppStore, selectCurrentWeekPlan } from '@/store/useAppStore'
 import {
   DAY_SHORT, DAY_LONG, MONTHS,
   getMondayByOffset, getDayFromMonday, getTodayIndex, getWeekKey,
-  cn,
+  haptic, cn,
 } from '@/lib/utils'
-import DayChip from './DayChip'
-import DayView from './DayView'
-import WeekOverview from './WeekOverview'
 import { showToast } from '@/components/ui/Toast'
+import type { Meal, SlotKey } from '@/types'
 
 export default function PlanningPage() {
-  const currentDayIdx    = useAppStore((s) => s.currentDayIdx)
-  const setCurrentDayIdx = useAppStore((s) => s.setCurrentDayIdx)
-  const weekOffset       = useAppStore((s) => s.weekOffset)
-  const setWeekOffset    = useAppStore((s) => s.setWeekOffset)
-  const weekPlans        = useAppStore((s) => s.weekPlans)
-  const weekPlan         = useAppStore(selectCurrentWeekPlan)
-  const clearWeek        = useAppStore((s) => s.clearWeek)
+  const weekPlan           = useAppStore(selectCurrentWeekPlan)
+  const weekOffset         = useAppStore((s) => s.weekOffset)
+  const setWeekOffset      = useAppStore((s) => s.setWeekOffset)
+  const weekPlans          = useAppStore((s) => s.weekPlans)
   const copyWeekFromOffset = useAppStore((s) => s.copyWeekFromOffset)
+  const openSheet          = useAppStore((s) => s.openSheet)
+  const setMeal            = useAppStore((s) => s.setMeal)
+  const recipes            = useAppStore((s) => s.recipes)
+
+  const openMealDetail = useCallback((dayIdx: number, slotKey: SlotKey, meal: Meal) => {
+    const recipe = recipes.find((r) => r.name === meal.name)
+    if (recipe) {
+      openSheet({ sheet: 'recipe-detail', recipeContext: recipe })
+    } else {
+      openSheet({ sheet: 'meal-actions', actionContext: { dayIdx, slotKey, meal } })
+    }
+  }, [recipes, openSheet])
+
+  // -- Drag & Drop ---------------------------------------------------------
+  type DragSrc = { dayIdx: number; slotKey: SlotKey; meal: Meal }
+  const [dragSrc,    setDragSrc]    = useState<DragSrc | null>(null)
+  const [dropTarget, setDropTarget] = useState<{ dayIdx: number; slotKey: SlotKey } | null>(null)
+  const [touchGhost, setTouchGhost] = useState<{ meal: Meal; x: number; y: number } | null>(null)
+  const longPressRef  = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const touchSrcRef   = useRef<DragSrc | null>(null)
+  const dropRef       = useRef<{ dayIdx: number; slotKey: SlotKey } | null>(null)
+  const wasDraggingRef = useRef(false)
+
+  const performDrop = useCallback((from: DragSrc, toDay: number, toSlot: SlotKey) => {
+    if (from.dayIdx === toDay && from.slotKey === toSlot) return
+    const toMeal = (weekPlan[toDay]?.[toSlot] as Meal | null) ?? null
+    setMeal(toDay, toSlot, from.meal)
+    setMeal(from.dayIdx, from.slotKey, toMeal)
+    haptic([10, 20, 10])
+  }, [weekPlan, setMeal])
+  // -------------------------------------------------------------------------
 
   const monday   = useMemo(() => getMondayByOffset(weekOffset), [weekOffset])
   const todayIdx = useMemo(() => getTodayIndex(monday), [monday])
 
-  const [selectedIdx, setSelectedIdx] = useState(currentDayIdx >= 0 ? currentDayIdx : 0)
-  const [slideDir, setSlideDir] = useState<'left' | 'right' | null>(null)
-  const [displayIdx, setDisplayIdx] = useState(selectedIdx)
-  const [weekSlideDir, setWeekSlideDir] = useState<'left' | 'right' | null>(null)
-  const [viewMode, setViewMode] = useState<'day' | 'week'>('day')
-  const [clearWeekConfirm, setClearWeekConfirm] = useState(false)
+  const [collapsedDays, setCollapsedDays] = useState<Record<number, boolean>>({})
 
-  const handleClearWeek = () => {
-    if (clearWeekConfirm) { clearWeek(); setClearWeekConfirm(false) }
-    else { setClearWeekConfirm(true); setTimeout(() => setClearWeekConfirm(false), 3000) }
-  }
-
-  // Sync depuis store (ouverture via PickDay, etc.)
-  useEffect(() => {
-    if (currentDayIdx >= 0) setSelectedIdx(currentDayIdx)
-  }, [currentDayIdx])
-
-  // Reset le jour sélectionné quand on change de semaine
-  useEffect(() => {
-    const newIdx = todayIdx >= 0 ? todayIdx : 0
-    setSelectedIdx(newIdx)
-    setDisplayIdx(newIdx)
-  }, [weekOffset, todayIdx])
+  useEffect(() => { setCollapsedDays({}) }, [weekOffset])
 
   const changeWeek = useCallback((delta: number) => {
     const next = weekOffset + delta
     if (next < -4 || next > 8) return
-    setWeekSlideDir(delta > 0 ? 'left' : 'right')
     setWeekOffset(next)
-    setTimeout(() => setWeekSlideDir(null), 280)
   }, [weekOffset, setWeekOffset])
 
-  const goToDay = useCallback((idx: number) => {
-    if (idx === selectedIdx) return
-    const dir = idx > selectedIdx ? 'left' : 'right'
-    setSlideDir(dir)
-    setSelectedIdx(idx)
-    setCurrentDayIdx(idx)
-    setTimeout(() => {
-      setDisplayIdx(idx)
-      setSlideDir(null)
-    }, 220)
-  }, [selectedIdx, setCurrentDayIdx])
-
-  // ── Swipe handling ──────────────────────────────────────────────────────────
-  const touchStartX = useRef(0)
-  const touchStartY = useRef(0)
-  const isHorizontal = useRef(false)
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX
-    touchStartY.current = e.touches[0].clientY
-    isHorizontal.current = false
-  }
-
-  const onTouchMove = (e: React.TouchEvent) => {
-    const dx = Math.abs(e.touches[0].clientX - touchStartX.current)
-    const dy = Math.abs(e.touches[0].clientY - touchStartY.current)
-    if (dx > dy && dx > 8) isHorizontal.current = true
-  }
-
-  const onTouchEnd = (e: React.TouchEvent) => {
-    if (!isHorizontal.current) return
-    const dx = e.changedTouches[0].clientX - touchStartX.current
-    if (dx < -50) {
-      if (selectedIdx < 6) goToDay(selectedIdx + 1)
-      else { changeWeek(1); setSelectedIdx(0); setDisplayIdx(0) }
-    } else if (dx > 50) {
-      if (selectedIdx > 0) goToDay(selectedIdx - 1)
-      else { changeWeek(-1); setSelectedIdx(6); setDisplayIdx(6) }
-    }
-  }
-
   const weekLabel = useMemo(() => {
-    const start = monday
     const end = getDayFromMonday(monday, 6)
-    return `${start.getDate()} ${MONTHS[start.getMonth()]} — ${end.getDate()} ${MONTHS[end.getMonth()]}`
+    return `${monday.getDate()} ${MONTHS[monday.getMonth()]} – ${end.getDate()} ${MONTHS[end.getMonth()]}`
   }, [monday])
+
+  const weekTitle = useMemo(() => {
+    if (weekOffset === 0) return 'Cette semaine'
+    if (weekOffset === 1) return 'Semaine prochaine'
+    if (weekOffset === -1) return 'Semaine dernière'
+    return weekOffset > 0 ? `Dans ${weekOffset} semaines` : `Il y a ${Math.abs(weekOffset)} semaines`
+  }, [weekOffset])
 
   const planCount = useMemo(() =>
     Object.values(weekPlan).reduce((acc, day) =>
@@ -112,200 +81,274 @@ export default function PlanningPage() {
     return !!weekPlans[prevKey]
   }, [weekPlans, weekOffset])
 
-  const selectedLabel = useMemo(() => {
-    const d = getDayFromMonday(monday, selectedIdx)
-    return `${DAY_LONG[selectedIdx]} ${d.getDate()} ${MONTHS[d.getMonth()]}`
-  }, [monday, selectedIdx])
-
-  const weekTitle = useMemo(() => {
-    if (weekOffset === 0) return 'Cette semaine'
-    if (weekOffset === 1) return 'Semaine prochaine'
-    if (weekOffset === -1) return 'Semaine dernière'
-    return weekOffset > 0 ? `Dans ${weekOffset} semaines` : `Il y a ${Math.abs(weekOffset)} semaines`
-  }, [weekOffset])
-
-  const handleShare = useCallback(() => {
-    const DAY_NAMES = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-    const SLOT_LABELS: Record<string, string> = { pdej: 'Matin', midi: 'Midi', soir: 'Soir' }
-    const lines: string[] = [`${weekTitle} (${weekLabel})`, '']
-    for (let i = 0; i < 7; i++) {
-      const day = weekPlan[i]
-      if (!day) continue
-      const slots = [
-        { key: 'pdej', meal: day.pdej },
-        { key: 'midi', meal: day.midi },
-        { key: 'soir', meal: day.soir },
-      ].filter((s) => s.meal)
-      if (!slots.length) continue
-      lines.push(`**${DAY_NAMES[i]}**`)
-      slots.forEach(({ key, meal }) => {
-        lines.push(`  ${SLOT_LABELS[key]} ${meal!.name}`)
-      })
-    }
-    if (lines.length <= 2) { showToast('Planning vide — rien à partager !'); return }
-    navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('Planning copié !'))
-  }, [weekPlan, weekTitle, weekLabel])
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      {/* Safe-area top */}
+    <div className="h-full overflow-y-auto no-scrollbar overscroll-contain">
       <div className="flex-shrink-0 pt-safe" />
-      {/* Header */}
-      <div className="flex-shrink-0 px-5 pt-4 pb-2">
-        {/* Ligne 1 : Titre + actions */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex-1 min-w-0">
-            <h1 className="text-[22px] font-black text-text1 leading-tight">{weekTitle}</h1>
-            <p className="text-[11px] font-semibold text-muted mt-0.5">{weekLabel}</p>
-          </div>
-          <div className="flex items-center gap-1.5">
-            {weekOffset !== 0 && (
-              <button
-                onClick={() => { setWeekOffset(0); setWeekSlideDir(null) }}
-                className="h-8 px-3 rounded-full text-[11px] font-black flex-shrink-0 active:scale-90 transition-transform bg-terra text-white"
-              >
-                Aujourd'hui
-              </button>
-            )}
-            <button
-              onClick={handleShare}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-card border border-border text-muted active:scale-90 transition-transform"
-              aria-label="Partager le planning"
-            >
-              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-            </button>
-            <button
-              onClick={() => setViewMode(v => v === 'day' ? 'week' : 'day')}
-              className={cn(
-                'w-8 h-8 flex items-center justify-center rounded-full text-sm transition-all active:scale-90 border',
-                viewMode === 'week'
-                  ? 'bg-terra text-white border-terra'
-                  : 'bg-card text-muted border-border',
-              )}
-              aria-label={viewMode === 'week' ? 'Vue journalière' : 'Vue hebdomadaire'}
-            >
-              {viewMode === 'week' ? '▤' : '▦'}
-            </button>
-          </div>
-        </div>
+      <div className="px-5 pt-4 pb-nav-safe">
 
-        {/* Ligne 2 : Nav semaine + compteur */}
-        <div className="flex items-center gap-1">
+        {/* Week nav */}
+        <div className="flex items-center gap-2 mb-5">
           <button
             onClick={() => changeWeek(-1)}
+            className="w-10 h-10 rounded-full glass flex items-center justify-center text-xl font-bold text-neutral-600 active:scale-90 transition-transform"
             aria-label="Semaine précédente"
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-card border border-border text-muted text-base font-bold leading-none active:scale-90 transition-transform"
+          ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <div
+            className="flex-1 text-center cursor-pointer"
+            onClick={() => weekOffset !== 0 && setWeekOffset(0)}
           >
-            ‹
-          </button>
-          <div className="flex-1" />
-          {planCount > 0 && (
-            <div className="flex items-center gap-1.5 mr-1">
-              <div className="flex items-center gap-0.5">
-                <div className="w-6 h-1.5 rounded-full bg-border/30 overflow-hidden">
-                  <div className="h-full bg-terra rounded-full transition-all duration-500" style={{ width: `${Math.round((planCount / 14) * 100)}%` }} />
-                </div>
-              </div>
-              <span className="text-[10px] font-black text-muted">{planCount}/14</span>
-            </div>
-          )}
-          {planCount > 0 && (
-            <button
-              onClick={handleClearWeek}
-              className={cn(
-                'text-[10px] font-bold px-2 py-1 rounded-full active:scale-90 transition-all',
-                clearWeekConfirm ? 'bg-danger-light text-danger' : 'text-muted',
-              )}
-            >
-              {clearWeekConfirm ? 'Confirmer ?' : 'Vider'}
-            </button>
-          )}
+            <p className="text-xs text-muted font-semibold">{weekTitle}</p>
+            <p className="text-[15px] font-semibold text-text1">{weekLabel}</p>
+          </div>
           <button
             onClick={() => changeWeek(1)}
+            className="w-10 h-10 rounded-full glass flex items-center justify-center text-xl font-bold text-neutral-600 active:scale-90 transition-transform"
             aria-label="Semaine suivante"
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-card border border-border text-muted text-base font-bold leading-none active:scale-90 transition-transform"
-          >
-            ›
-          </button>
+          ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><polyline points="9 18 15 12 9 6"/></svg></button>
         </div>
-      </div>
 
-      {/* Zone scrollable interne */}
-      <div className="flex-1 overflow-y-auto no-scrollbar overscroll-contain pb-nav-safe">
-      {/* Day chips + contenu animé au changement de semaine */}
-      <div className={cn(
-        'transition-all duration-250 ease-out',
-        weekSlideDir === 'left'  && 'animate-slide-left',
-        weekSlideDir === 'right' && 'animate-slide-right',
-      )}>
+        {/* 7 day cards */}
+        <div className="space-y-3">
+          {Array.from({ length: 7 }).map((_, dayIdx) => {
+            const date = getDayFromMonday(monday, dayIdx)
+            const isToday = weekOffset === 0 && dayIdx === todayIdx
+            const isPast = date.getTime() < today.getTime() && !isToday
+            const collapsed = collapsedDays[dayIdx] ?? isPast
+            const toggleDay = () => setCollapsedDays(c => ({ ...c, [dayIdx]: !(c[dayIdx] ?? isPast) }))
+            const plan = weekPlan[dayIdx]
+            const midiMeal = plan?.midi ?? null
+            const soirMeal = plan?.soir ?? null
 
-      {viewMode === 'week' ? (
-        <WeekOverview
-          selectedIdx={selectedIdx}
-          onSelectDay={(idx) => { setSelectedIdx(idx); setCurrentDayIdx(idx); setViewMode('day') }}
-        />
-      ) : (
-        <>
-        {/* Day chips */}
-        <div className="flex gap-1 px-5 pb-2">
-          {Array.from({ length: 7 }).map((_, i) => {
-            const d = getDayFromMonday(monday, i)
-            const day = weekPlan[i]
+            if (collapsed) {
+              return (
+                <button
+                  key={dayIdx}
+                  onClick={toggleDay}
+                  className="w-full rounded-2xl px-4 py-2.5 glass-subtle flex items-center gap-3 active:opacity-70 transition-opacity text-left"
+                >
+                  <span className="text-[11px] font-bold text-muted tabular-nums w-16 shrink-0">
+                    {DAY_SHORT[dayIdx]}. {date.getDate()}
+                  </span>
+                  <div className="flex-1 h-px bg-white/50 rounded-full" />
+                  {[midiMeal, soirMeal].filter(Boolean).map((_, i) => (
+                    <span
+                      key={i}
+                      className="w-1.5 h-1.5 rounded-full shrink-0"
+                      style={{ background: 'rgba(0,24,168,0.35)' }}
+                    />
+                  ))}
+                  <svg className="w-3 h-3 text-muted/50 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+              )
+            }
+
+            const cardClass = isToday
+              ? 'rounded-3xl p-4'
+              : isPast
+              ? 'glass-subtle rounded-3xl p-4'
+              : 'glass rounded-3xl p-4'
+
             return (
-              <DayChip
-                key={i}
-                dayLabel={DAY_SHORT[i]}
-                dayNum={d.getDate()}
-                isToday={i === todayIdx}
-                isSelected={i === selectedIdx}
-                hasMidi={!!day?.midi}
-                hasSoir={!!day?.soir}
-                onClick={() => goToDay(i)}
-              />
+              <div
+                key={dayIdx}
+                className={cardClass}
+                style={isToday ? { background: '#0018A8', boxShadow: '0 12px 32px rgba(0,24,168,0.35)' } : undefined}
+              >
+                {/* Day header – tap to collapse */}
+                <div
+                  className="flex items-center gap-3 mb-3 cursor-pointer select-none active:opacity-70 transition-opacity"
+                  onClick={toggleDay}
+                >
+                  <div className={cn(
+                    'w-12 h-12 rounded-2xl flex flex-col items-center justify-center shrink-0',
+                    isToday ? 'bg-white/20' : 'bg-white/50',
+                  )}>
+                    <span className={`text-[9px] font-bold uppercase tracking-wider ${isToday ? 'text-white/70' : 'text-muted'}`}>
+                      {DAY_SHORT[dayIdx]}
+                    </span>
+                    <span className={`text-[17px] font-black leading-none ${isToday ? 'text-white' : 'text-text1'}`}>
+                      {date.getDate()}
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <p className={`text-sm font-semibold ${isToday ? 'text-white' : 'text-text2'}`}>
+                      {DAY_LONG[dayIdx]}
+                    </p>
+                    {isToday && (
+                      <span className="inline-block mt-0.5 px-2 py-0.5 bg-white text-[#0018A8] rounded-full text-[10px] font-bold">
+                        Aujourd'hui
+                      </span>
+                    )}
+                  </div>
+                  <svg
+                    className={`w-4 h-4 shrink-0 transition-transform duration-200 ${isToday ? 'text-white/60' : 'text-muted/50'}`}
+                    style={{ transform: 'rotate(180deg)' }}
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
+                  >
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
+                </div>
+
+                {/* Meal slots – 2-col grid */}
+                <div className="grid grid-cols-2 gap-2">
+                  {([
+                    { slotKey: 'midi' as const, label: 'Déjeuner', meal: midiMeal },
+                    { slotKey: 'soir' as const, label: 'Dîner',    meal: soirMeal },
+                  ]).map(({ slotKey, label, meal }) => (
+                    <div
+                      key={slotKey}
+                      data-slot
+                      data-day-idx={dayIdx}
+                      data-slot-key={slotKey}
+                      /* -- HTML5 DnD (desktop) -- */
+                      draggable={!!meal}
+                      onDragStart={(e) => {
+                        if (!meal) return
+                        setDragSrc({ dayIdx, slotKey, meal })
+                        e.dataTransfer.effectAllowed = 'move'
+                      }}
+                      onDragEnd={() => { setDragSrc(null); setDropTarget(null) }}
+                      onDragOver={(e) => {
+                        if (!dragSrc) return
+                        e.preventDefault()
+                        e.dataTransfer.dropEffect = 'move'
+                        setDropTarget({ dayIdx, slotKey })
+                      }}
+                      onDragLeave={(e) => {
+                        if (!e.currentTarget.contains(e.relatedTarget as Node)) setDropTarget(null)
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault()
+                        if (dragSrc) performDrop(dragSrc, dayIdx, slotKey)
+                        setDragSrc(null); setDropTarget(null)
+                      }}
+                      /* -- Touch DnD (mobile) long-press -- */
+                      onTouchStart={(e) => {
+                        if (!meal) return
+                        const t = e.touches[0]
+                        longPressRef.current = setTimeout(() => {
+                          touchSrcRef.current = { dayIdx, slotKey, meal }
+                          setTouchGhost({ meal, x: t.clientX, y: t.clientY })
+                          haptic([10])
+                        }, 300)
+                      }}
+                      onTouchMove={(e) => {
+                        if (!touchSrcRef.current) { clearTimeout(longPressRef.current!); return }
+                        const t = e.touches[0]
+                        setTouchGhost((g) => g ? { ...g, x: t.clientX, y: t.clientY } : null)
+                        const el = document.elementFromPoint(t.clientX, t.clientY)?.closest('[data-slot]')
+                        if (el) {
+                          const dt = {
+                            dayIdx: parseInt(el.getAttribute('data-day-idx') ?? '-1'),
+                            slotKey: el.getAttribute('data-slot-key') as SlotKey,
+                          }
+                          dropRef.current = dt
+                          setDropTarget(dt)
+                        } else {
+                          dropRef.current = null
+                          setDropTarget(null)
+                        }
+                      }}
+                      onTouchEnd={() => {
+                        clearTimeout(longPressRef.current!)
+                        if (touchSrcRef.current && dropRef.current) {
+                          wasDraggingRef.current = true
+                          performDrop(touchSrcRef.current, dropRef.current.dayIdx, dropRef.current.slotKey)
+                        }
+                        touchSrcRef.current = null; dropRef.current = null
+                        setTouchGhost(null); setDropTarget(null)
+                      }}
+                      onTouchCancel={() => {
+                        clearTimeout(longPressRef.current!)
+                        touchSrcRef.current = null; dropRef.current = null
+                        setTouchGhost(null); setDropTarget(null)
+                      }}
+                      onClick={() => {
+                        if (wasDraggingRef.current) { wasDraggingRef.current = false; return }
+                        meal
+                          ? openMealDetail(dayIdx, slotKey, meal)
+                          : openSheet({ sheet: 'add-meal', addMealPeriod: slotKey, mealContext: { dayIdx, slotKey } })
+                      }}
+                      style={{ touchAction: meal ? 'none' : 'auto' }}
+                      className={cn(
+                        'min-h-[88px] rounded-2xl p-3 relative overflow-hidden cursor-pointer select-none transition',
+                        isToday ? 'bg-white/15 active:bg-white/25' : 'bg-white/40 backdrop-blur active:bg-white/60',
+                        dragSrc?.dayIdx === dayIdx && dragSrc?.slotKey === slotKey && 'opacity-40 scale-95',
+                        dropTarget?.dayIdx === dayIdx && dropTarget?.slotKey === slotKey && 'ring-2 ring-[#0018A8]/50 ring-inset',
+                      )}
+                    >
+                      <div className={`text-[10px] uppercase tracking-wide mb-1 font-medium ${isToday ? 'text-white/70' : 'text-muted'}`}>
+                        {label}
+                      </div>
+
+                      {meal ? (
+                        <>
+                          <p className={`text-[13px] font-semibold leading-tight pr-6 ${isToday ? 'text-white' : 'text-text1'}`}>
+                            {meal.name}
+                          </p>
+                          {meal.emoji && (
+                            <div
+                              className="absolute -bottom-2 -right-2 text-[58px] leading-none pointer-events-none select-none"
+                              style={{ opacity: isToday ? 0.15 : 0.11 }}
+                            >
+                              {meal.emoji}
+                            </div>
+                          )}
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setMeal(dayIdx, slotKey, null) }}
+                            className="absolute top-2 right-2 w-5 h-5 rounded-full bg-white shadow flex items-center justify-center"
+                          >
+                            <svg className="w-2.5 h-2.5 text-neutral-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                              <line x1="18" y1="6" x2="6" y2="18"/>
+                              <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                          </button>
+                        </>
+                      ) : (
+                        <div className={`flex items-center gap-1.5 text-sm ${isToday ? 'text-white/60' : 'text-neutral-400'}`}>
+                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                            <line x1="12" y1="5" x2="12" y2="19"/>
+                            <line x1="5" y1="12" x2="19" y2="12"/>
+                          </svg>
+                          Ajouter
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
             )
           })}
         </div>
 
-        {/* Label jour sélectionné */}
-        <div className="px-5 pb-3 pt-1">
-          <p className="text-[13px] font-extrabold text-text1 capitalize">{selectedLabel}</p>
-        </div>
-
-        {/* Day view avec swipe */}
-        <div
-          className="px-5 pb-6 overflow-hidden"
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-        >
+        {/* -- Touch drag ghost -- */}
+        {touchGhost && (
           <div
-            className={cn(
-              'transition-all duration-200 ease-out',
-              slideDir === 'left'  && 'animate-slide-left',
-              slideDir === 'right' && 'animate-slide-right',
-            )}
+            className="fixed z-[9999] pointer-events-none"
+            style={{ left: touchGhost.x - 36, top: touchGhost.y - 36 }}
           >
-            <DayView dayIdx={displayIdx} />
-          </div>
-
-          {/* CTA copier semaine précédente */}
-          {planCount === 0 && hasPrevWeek && (
-            <button
-              onClick={() => {
-                copyWeekFromOffset(weekOffset - 1)
-              }}
-              className="mt-4 w-full flex items-center justify-center gap-2 py-3 rounded-2xl border-2 border-dashed border-terra text-terra text-sm font-extrabold active:scale-[0.97] transition-transform"
+            <div
+              className="w-[72px] h-[72px] rounded-2xl flex items-center justify-center text-[36px] shadow-2xl"
+              style={{ background: '#0018A8', opacity: 0.92, transform: 'scale(1.08)' }}
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
-              Réutiliser la semaine précédente
-            </button>
-          )}
-        </div>
-        </>
-      )}
+              {touchGhost.meal.emoji || touchGhost.meal.name.slice(0, 1)}
+            </div>
+          </div>
+        )}
+
+        {planCount === 0 && hasPrevWeek && (
+          <button
+            onClick={() => { copyWeekFromOffset(weekOffset - 1); showToast('Semaine copiée !') }}
+            className="mt-4 w-full glass rounded-2xl py-3 flex items-center justify-center gap-2 text-sm font-semibold text-text2 active:scale-[0.97] transition-transform"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+            Réutiliser la semaine précédente
+          </button>
+        )}
       </div>
-      </div>{/* /zone scrollable */}
     </div>
   )
 }
-

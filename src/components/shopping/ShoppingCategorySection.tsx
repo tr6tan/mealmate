@@ -1,17 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import type { ShoppingCategory } from '@/types'
-import ShoppingItemRow from './ShoppingItemRow'
-import { cn } from '@/lib/utils'
-
-const CAT_EMOJI: Record<ShoppingCategory, string> = {
-  legumes: '\u{1F966}',
-  viandes: '\u{1F969}',
-  cremerie: '\u{1F9C0}',
-  epicerie: '\u{1F36A}',
-  surgeles: '\u{2744}\uFE0F',
-  maison: '\u{1F9F9}',
-}
+import { ingredientEmoji } from '@/lib/utils'
 
 interface Props {
   category: ShoppingCategory
@@ -19,8 +9,9 @@ interface Props {
 }
 
 export default function ShoppingCategorySection({ category, label }: Props) {
-  const shoppingItems = useAppStore((s) => s.shoppingItems)
-  const [collapsed, setCollapsed] = useState(false)
+  const shoppingItems      = useAppStore((s) => s.shoppingItems)
+  const toggleShoppingItem = useAppStore((s) => s.toggleShoppingItem)
+  const removeShoppingItem = useAppStore((s) => s.removeShoppingItem)
 
   const items = useMemo(
     () => shoppingItems.filter((i) => i.category === category),
@@ -33,71 +24,62 @@ export default function ShoppingCategorySection({ category, label }: Props) {
     return [...unchecked, ...checked]
   }, [items])
 
-  const remaining = items.filter((i) => !i.checked).length
-  const checked   = items.filter((i) => i.checked).length
-  const total     = items.length
-  const allDone   = remaining === 0
-
-  if (total === 0) return null
+  if (items.length === 0) return null
 
   return (
-    <div className="bg-card rounded-2xl border-[1.5px] border-border overflow-hidden">
-      {/* Header catégorie */}
-      <button
-        type="button"
-        onClick={() => setCollapsed((v) => !v)}
-        className="w-full flex items-center justify-between px-3.5 py-3 cursor-pointer select-none"
-      >
-        <div className="flex items-center gap-2.5">
-          <span className="text-base leading-none">{CAT_EMOJI[category]}</span>
-          <span className={cn(
-            'text-[13px] font-extrabold transition-colors',
-            allDone ? 'text-sage' : 'text-text1',
-          )}>
-            {label}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          {allDone ? (
-            <span className="text-sage font-extrabold text-[11px]">{'\u2705'}</span>
-          ) : (
-            <span className="text-[11px] font-bold text-muted tabular-nums">
-              {remaining}<span className="opacity-50">/{total}</span>
-            </span>
-          )}
-          <svg
-            className={cn(
-              'w-3.5 h-3.5 text-muted/50 transition-transform duration-200',
-              collapsed && '-rotate-90',
-            )}
-            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
+    <div className="mb-6">
+      <h3 className="text-sm text-neutral-500 uppercase tracking-wide mb-3">
+        {label}
+      </h3>
+      <div className="grid grid-cols-3 gap-3">
+        {sorted.map((item) => (
+          <div
+            key={item.id}
+            onClick={() => toggleShoppingItem(item.id)}
+            className="relative flex flex-col items-center gap-1 rounded-3xl p-3 cursor-pointer select-none transition-opacity"
+            style={{
+              background: 'white',
+              boxShadow: item.checked
+                ? '0 0 0 3px #34C759, 0 4px 16px rgba(0,0,0,0.08)'
+                : '0 0 0 3px white, 0 6px 20px rgba(0,0,0,0.13)',
+              opacity: item.checked ? 0.55 : 1,
+            }}
           >
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-        </div>
-      </button>
+            {/* Ingredient emoji */}
+            <span className="text-4xl leading-none mb-0.5">{ingredientEmoji(item.name)}</span>
 
-      {/* Contenu */}
-      <div className={cn(
-        'grid transition-[grid-template-rows] duration-300 ease-in-out',
-        collapsed ? 'grid-rows-[0fr]' : 'grid-rows-[1fr]',
-      )}>
-        <div className="overflow-hidden">
-          <div className="px-3 pb-3 space-y-1.5">
-            {sorted.map((item, i) => (
-              <div key={item.id}>
-                {i > 0 && !sorted[i - 1].checked && item.checked && checked > 0 && (
-                  <div className="flex items-center gap-2 py-2 px-1">
-                    <div className="flex-1 h-px bg-border/60" />
-                    <span className="text-[10px] font-bold text-muted/50 uppercase tracking-wider">Cochés</span>
-                    <div className="flex-1 h-px bg-border/60" />
-                  </div>
-                )}
-                <ShoppingItemRow item={item} />
+            {/* Item name */}
+            <span className={`text-[10px] text-center text-neutral-700 leading-tight ${item.checked ? 'line-through' : ''}`}>
+              {item.name}
+            </span>
+
+            {/* Qty */}
+            {item.qty && (
+              <span className="text-[10px] text-neutral-400 text-center">{item.qty}</span>
+            )}
+
+            {/* Green check badge */}
+            {item.checked && (
+              <div className="absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-[#34C759] flex items-center justify-center shadow ring-2 ring-white">
+                <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
               </div>
-            ))}
+            )}
+
+            {/* Remove button */}
+            <button
+              onClick={(e) => { e.stopPropagation(); removeShoppingItem(item.id) }}
+              className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full bg-neutral-200 flex items-center justify-center opacity-0 hover:opacity-100 active:opacity-100 transition-opacity"
+              aria-label="Supprimer"
+            >
+              <svg className="w-2.5 h-2.5 text-neutral-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   )

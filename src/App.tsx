@@ -19,6 +19,7 @@ const PickDaySheet      = lazy(() => import('@/components/sheets/PickDaySheet'))
 const AddItemSheet      = lazy(() => import('@/components/sheets/AddItemSheet'))
 const NewRecipeSheet    = lazy(() => import('@/components/sheets/NewRecipeSheet'))
 const EditRecipeSheet   = lazy(() => import('@/components/sheets/EditRecipeSheet'))
+const CookingSheet      = lazy(() => import('@/components/sheets/CookingSheet'))
 
 export default function App() {
   const activeTab = useAppStore((s) => s.activeTab)
@@ -72,6 +73,7 @@ export default function App() {
         <AddItemSheet />
         <NewRecipeSheet />
         <EditRecipeSheet />
+        <CookingSheet />
       </Suspense>
       </ErrorBoundary>
       {/* Toast */}

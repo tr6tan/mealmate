@@ -1,8 +1,8 @@
-import { useMemo, useRef, useEffect, useState } from 'react'
+import { useMemo, useRef, useEffect } from 'react'
 import confetti from 'canvas-confetti'
 import { useAppStore } from '@/store/useAppStore'
 import type { ShoppingCategory } from '@/types'
-import { CAT_LABELS, MONTHS, getMondayByOffset, cn } from '@/lib/utils'
+import { CAT_LABELS } from '@/lib/utils'
 import ShoppingCategorySection from './ShoppingCategorySection'
 import { showToast } from '@/components/ui/Toast'
 
@@ -16,36 +16,70 @@ const CATEGORIES: { id: ShoppingCategory }[] = [
 ]
 
 export default function ShoppingPage() {
-  const openSheet           = useAppStore((s) => s.openSheet)
+  const openSheet                = useAppStore((s) => s.openSheet)
   const generateShoppingFromPlan = useAppStore((s) => s.generateShoppingFromPlan)
-  const clearCheckedItems   = useAppStore((s) => s.clearCheckedItems)
-  const clearAllItems       = useAppStore((s) => s.clearAllItems)
-  const shoppingItems       = useAppStore((s) => s.shoppingItems)
-  const weekOffset          = useAppStore((s) => s.weekOffset)
+  const clearCheckedItems        = useAppStore((s) => s.clearCheckedItems)
+  const setAllChecked            = useAppStore((s) => s.setAllChecked)
+  const shoppingItems            = useAppStore((s) => s.shoppingItems)
 
-  const [clearConfirm, setClearConfirm] = useState(false)
-
-  const handleClearAll = () => {
-    if (clearConfirm) { clearAllItems(); showToast('Liste vid\u00e9e'); setClearConfirm(false) }
-    else { setClearConfirm(true); setTimeout(() => setClearConfirm(false), 3000) }
-  }
-
-  const total   = shoppingItems.length
-  const checked = shoppingItems.filter((i) => i.checked).length
+  const total     = shoppingItems.length
+  const checked   = shoppingItems.filter((i) => i.checked).length
   const remaining = total - checked
-  const pct     = total ? Math.round((checked / total) * 100) : 0
+  const pct       = total ? Math.round((checked / total) * 100) : 0
 
   const prevPctRef = useRef(0)
   useEffect(() => {
     if (pct === 100 && total > 0 && prevPctRef.current < 100) {
-      confetti({ particleCount: 120, spread: 80, origin: { y: 0.7 }, colors: ['#D23D2D', '#F5C065', '#31603D', '#6E433D'] })
-      showToast('Liste compl\u00e8te ! \u{1F389}')
+      // Salve 1 — deux canons latéraux simultanés
+      const fire = (originX: number, angle: number) =>
+        confetti({
+          particleCount: 60,
+          angle,
+          spread: 55,
+          origin: { x: originX, y: 0.75 },
+          colors: ['#001DC1', '#F5C065', '#34C759', '#FF3B5C', '#ffffff'],
+          scalar: 1.1,
+          gravity: 0.9,
+          drift: 0.1,
+          ticks: 280,
+        })
+
+      fire(0.15, 65)
+      fire(0.85, 115)
+
+      // Salve 2 — rafale centrale 200ms après
+      setTimeout(() => {
+        confetti({
+          particleCount: 90,
+          spread: 100,
+          origin: { x: 0.5, y: 0.6 },
+          colors: ['#001DC1', '#F5C065', '#34C759', '#FF3B5C', '#ffffff'],
+          scalar: 0.9,
+          gravity: 0.7,
+          ticks: 350,
+          startVelocity: 30,
+        })
+      }, 200)
+
+      // Salve 3 — étoiles dorées 400ms après
+      setTimeout(() => {
+        confetti({
+          particleCount: 30,
+          spread: 60,
+          origin: { x: 0.5, y: 0.55 },
+          shapes: ['star'],
+          colors: ['#F5C065', '#FFD700', '#FFA500'],
+          scalar: 1.4,
+          gravity: 0.6,
+          ticks: 400,
+          startVelocity: 25,
+        })
+      }, 400)
+
+      showToast('Liste complète ! 🎉')
     }
     prevPctRef.current = pct
   }, [pct, total])
-
-  const monday   = getMondayByOffset(weekOffset)
-  const weekLabel = `Semaine du ${monday.getDate()} ${MONTHS[monday.getMonth()]}`
 
   const filledCategories = useMemo(
     () => CATEGORIES.filter((c) => shoppingItems.some((i) => i.category === c.id)),
@@ -66,106 +100,73 @@ export default function ShoppingPage() {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="h-full overflow-y-auto no-scrollbar overscroll-contain">
       <div className="flex-shrink-0 pt-safe" />
-      {/* Header */}
-      <div className="flex-shrink-0 flex items-center justify-between px-5 pt-4 pb-3">
-        <div>
-          <h1 className="text-2xl font-black text-text1">{'\u{1F6D2}'} Courses</h1>
-          <p className="text-[13px] text-muted font-semibold mt-0.5">{weekLabel}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          {total > 0 && (
-            <button
-              onClick={handleCopy}
-              className="w-10 h-10 rounded-full bg-card border-[1.5px] border-border text-text2 flex items-center justify-center shadow-card active:scale-95 transition-transform"
-              aria-label="Copier la liste"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-              </svg>
-            </button>
-          )}
-          <button
-            onClick={() => openSheet({ sheet: 'add-item' })}
-            className="w-10 h-10 rounded-full bg-terra text-white flex items-center justify-center text-xl font-bold shadow-terra-sm active:scale-95 transition-transform"
-            aria-label="Ajouter un article"
-          >
-            +
+      <div className="px-5 pt-4 pb-nav-safe">
+
+        {/* Status */}
+        <p className="text-sm text-neutral-500 mb-5">
+          {remaining > 0
+            ? `${remaining} article${remaining > 1 ? 's' : ''} restant${remaining > 1 ? 's' : ''} sur ${total}`
+            : total > 0 ? '✅ Tout est coché !' : 'La liste est vide'
+          }
+        </p>
+
+        {/* CTA buttons */}
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          <button onClick={() => openSheet({ sheet: 'add-item' })} className="btn-primary">
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Ajouter
+          </button>
+          <button onClick={handleGenerate} className="btn-secondary">
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Depuis planning
           </button>
         </div>
-      </div>
 
-      <div
-        className="flex-1 overflow-y-auto no-scrollbar overscroll-contain"
-        style={{ paddingBottom: '16px' }}
-      >
-      {total === 0 ? (
-        /* ── Empty state ── */
-        <div className="px-5 pt-12 flex flex-col items-center gap-5">
-          <span className="text-6xl">{'\u{1F6D2}'}</span>
-          <div className="text-center max-w-[260px]">
-            <p className="text-[17px] font-extrabold text-text1 mb-1.5">Ta liste est vide</p>
-            <p className="text-[13px] text-muted font-semibold leading-relaxed">Génère ta liste depuis le planning ou ajoute des articles manuellement.</p>
-          </div>
-          <div className="w-full space-y-2.5 mt-2">
+        {/* Action links */}
+        {total > 0 && (
+          <div className="flex gap-3 mb-6 flex-wrap">
             <button
-              onClick={handleGenerate}
-              className="w-full rounded-xl py-3.5 text-sm font-bold text-terra bg-terra-light/60 active:bg-terra-light active:scale-[0.98] transition-all"
+              onClick={() => remaining === 0 ? setAllChecked(false) : setAllChecked(true)}
+              className="text-xs flex items-center gap-1 text-neutral-500 underline"
             >
-              Générer depuis le planning
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              {remaining === 0 ? 'Tout décocher' : 'Tout cocher'}
             </button>
+            {checked > 0 && (
+              <button
+                onClick={() => { clearCheckedItems(); showToast('Articles cochés supprimés') }}
+                className="text-xs flex items-center gap-1 text-neutral-500 underline"
+              >
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                Vider les cochés ({checked})
+              </button>
+            )}
             <button
-              onClick={() => openSheet({ sheet: 'add-item' })}
-              className="w-full rounded-xl py-3.5 text-sm font-bold text-muted bg-bg active:bg-border/20 active:scale-[0.98] transition-all"
+              onClick={handleCopy}
+              className="text-xs flex items-center gap-1 text-neutral-500 underline ml-auto"
             >
-              + Article manuel
+              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Partager
             </button>
           </div>
-        </div>
-      ) : (
-        <>
-          {/* Progress bar */}
-          <div className="mx-5 mb-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className={cn(
-                'text-sm font-extrabold transition-colors',
-                pct === 100 ? 'text-sage' : 'text-text1'
-              )}>
-                {pct === 100 ? '\u2705 Termin\u00e9 !' : `${checked}/${total} articles`}
-              </span>
-              <span className={cn(
-                'text-xs font-bold tabular-nums',
-                pct === 100 ? 'text-sage' : 'text-muted'
-              )}>
-                {remaining > 0 ? `${remaining} restant${remaining > 1 ? 's' : ''}` : ''}
-              </span>
-            </div>
-            <div className="w-full h-2 bg-border/30 rounded-full overflow-hidden">
-              <div
-                className={cn(
-                  'h-full rounded-full transition-all duration-700 ease-out',
-                  pct === 100 ? 'bg-sage' : 'bg-terra',
-                )}
-                style={{ width: `${pct}%` }}
-              />
+        )}
+
+        {/* Empty state */}
+        {total === 0 ? (
+          <div className="glass rounded-[32px] px-8 py-10 text-center mt-4 flex flex-col items-center gap-3">
+            <svg className="w-9 h-9 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            <div>
+              <p className="text-sm text-neutral-700 mb-1">Votre panier est vide</p>
+              <p className="text-xs text-neutral-400 leading-relaxed">Ajoutez des articles ou importez<br/>votre planning de la semaine.</p>
             </div>
           </div>
-
-          {/* CTA re-générer */}
-          <div className="px-5 mb-5">
-            <button
-              onClick={handleGenerate}
-              className="w-full rounded-2xl py-3 flex items-center justify-center gap-2 text-[13px] font-extrabold text-terra bg-terra-light border-[1.5px] border-terra/15 active:scale-[0.97] transition-transform"
-            >
-              <span>{'\u2728'}</span>
-              <span>Régénérer depuis le planning</span>
-            </button>
-          </div>
-
-          {/* Catégories */}
-          <div className="px-5 space-y-5">
+        ) : (
+          /* Categories */
+          <div>
             {filledCategories.map((cat) => (
               <ShoppingCategorySection
                 key={cat.id}
@@ -174,34 +175,8 @@ export default function ShoppingPage() {
               />
             ))}
           </div>
-        </>
-      )}
-      </div>{/* /scroll */}
-
-      {/* Barre d'actions en bas */}
-      {total > 0 && (
-        <div className="flex-shrink-0 bg-card/98 backdrop-blur-xl border-t border-sep px-5 py-3 flex gap-2">
-          {checked > 0 && (
-            <button
-              onClick={() => { clearCheckedItems(); showToast('Articles coch\u00e9s supprim\u00e9s') }}
-              className="flex-1 py-2.5 rounded-xl bg-sage/15 text-sage text-xs font-extrabold active:scale-95 transition-transform flex items-center justify-center gap-1.5"
-            >
-              {'\u2705'} Effacer cochés ({checked})
-            </button>
-          )}
-          <button
-            onClick={handleClearAll}
-            className={cn(
-              'flex-1 py-2.5 rounded-xl text-xs font-extrabold active:scale-95 transition-all flex items-center justify-center gap-1.5',
-              clearConfirm
-                ? 'bg-terra text-white'
-                : 'bg-danger-light text-danger',
-            )}
-          >
-            {clearConfirm ? '\u26A0\uFE0F Confirmer ?' : '\u{1F5D1}\uFE0F Vider la liste'}
-          </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

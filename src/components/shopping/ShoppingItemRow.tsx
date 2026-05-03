@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import type { ShoppingItem } from '@/types'
-import { cn } from '@/lib/utils'
+import { cn, ingredientEmoji } from '@/lib/utils'
 
 interface Props {
   item: ShoppingItem
@@ -61,6 +61,11 @@ export default function ShoppingItemRow({ item }: Props) {
           </svg>
         )}
       </button>
+
+      {/* Emoji */}
+      <span className="text-[20px] leading-none flex-shrink-0 select-none" aria-hidden>
+        {ingredientEmoji(item.name)}
+      </span>
 
       {/* Nom */}
       <span

@@ -76,6 +76,107 @@ export const CAT_LABELS: Record<string, string> = {
   maison: 'Maison & Hygiène',
 }
 
+// ── Emoji par nom d'ingrédient ───────────────────────────────────────────────
+
+const INGREDIENT_EMOJIS: [RegExp, string][] = [
+  // Légumes & herbes
+  [/tomat/i,                                           '🍅'],
+  [/carott/i,                                          '🥕'],
+  [/poireau/i,                                         '🧅'],
+  [/echalote|échalote/i,                               '🧅'],
+  [/oignon/i,                                          '🧅'],
+  [/ail|gousse d'ail/i,                                '🧄'],
+  [/poivron/i,                                         '🫑'],
+  [/piment/i,                                          '🌶️'],
+  [/courgett/i,                                        '🥒'],
+  [/concombr/i,                                        '🥒'],
+  [/brocoli/i,                                         '🥦'],
+  [/chou/i,                                            '🥬'],
+  [/salade|laitue|roquette|épinard|spinach/i,          '🥬'],
+  [/champignon/i,                                      '🍄'],
+  [/pomme de terre|patate/i,                           '🥔'],
+  [/aubergine/i,                                       '🍆'],
+  [/mais|maïs/i,                                       '🌽'],
+  [/avocat/i,                                          '🥑'],
+  [/citron|lime/i,                                     '🍋'],
+  [/orange/i,                                          '🍊'],
+  [/pomme/i,                                           '🍎'],
+  [/poire/i,                                           '🍐'],
+  [/banane/i,                                          '🍌'],
+  [/fraise/i,                                          '🍓'],
+  [/cerise/i,                                          '🍒'],
+  [/peche|pêche/i,                                     '🍑'],
+  [/raisin/i,                                          '🍇'],
+  [/ananas/i,                                          '🍍'],
+  [/noix de coco|coco rappé/i,                         '🥥'],
+  [/mangue/i,                                          '🥭'],
+  [/pastèque/i,                                        '🍉'],
+  [/melon/i,                                           '🍈'],
+  [/haricot vert|haricot plat/i,                       '🫘'],
+  [/petits pois|pois|haricot/i,                        '🫘'],
+  [/asperge/i,                                         '🌿'],
+  [/artichaut/i,                                       '🌿'],
+  [/betterave/i,                                       '🫀'],
+  [/navet|radis/i,                                     '🌱'],
+  [/basilic|persil|coriandre|thym|romarin|origan|menthe|laurier|estragon/i, '🌿'],
+  [/herbe|herbes|épice|épices/i,                       '🌿'],
+  [/fenouil|celeri|céleri/i,                           '🌿'],
+  // Viandes & poissons
+  [/poulet|dinde|volaille/i,                           '🍗'],
+  [/porc|cochon|filet mignon|rôti/i,                   '🥓'],
+  [/lard|bacon|lardons/i,                              '🥓'],
+  [/jambon/i,                                          '🥓'],
+  [/saucisse|saucisson|merguez|chorizo|chipolata/i,    '🌭'],
+  [/agneau|mouton|gigot/i,                             '🍖'],
+  [/veau|bœuf|boeuf|steak|hach|entrecôte|côte de/i,   '🥩'],
+  [/viande/i,                                          '🥩'],
+  [/crevette/i,                                        '🦐'],
+  [/moule|coquille saint|huitre|huître/i,              '🦪'],
+  [/calamar|calmar|seiche/i,                           '🦑'],
+  [/crabe|homard|langouste/i,                          '🦀'],
+  [/saumon|thon|cabillaud|truite|sole|dorade|lieu|flétan|maquereau|sardine/i, '🐟'],
+  [/poisson/i,                                         '🐟'],
+  // Crèmerie
+  [/parmesan|mozzarella|gruyere|gruyère|emmental|feta|brie|camembert|roquefort|gouda|cheddar|comté|ricotta|mascarpone|fromage/i, '🧀'],
+  [/oeuf|œuf|oeufs|œufs/i,                            '🥚'],
+  [/beurre/i,                                          '🧈'],
+  [/crème|creme fraîche|creme|crème fraîche/i,         '🥛'],
+  [/lait/i,                                            '🥛'],
+  [/yaourt|yogourt|yoghurt/i,                          '🥛'],
+  // Épicerie
+  [/pâte|pasta|spaghetti|tagliatelle|rigatoni|fusilli|macaroni|lasagne|penne|linguine|fettucine/i, '🍝'],
+  [/riz/i,                                             '🍚'],
+  [/pain|baguette|brioche|toast|biscottes/i,           '🍞'],
+  [/farine/i,                                          '🌾'],
+  [/sucre|cassonade|sirop/i,                           '🍬'],
+  [/miel/i,                                            '🍯'],
+  [/chocolat/i,                                        '🍫'],
+  [/cafe|café/i,                                       '☕'],
+  [/the|thé/i,                                         '🍵'],
+  [/noix|noisette|amande|pistache|cacahuète|cacahuete|noix de cajou/i, '🥜'],
+  [/lentille|pois chiche/i,                            '🫘'],
+  [/huile/i,                                           '🫙'],
+  [/vinaigre/i,                                        '🫙'],
+  [/bouillon|fond de/i,                                '🫙'],
+  [/sauce|ketchup|mayonnaise|moutarde|tamari|soja|worcestershire/i, '🫙'],
+  [/confiture|marmelade/i,                             '🍓'],
+  [/levure|bicarbonate/i,                              '🧫'],
+  [/vanille|cannelle|cardamome|curcuma|paprika|cumin|curry|gingembre|muscade|sumac/i, '🌶️'],
+  [/sel|poivre/i,                                      '🧂'],
+  // Surgelés
+  [/surgelé|surgele|glace|sorbet/i,                    '🧊'],
+  // Maison
+  [/détergent|nettoyant|liquide vaisselle|savon|shampoo/i, '🧴'],
+  [/papier|essuie/i,                                   '🧻'],
+]
+
+export function ingredientEmoji(name: string): string {
+  for (const [pattern, emoji] of INGREDIENT_EMOJIS) {
+    if (pattern.test(name)) return emoji
+  }
+  return '🫙'
+}
+
 /** Vibration haptic légère (iOS silent, Android light) */
 export function haptic(pattern: number | number[] = 8) {
   try { navigator.vibrate?.(pattern) } catch { /* silencé si non supporté */ }

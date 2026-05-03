@@ -26,7 +26,7 @@ export default function AppShell({ nav, children }: Props) {
         {nav}
       </main>
 
-      {/* Nav en bas — élément flex normal dans AppShell (pas fixed) */}
+      {/* Nav flottante (position:fixed, hors du flux) */}
       <BottomNav />
 
       {/* Overlay */}
