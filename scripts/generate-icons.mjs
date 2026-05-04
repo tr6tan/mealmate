@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const outDir    = resolve(__dirname, '../public/icons')
 const publicDir = resolve(__dirname, '../public')
-const logoSvg   = resolve(publicDir, 'logo-source.svg')
+const logoPng   = resolve(publicDir, 'logo-source.png')
 const ogSvg     = resolve(publicDir, 'og-image-source.svg')
 
 const icons = [
@@ -17,9 +17,9 @@ const icons = [
   { name: 'manifest-icon-512.maskable.png', size: 512 },
 ]
 
-// Icônes app depuis logo-source.svg
+// Icônes app depuis logo-source.png
 for (const { name, size } of icons) {
-  await sharp(logoSvg, { density: 300 })
+  await sharp(logoPng)
     .resize(size, size)
     .png()
     .toFile(`${outDir}/${name}`)

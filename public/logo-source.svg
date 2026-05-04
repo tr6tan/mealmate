@@ -1,48 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <defs>
-    <clipPath id="clip">
-      <rect width="512" height="512" rx="112"/>
-    </clipPath>
-  </defs>
+  <!-- Fond bleu, coins arrondis -->
+  <rect width="512" height="512" rx="112" fill="#0018A8"/>
 
-  <!-- Fond beige, coins arrondis -->
-  <rect width="512" height="512" rx="112" fill="#F4F1EA"/>
+  <!-- Carotte blanche, tournée -45° autour du centre -->
+  <g transform="rotate(-45, 256, 256)">
+    <!-- Corps de la carotte -->
+    <path fill="white" d="
+      M 82 256
+      C 120 206 198 196 284 205
+      L 344 198
+      Q 388 198 388 256
+      Q 388 314 344 314
+      L 284 307
+      C 198 316 120 306 82 256
+      Z
+    "/>
 
-  <g clip-path="url(#clip)">
-    <!-- Ombre portée bleue -->
-    <ellipse cx="308" cy="416" rx="145" ry="20" fill="#0018A8"/>
+    <!-- Encoche 1 (bleue) -->
+    <rect x="208" y="248" width="38" height="66" rx="8" fill="#0018A8"/>
+    <!-- Encoche 2 (bleue) -->
+    <rect x="257" y="248" width="38" height="66" rx="8" fill="#0018A8"/>
 
-    <!-- Corps du pain (vue 3/4 : face avant + côté droit) -->
-    <!-- Face avant: largeur 75→355, avec dôme en haut -->
-    <!-- Côté droit: 355→445, profondeur perspective -->
-    <!-- Dôme: bezier cubique de (355,198) à (75,213) via contrôles (355,73) et (75,73) -->
-    <!-- → pic du dôme à ~(215, 106) -->
-    <path
-      fill="#FAF5EA"
-      stroke="#0018A8"
-      stroke-width="16"
-      stroke-linejoin="round"
-      stroke-linecap="round"
-      d="M 75 393
-         L 355 393
-         L 445 323
-         L 445 213
-         L 355 198
-         C 355 73 75 73 75 213
-         Z"
-    />
-
-    <!-- Ligne de séparation face avant / côté droit -->
-    <line x1="355" y1="393" x2="355" y2="198"
-      stroke="#0018A8" stroke-width="14" stroke-linecap="round"/>
-
-    <!-- Anneau de croûte intérieur (suit le dôme, ~60px en dessous) -->
-    <path
-      fill="none"
-      stroke="#0018A8"
-      stroke-width="13"
-      stroke-linecap="round"
-      d="M 90 220 Q 215 120 340 210"
-    />
+    <!-- Feuille haute -->
+    <ellipse cx="424" cy="206" rx="52" ry="21" fill="white"
+             transform="rotate(-32, 424, 206)"/>
+    <!-- Feuille milieu -->
+    <ellipse cx="443" cy="252" rx="55" ry="21" fill="white"/>
+    <!-- Feuille basse -->
+    <ellipse cx="424" cy="302" rx="52" ry="21" fill="white"
+             transform="rotate(32, 424, 302)"/>
   </g>
 </svg>

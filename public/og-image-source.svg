@@ -6,42 +6,33 @@
   <circle cx="80"  cy="540" r="320" fill="none" stroke="white" stroke-width="1" opacity="0.05"/>
   <circle cx="1120" cy="90" r="260" fill="none" stroke="white" stroke-width="1" opacity="0.05"/>
 
-  <!-- Pain centré en haut : scale 0.55, centré à x=600, y≈190 -->
-  <!-- translate(457, 75) scale(0.55) -->
-  <!-- Résultat : bread x:498→702, y:115→291 -->
-  <g transform="translate(457, 75) scale(0.55)">
-    <!-- Ombre (bleu foncé sur fond bleu, subtile) -->
-    <ellipse cx="308" cy="416" rx="145" ry="18" fill="#00107A" opacity="0.6"/>
+  <!-- Carotte centrée en haut (scale 0.5, tournée -45°) -->
+  <g transform="translate(600, 175) scale(0.5) rotate(-45) translate(-256, -256)">
+    <!-- Corps de la carotte -->
+    <path fill="white" d="
+      M 82 256
+      C 120 206 198 196 284 205
+      L 344 198
+      Q 388 198 388 256
+      Q 388 314 344 314
+      L 284 307
+      C 198 316 120 306 82 256
+      Z
+    "/>
 
-    <!-- Corps du pain — contour blanc, fill beige -->
-    <path
-      fill="#F4F1EA"
-      stroke="white"
-      stroke-width="16"
-      stroke-linejoin="round"
-      stroke-linecap="round"
-      d="M 75 393
-         L 355 393
-         L 445 323
-         L 445 213
-         L 355 198
-         C 355 73 75 73 75 213
-         Z"
-    />
+    <!-- Encoche 1 (bleue) -->
+    <rect x="208" y="248" width="38" height="66" rx="8" fill="#0018A8"/>
+    <!-- Encoche 2 (bleue) -->
+    <rect x="257" y="248" width="38" height="66" rx="8" fill="#0018A8"/>
 
-    <!-- Séparateur face/côté -->
-    <line x1="355" y1="393" x2="355" y2="198"
-      stroke="white" stroke-width="14" stroke-linecap="round" opacity="0.85"/>
-
-    <!-- Anneau de croûte intérieur -->
-    <path
-      fill="none"
-      stroke="white"
-      stroke-width="13"
-      stroke-linecap="round"
-      opacity="0.85"
-      d="M 90 220 Q 215 120 340 210"
-    />
+    <!-- Feuille haute -->
+    <ellipse cx="424" cy="206" rx="52" ry="21" fill="white"
+             transform="rotate(-32, 424, 206)"/>
+    <!-- Feuille milieu -->
+    <ellipse cx="443" cy="252" rx="55" ry="21" fill="white"/>
+    <!-- Feuille basse -->
+    <ellipse cx="424" cy="302" rx="52" ry="21" fill="white"
+             transform="rotate(32, 424, 302)"/>
   </g>
 
   <!-- Nom de l'app -->
