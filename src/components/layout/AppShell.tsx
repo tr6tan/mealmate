@@ -42,7 +42,7 @@ export default function AppShell({ nav, children }: Props) {
         className="fixed z-50 text-[10px] font-mono opacity-30 pointer-events-none select-none"
         style={{ bottom: 6, left: 8, color: '#0018A8' }}
       >
-        v{__APP_VERSION__}
+        v{__APP_VERSION__} · {__BUILD_TIME__}
       </span>
 
       {/* Sheets & toasts */}
