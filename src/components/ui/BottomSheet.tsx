@@ -135,7 +135,6 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
             : 'overflow-y-auto overscroll-contain no-scrollbar',
           'transition-transform duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)] will-change-transform',
           'px-5 pt-3',
-          isOpen ? '' : 'translate-y-full',
           className,
         )}
         style={{
@@ -146,6 +145,9 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
           paddingBottom: isOpen
             ? (keyboardHeight > 0 ? '8px' : '40px')
             : undefined,
+          transform: isOpen
+            ? 'translateY(0)'
+            : 'translateY(calc(100% + env(safe-area-inset-bottom)))',
         }}
       >
         {/* Handle */}
