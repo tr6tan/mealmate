@@ -179,7 +179,8 @@
     margin-bottom: env(safe-area-inset-bottom);
   }
   .pb-nav-safe {
-    padding-bottom: 88px;
+    /* hauteur pilule ~52px + paddingTop 8px du wrapper + safe area */
+    padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
   }
 }
 
