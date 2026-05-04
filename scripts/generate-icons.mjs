@@ -18,8 +18,15 @@ const icons = [
 ]
 
 // Icônes app depuis logo-source.png
+// On zoome de ~8% pour que le bleu arrive aux bords (élimine les coins transparents)
+const meta = await sharp(logoPng).metadata()
+const cropFactor = 0.08
+const cropPx = Math.round(meta.width * cropFactor)
+const extractSize = meta.width - cropPx * 2
+
 for (const { name, size } of icons) {
   await sharp(logoPng)
+    .extract({ left: cropPx, top: cropPx, width: extractSize, height: extractSize })
     .resize(size, size)
     .png()
     .toFile(`${outDir}/${name}`)
