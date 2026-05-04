@@ -96,6 +96,21 @@
     background-color: rgb(var(--c-bg));
   }
 
+  /* Remplit explicitement la safe area basse avec la couleur app.
+     Sur iOS PWA, le fond système (gris clair) peut transparaître sous le contenu fixé.
+     Ce pseudo-élément garantit que la zone home indicator est beige, pas grise. */
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-bottom, 0px);
+    background-color: rgb(var(--c-bg));
+    z-index: 0;
+    pointer-events: none;
+  }
+
   body {
     /*
      * ── MealMate type stack ─────────────────────────────────
