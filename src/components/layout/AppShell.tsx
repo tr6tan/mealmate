@@ -22,7 +22,7 @@ export default function AppShell({ nav, children }: Props) {
       }}
     >
       {/* Contenu — chaque page gère son propre scroll */}
-      <main className="flex-1 overflow-hidden flex flex-col">
+      <main className="flex-1 overflow-hidden flex flex-col h-full">
         {nav}
       </main>
 
