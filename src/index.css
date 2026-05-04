@@ -179,7 +179,7 @@
     margin-bottom: 0;
   }
   .pb-nav-safe {
-    padding-bottom: 76px;
+    padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
   }
 }
 
