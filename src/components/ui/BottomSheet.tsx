@@ -144,7 +144,7 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
             ? `calc(92dvh - ${keyboardHeight}px)`
             : '92dvh',
           paddingBottom: isOpen
-            ? (keyboardHeight > 0 ? '8px' : 'max(40px, calc(env(safe-area-inset-bottom, 0px) + 24px))')
+            ? (keyboardHeight > 0 ? '8px' : '40px')
             : undefined,
         }}
       >

@@ -376,7 +376,7 @@ export default function AddItemSheet() {
       {selected.size > 0 && (
         <div
           className="shrink-0 px-5 pt-3 border-t border-black/[0.06]"
-          style={{ paddingBottom: 'max(16px, calc(env(safe-area-inset-bottom, 0px) + 12px))' }}
+          style={{ paddingBottom: '16px' }}
         >
           <button
             onClick={handleAdd}
