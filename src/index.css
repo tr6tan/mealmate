@@ -86,15 +86,14 @@
   }
 
   html {
-    /* Zone physique sous la navbar iOS PWA (coins arrondis) = couleur de la nav.
-       Transparent : le fond vient du AppShell (fixed inset:0). Le SplashScreen
-       met lui-même le fond en rouge le temps de l'animation. */
-    background-color: rgb(var(--c-card));
+    /* La zone physique sous la barre de gestes / home indicator prend la couleur
+       du fond app. Évite le flash blanc visible en PWA sur Android et iOS. */
+    background-color: rgb(var(--c-bg));
   }
 
-  /* Assure que la zone safe-area-inset-bottom a le fond de la nav bar */
+  /* Même chose sur body : si quoi que ce soit dépasse du shell fixé, c'est beige */
   body {
-    background-color: rgb(var(--c-card));
+    background-color: rgb(var(--c-bg));
   }
 
   body {
