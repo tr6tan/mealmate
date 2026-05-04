@@ -60,7 +60,7 @@ export default function AppShell({ nav, children }: Props) {
         v{__APP_VERSION__} · {__BUILD_TIME__}
       </span>
 
-      {/* Sheets & toasts */}}}
+      {/* Sheets & toasts */}
       {children}
     </div>
   )
