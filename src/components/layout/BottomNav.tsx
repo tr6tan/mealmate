@@ -25,7 +25,7 @@ export default function BottomNav() {
     <nav
       className="fixed left-1/2 -translate-x-1/2 rounded-full px-2 py-2 flex gap-1 z-50"
       style={{
-        bottom: '12px',
+        bottom: 'calc(12px + env(safe-area-inset-bottom))',
         background: '#0018A8',
         boxShadow: '0 8px 32px rgba(0,24,168,0.40), 0 1px 0 rgba(255,255,255,0.14) inset',
         border: '1px solid rgba(0,50,220,0.35)',
