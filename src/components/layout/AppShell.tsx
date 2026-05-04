@@ -46,7 +46,23 @@ export default function AppShell({ nav, children }: Props) {
         v{__APP_VERSION__} · {__BUILD_TIME__}
       </span>
 
-      {/* Sheets & toasts */}
+      {/* Debug safe area — TEMP */}
+      <div
+        style={{ position: 'fixed', bottom: 0, right: 0, fontSize: 11, background: 'rgba(255,0,0,0.85)', color: '#fff', padding: '2px 6px', zIndex: 99999, pointerEvents: 'none' }}
+        ref={(el) => {
+          if (!el) return
+          const probe = document.createElement('div')
+          probe.style.cssText = 'position:fixed;bottom:0;height:1px;width:1px;pointer-events:none;opacity:0'
+          document.body.appendChild(probe)
+          const sab = parseFloat(getComputedStyle(probe).getPropertyValue('bottom')) || 0
+          const innerH = window.innerHeight
+          const screenH = window.screen.height
+          el.textContent = `sab≈${Math.round(screenH-innerH)}px iH=${innerH} sH=${screenH}`
+          document.body.removeChild(probe)
+        }}
+      />
+
+      {/* Sheets & toasts */}}
       {children}
     </div>
   )
