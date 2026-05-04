@@ -13,7 +13,7 @@ export default function AppShell({ nav, children }: Props) {
 
   return (
     <div
-      className="relative flex flex-col bg-bg overflow-hidden"
+      className="relative flex flex-col bg-bg"
       style={{
         position: 'fixed',
         top: 0,
