@@ -46,6 +46,15 @@ export default function AppShell({ nav, children }: Props) {
         v{__APP_VERSION__} · {__BUILD_TIME__}
       </span>
 
+      {/* Peint la safe area bas en beige (iOS auto-offset annulé) */}
+      <div
+        className="fixed left-0 right-0 z-[49] pointer-events-none bg-bg"
+        style={{
+          bottom: 'calc(-1 * env(safe-area-inset-bottom))',
+          height: 'env(safe-area-inset-bottom)',
+        }}
+      />
+
       {/* Sheets & toasts */}
       {children}
     </div>
