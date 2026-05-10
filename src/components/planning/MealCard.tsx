@@ -15,20 +15,26 @@ export default function MealCard({ meal, onPress, period }: Props) {
         onClick={onPress}
         className={cn(
           'w-full rounded-xl px-3 py-2.5 flex items-center gap-3',
-          'bg-terra-light/50',
-          'active:scale-[0.98] transition-transform duration-150 text-left',
+          'active:scale-[0.97] transition-all duration-150 text-left',
         )}
+        style={{
+          background: 'linear-gradient(135deg, #000D6B 0%, #0020B8 38%, #1A3FE8 55%, #0020B8 72%, #000D6B 100%)',
+          boxShadow: '0 4px 20px rgba(0,18,168,0.45), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,0,0,0.15)',
+        }}
       >
-        <div className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-[10px]">
+        <div
+          className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-[10px]"
+          style={{ background: 'rgba(255,255,255,0.14)' }}
+        >
           <span className="text-lg leading-none">{"\u{1F468}\u200D\u{1F373}"}</span>
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-[13px] font-bold text-terra-dark">{meal.name || 'Restaurant'}</div>
-          <span className="text-[11px] font-semibold text-terra/60 mt-0.5 block">
+          <div className="text-[13px] font-bold text-white">{meal.name || 'Restaurant'}</div>
+          <span className="text-[11px] font-semibold mt-0.5 block" style={{ color: 'rgba(255,255,255,0.55)' }}>
             On mange dehors
           </span>
         </div>
-        <svg className="w-4 h-4 text-terra/30 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <svg className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.35)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <polyline points="9 18 15 12 9 6" />
         </svg>
       </button>

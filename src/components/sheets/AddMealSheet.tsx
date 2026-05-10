@@ -178,7 +178,7 @@ export default function AddMealSheet() {
   }
 
   return (
-    <BottomSheet name="add-meal" noScroll>
+    <BottomSheet name="add-meal" noScroll className="h-[88dvh]">
 
       {/* ── Header figé ── */}
       <div className="flex-shrink-0 pb-1">
