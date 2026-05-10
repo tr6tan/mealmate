@@ -24,7 +24,7 @@ export default function MealCard({ meal, onPress, period }: Props) {
         )}
         style={{
           background: 'linear-gradient(135deg, #001080 0%, #0022CC 40%, #2B50F0 58%, #0022CC 75%, #001080 100%)',
-          boxShadow: '0 6px 24px rgba(0,20,180,0.55), 0 1px 0 rgba(255,255,255,0.08)',
+          boxShadow: '0 0 0 2px rgba(255,255,255,0.85), 0 0 0 3.5px #0018A8, 0 8px 24px rgba(0,20,180,0.55), 0 1px 0 rgba(255,255,255,0.10) inset',
         }}
       >
         {/* reflet brillant */}
