@@ -34,6 +34,9 @@ export default defineConfig({
           { src: '/icons/manifest-icon-512.maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
+      devOptions: {
+        enabled: false, // SW désactivé en dev pour éviter le cache stale
+      },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         runtimeCaching: [
