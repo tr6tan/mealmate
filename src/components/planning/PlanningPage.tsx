@@ -272,50 +272,71 @@ export default function PlanningPage() {
                           ? openMealDetail(dayIdx, slotKey, meal)
                           : openSheet({ sheet: 'add-meal', addMealPeriod: slotKey, mealContext: { dayIdx, slotKey } })
                       }}
-                      style={{ touchAction: meal ? 'none' : 'auto' }}
+                      style={(() => {
+                        const isResto = meal && (meal.isRestaurant === true || meal.name === 'Restaurant')
+                        if (isResto) return {
+                          touchAction: 'none' as React.CSSProperties['touchAction'],
+                          background: 'linear-gradient(135deg, #001080 0%, #0022CC 40%, #2B50F0 58%, #0022CC 75%, #001080 100%)',
+                          boxShadow: '0 4px 16px rgba(0,20,180,0.50)',
+                        }
+                        return { touchAction: (meal ? 'none' : 'auto') as React.CSSProperties['touchAction'] }
+                      })()}
                       className={cn(
                         'min-h-[88px] rounded-2xl p-3 relative overflow-hidden cursor-pointer select-none transition',
-                        isToday ? 'bg-white/15 active:bg-white/25' : 'bg-white/40 backdrop-blur active:bg-white/60',
+                        !(meal && (meal.isRestaurant === true || meal.name === 'Restaurant')) && (
+                          isToday ? 'bg-white/15 active:bg-white/25' : 'bg-white/40 backdrop-blur active:bg-white/60'
+                        ),
                         dragSrc?.dayIdx === dayIdx && dragSrc?.slotKey === slotKey && 'opacity-40 scale-95',
                         dropTarget?.dayIdx === dayIdx && dropTarget?.slotKey === slotKey && 'ring-2 ring-[#0018A8]/50 ring-inset',
                       )}
                     >
-                      <div className={`text-[10px] uppercase tracking-wide mb-1 font-medium ${isToday ? 'text-white/70' : 'text-muted'}`}>
-                        {label}
-                      </div>
-
-                      {meal ? (
-                        <>
-                          <p className={`text-[13px] font-semibold leading-tight pr-6 ${isToday ? 'text-white' : 'text-text1'}`}>
-                            {meal.name}
-                          </p>
-                          {meal.emoji && (
-                            <div
-                              className="absolute -bottom-2 -right-2 text-[58px] leading-none pointer-events-none select-none"
-                              style={{ opacity: isToday ? 0.15 : 0.11 }}
-                            >
-                              {meal.emoji}
+                      {(() => {
+                        const isResto = meal && (meal.isRestaurant === true || meal.name === 'Restaurant')
+                        const onDark = isToday || !!isResto
+                        return (
+                          <>
+                            <div className={`text-[10px] uppercase tracking-wide mb-1 font-medium ${onDark ? 'text-white/70' : 'text-muted'}`}>
+                              {label}
                             </div>
-                          )}
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setMeal(dayIdx, slotKey, null) }}
-                            className="absolute top-2 right-2 w-5 h-5 rounded-full bg-white shadow flex items-center justify-center"
-                          >
-                            <svg className="w-2.5 h-2.5 text-neutral-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
-                              <line x1="18" y1="6" x2="6" y2="18"/>
-                              <line x1="6" y1="6" x2="18" y2="18"/>
-                            </svg>
-                          </button>
-                        </>
-                      ) : (
-                        <div className={`flex items-center gap-1.5 text-sm ${isToday ? 'text-white/60' : 'text-neutral-400'}`}>
-                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                            <line x1="12" y1="5" x2="12" y2="19"/>
-                            <line x1="5" y1="12" x2="19" y2="12"/>
-                          </svg>
-                          Ajouter
-                        </div>
-                      )}
+                            {meal ? (
+                              <>
+                                <p className={`text-[13px] font-semibold leading-tight pr-6 ${onDark ? 'text-white' : 'text-text1'}`}>
+                                  {meal.name}
+                                </p>
+                                {isResto ? (
+                                  /* Reflet nacré + icône couverts pour restaurant */
+                                  <>
+                                    <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(155deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 45%)', borderRadius: 'inherit' }} />
+                                    <div className="absolute top-0 left-3 right-3 h-px pointer-events-none" style={{ background: 'rgba(255,255,255,0.25)' }} />
+                                    <div className="absolute bottom-2 right-3 text-[32px] leading-none pointer-events-none select-none opacity-20">🍽️</div>
+                                  </>
+                                ) : meal.emoji ? (
+                                  <div className="absolute -bottom-2 -right-2 text-[58px] leading-none pointer-events-none select-none" style={{ opacity: isToday ? 0.15 : 0.11 }}>
+                                    {meal.emoji}
+                                  </div>
+                                ) : null}
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); setMeal(dayIdx, slotKey, null) }}
+                                  className="absolute top-2 right-2 w-5 h-5 rounded-full bg-white shadow flex items-center justify-center"
+                                >
+                                  <svg className="w-2.5 h-2.5 text-neutral-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                  </svg>
+                                </button>
+                              </>
+                            ) : (
+                              <div className={`flex items-center gap-1.5 text-sm ${isToday ? 'text-white/60' : 'text-neutral-400'}`}>
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                                  <line x1="12" y1="5" x2="12" y2="19"/>
+                                  <line x1="5" y1="12" x2="19" y2="12"/>
+                                </svg>
+                                Ajouter
+                              </div>
+                            )}
+                          </>
+                        )
+                      })()}
                     </div>
                   ))}
                 </div>
