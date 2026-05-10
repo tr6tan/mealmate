@@ -66,7 +66,7 @@ export default function DayView({ dayIdx }: Props) {
         const dessertMeal = dessertKey === 'midi_dessert' ? plan.midi_dessert : plan.soir_dessert
 
         return (
-          <div key={period} className="bg-card rounded-2xl border-[1.5px] border-border p-3 flex flex-col gap-1">
+          <div key={period} className="rounded-2xl border-[1.5px] border-border p-3 flex flex-col gap-1" style={{ background: 'var(--c-bg, #F4F1EA)' }}>
             {/* En-tête période */}
             <div className="flex items-center gap-2 mb-1">
               <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: PERIOD_STYLE[period].dot }} />
