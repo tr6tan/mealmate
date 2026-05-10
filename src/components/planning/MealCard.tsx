@@ -1,6 +1,7 @@
 import type { Meal, Period } from '@/types'
 import { cn } from '@/lib/utils'
 import MealAvatar from '@/components/ui/MealAvatar'
+import FoodSticker from '@/components/ui/FoodSticker'
 
 interface Props {
   meal: Meal
@@ -24,14 +25,14 @@ export default function MealCard({ meal, onPress, period }: Props) {
         )}
         style={{
           background: 'linear-gradient(135deg, #001080 0%, #0022CC 40%, #2B50F0 58%, #0022CC 75%, #001080 100%)',
-          // contour blanc + halo bleu ciel brillant
+          // Contour or chaud : ambiance "soirée chic restaurant gastronomique"
           boxShadow: [
-            '0 0 0 1.5px rgba(255,255,255,0.95)',          // liseré blanc net
-            '0 0 0 3px rgba(125,200,255,0.55)',            // halo bleu ciel brillant
-            '0 0 12px 2px rgba(125,200,255,0.45)',         // glow doux extérieur
-            '0 8px 24px rgba(0,20,180,0.50)',              // ombre portée
-            'inset 0 1px 0 rgba(255,255,255,0.18)',        // highlight intérieur haut
-            'inset 0 0 0 1px rgba(180,220,255,0.20)',      // liseré intérieur bleu pâle
+            '0 0 0 1.5px rgba(255,225,150,0.95)',          // liseré or pâle net
+            '0 0 0 3px rgba(255,190,80,0.55)',             // halo ambre brillant
+            '0 0 14px 2px rgba(255,180,60,0.45)',          // glow doré extérieur
+            '0 8px 24px rgba(0,15,140,0.55)',              // ombre portée bleu marine
+            'inset 0 1px 0 rgba(255,235,180,0.22)',        // highlight intérieur haut chaud
+            'inset 0 0 0 1px rgba(255,210,130,0.18)',      // liseré intérieur or pâle
           ].join(', '),
         }}
       >
@@ -43,10 +44,10 @@ export default function MealCard({ meal, onPress, period }: Props) {
             borderRadius: 'inherit',
           }}
         />
-        {/* ligne lumière haute */}
+        {/* ligne lumière haute (or pâle) */}
         <div
           className="absolute top-0 left-4 right-4 h-px pointer-events-none"
-          style={{ background: 'rgba(190,225,255,0.55)' }}
+          style={{ background: 'rgba(255,225,160,0.55)' }}
         />
         <div
           className="w-11 h-11 flex-shrink-0 flex items-center justify-center"
@@ -77,9 +78,13 @@ export default function MealCard({ meal, onPress, period }: Props) {
       )}
     >
       <div className="w-9 h-9 rounded-[10px] flex-shrink-0 flex items-center justify-center">
-        {meal.emoji
-          ? <span className="text-lg leading-none">{meal.emoji}</span>
-          : <MealAvatar name={meal.name} size="md" />}
+        <FoodSticker
+          name={meal.name}
+          size={36}
+          fallback={meal.emoji
+            ? <span className="text-lg leading-none">{meal.emoji}</span>
+            : <MealAvatar name={meal.name} size="md" />}
+        />
       </div>
       <div className="flex-1 min-w-0">
         <div className="text-[13px] font-bold text-text1 truncate">{meal.name}</div>

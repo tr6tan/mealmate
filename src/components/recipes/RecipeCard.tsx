@@ -1,5 +1,6 @@
 import type { Recipe } from '@/types'
 import { ingredientEmoji } from '@/lib/utils'
+import { getStickerSlug, stickerUrl } from '@/lib/stickers'
 
 interface Props {
   recipe: Recipe
@@ -10,21 +11,30 @@ interface Props {
 
 export default function RecipeCard({ recipe, onClick, planCount = 0 }: Props) {
   const ingredients = recipe.ingredients?.slice(0, 5) ?? []
+  const stickerSlug = getStickerSlug(recipe.name)
 
   return (
     <div
       onClick={onClick}
       className="glass rounded-[32px] p-4 relative overflow-hidden cursor-pointer select-none active:scale-[0.98] transition-transform"
     >
-      {/* Emoji watermark */}
-      {recipe.emoji && (
+      {/* Watermark : sticker si match, sinon emoji */}
+      {stickerSlug ? (
+        <img
+          src={stickerUrl(stickerSlug)}
+          alt=""
+          aria-hidden
+          className="absolute -bottom-3 -right-3 w-[110px] h-[110px] object-contain pointer-events-none select-none"
+          style={{ opacity: 0.18 }}
+        />
+      ) : recipe.emoji ? (
         <div
           className="absolute bottom-2 right-3 pointer-events-none text-[72px] leading-none"
           style={{ opacity: 0.07 }}
         >
           {recipe.emoji}
         </div>
-      )}
+      ) : null}
 
       {/* Fav indicator */}
       {recipe.fav && (
