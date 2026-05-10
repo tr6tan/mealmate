@@ -8,8 +8,13 @@ interface Props {
   period?: Period
 }
 
+/** Détecte les repas restaurant, y compris les anciens enregistrements Firestore sans le flag. */
+function isResto(meal: Meal) {
+  return meal.isRestaurant === true || meal.name === 'Restaurant'
+}
+
 export default function MealCard({ meal, onPress, period }: Props) {
-  if (meal.isRestaurant) {
+  if (isResto(meal)) {
     return (
       <button
         onClick={onPress}

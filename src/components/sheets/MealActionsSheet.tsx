@@ -98,7 +98,7 @@ export default function MealActionsSheet() {
     <BottomSheet name="meal-actions">
 
       {/* ── Hero ── */}
-      {meal.isRestaurant ? (
+      {(meal.isRestaurant === true || meal.name === 'Restaurant') ? (
         /* Hero restaurant — version carte bleue immersive */
         <div
           className="relative -mx-5 -mt-5 mb-5 px-5 pt-8 pb-6 rounded-t-[28px] overflow-hidden"

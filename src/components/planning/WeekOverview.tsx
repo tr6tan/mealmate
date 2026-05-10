@@ -106,6 +106,7 @@ export default function WeekOverview({ onSelectDay, selectedIdx }: Props) {
               const plan = weekPlan[i]
               const meal = row === 'midi' ? plan?.midi : plan?.soir
               const isToday = i === todayIdx
+              const isResto = !!meal && (meal.isRestaurant === true || meal.name === 'Restaurant')
 
               return (
                 <button
@@ -117,7 +118,7 @@ export default function WeekOverview({ onSelectDay, selectedIdx }: Props) {
                   )}
                 >
                   {meal ? (
-                    meal.isRestaurant ? (
+                    isResto ? (
                       <div
                         className="w-6 h-6 rounded-full flex items-center justify-center text-[13px] leading-none"
                         style={{ background: 'linear-gradient(135deg, #001080 0%, #2B50F0 100%)' }}
@@ -172,31 +173,39 @@ export default function WeekOverview({ onSelectDay, selectedIdx }: Props) {
               {/* Repas */}
               {hasAny ? (
                 <div className="flex-1 flex items-center gap-2 min-w-0">
-                  {hasMidi && (
-                    <span className={cn(
-                      'flex items-center gap-1 text-[11px] font-semibold truncate',
-                      plan!.midi!.isRestaurant ? 'text-[#2B50F0] font-black' : 'text-text1',
-                    )}>
+                  {hasMidi && (() => {
+                    const m = plan!.midi!
+                    const r = m.isRestaurant === true || m.name === 'Restaurant'
+                    return (
                       <span className={cn(
-                        'w-1.5 h-1.5 rounded-full flex-shrink-0',
-                        plan!.midi!.isRestaurant ? 'bg-[#0022CC]' : 'bg-terra',
-                      )} />
-                      {plan!.midi!.name}
-                    </span>
-                  )}
+                        'flex items-center gap-1 text-[11px] font-semibold truncate',
+                        r ? 'text-[#2B50F0] font-black' : 'text-text1',
+                      )}>
+                        <span className={cn(
+                          'w-1.5 h-1.5 rounded-full flex-shrink-0',
+                          r ? 'bg-[#0022CC]' : 'bg-terra',
+                        )} />
+                        {m.name}
+                      </span>
+                    )
+                  })()}
                   {hasMidi && hasSoir && <span className="text-sep font-bold">·</span>}
-                  {hasSoir && (
-                    <span className={cn(
-                      'flex items-center gap-1 text-[11px] font-semibold truncate',
-                      plan!.soir!.isRestaurant ? 'text-[#2B50F0] font-black' : 'text-text1',
-                    )}>
+                  {hasSoir && (() => {
+                    const m = plan!.soir!
+                    const r = m.isRestaurant === true || m.name === 'Restaurant'
+                    return (
                       <span className={cn(
-                        'w-1.5 h-1.5 rounded-full flex-shrink-0',
-                        plan!.soir!.isRestaurant ? 'bg-[#0022CC]' : 'bg-evening',
-                      )} />
-                      {plan!.soir!.name}
-                    </span>
-                  )}
+                        'flex items-center gap-1 text-[11px] font-semibold truncate',
+                        r ? 'text-[#2B50F0] font-black' : 'text-text1',
+                      )}>
+                        <span className={cn(
+                          'w-1.5 h-1.5 rounded-full flex-shrink-0',
+                          r ? 'bg-[#0022CC]' : 'bg-evening',
+                        )} />
+                        {m.name}
+                      </span>
+                    )
+                  })()}
                 </div>
               ) : (
                 <span className="text-[11px] text-muted italic">Aucun repas</span>
