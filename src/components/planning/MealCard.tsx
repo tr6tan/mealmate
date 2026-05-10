@@ -41,10 +41,9 @@ export default function MealCard({ meal, onPress, period }: Props) {
           style={{ background: 'rgba(255,255,255,0.30)' }}
         />
         <div
-          className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl"
-          style={{ background: 'rgba(255,255,255,0.16)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25)' }}
+          className="w-11 h-11 flex-shrink-0 flex items-center justify-center"
         >
-          <span className="text-xl leading-none">🍽️</span>
+          <img src="/icons/icons8-dinner.png" alt="" className="w-11 h-11 object-contain" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.25))' }} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-[14px] font-black text-white tracking-tight truncate">

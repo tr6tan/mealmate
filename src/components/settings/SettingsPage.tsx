@@ -174,6 +174,11 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* ── Crédits ── */}
+        <p className="text-[10px] text-neutral-400 text-center px-4 leading-relaxed">
+          Icônes par <a href="https://icons8.com" target="_blank" rel="noopener noreferrer" className="underline">Icons8</a>
+        </p>
+
       </div>
     </div>
   )
