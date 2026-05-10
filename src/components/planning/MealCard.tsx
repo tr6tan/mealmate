@@ -14,27 +14,42 @@ export default function MealCard({ meal, onPress, period }: Props) {
       <button
         onClick={onPress}
         className={cn(
-          'w-full rounded-xl px-3 py-2.5 flex items-center gap-3',
-          'active:scale-[0.97] transition-all duration-150 text-left',
+          'w-full rounded-2xl px-4 py-3 flex items-center gap-3',
+          'active:scale-[0.97] transition-all duration-150 text-left relative overflow-hidden',
         )}
         style={{
-          background: 'linear-gradient(135deg, #000D6B 0%, #0020B8 38%, #1A3FE8 55%, #0020B8 72%, #000D6B 100%)',
-          boxShadow: '0 4px 20px rgba(0,18,168,0.45), inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(0,0,0,0.15)',
+          background: 'linear-gradient(135deg, #001080 0%, #0022CC 40%, #2B50F0 58%, #0022CC 75%, #001080 100%)',
+          boxShadow: '0 6px 24px rgba(0,20,180,0.55), 0 1px 0 rgba(255,255,255,0.08)',
         }}
       >
+        {/* reflet brillant */}
         <div
-          className="w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-[10px]"
-          style={{ background: 'rgba(255,255,255,0.14)' }}
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'linear-gradient(160deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 45%)',
+            borderRadius: 'inherit',
+          }}
+        />
+        {/* ligne lumière haute */}
+        <div
+          className="absolute top-0 left-4 right-4 h-px pointer-events-none"
+          style={{ background: 'rgba(255,255,255,0.30)' }}
+        />
+        <div
+          className="w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-xl"
+          style={{ background: 'rgba(255,255,255,0.16)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25)' }}
         >
-          <span className="text-lg leading-none">{"\u{1F468}\u200D\u{1F373}"}</span>
+          <span className="text-xl leading-none">🍽️</span>
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-[13px] font-bold text-white">{meal.name || 'Restaurant'}</div>
-          <span className="text-[11px] font-semibold mt-0.5 block" style={{ color: 'rgba(255,255,255,0.55)' }}>
-            On mange dehors
+          <div className="text-[14px] font-black text-white tracking-tight truncate">
+            {meal.name && meal.name !== 'Restaurant' ? meal.name : 'Restaurant'}
+          </div>
+          <span className="text-[11px] font-semibold mt-0.5 block" style={{ color: 'rgba(255,255,255,0.50)' }}>
+            On mange dehors 🌆
           </span>
         </div>
-        <svg className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.35)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <svg className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(255,255,255,0.30)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <polyline points="9 18 15 12 9 6" />
         </svg>
       </button>

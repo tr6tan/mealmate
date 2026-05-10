@@ -169,9 +169,9 @@ export default function AddMealSheet() {
   }
 
   const handleResto = () => {
-    if (!context || !restoName.trim()) return
+    if (!context) return
     haptic(10)
-    setMeal(context.dayIdx, context.slotKey, { name: restoName.trim(), emoji: '🍴', time: '?', fav: false, isRestaurant: true })
+    setMeal(context.dayIdx, context.slotKey, { name: restoName.trim() || 'Restaurant', emoji: '🍴', time: '?', fav: false, isRestaurant: true })
     closeSheet()
     setRestoName('')
     showToast('Restaurant ajouté !')
@@ -261,7 +261,7 @@ export default function AddMealSheet() {
           className="w-full px-4 py-3.5 rounded-2xl text-[15px] font-medium text-text1 outline-none placeholder:text-neutral-400"
           style={{ background: 'rgba(0,0,0,0.05)' }}
         />
-        <button onClick={handleResto} disabled={!restoName.trim()} className="btn-primary w-full" style={!restoName.trim() ? { opacity: 0.4 } : {}}>
+        <button onClick={handleResto} className="btn-primary w-full">
           Ajouter ce restaurant
         </button>
       </div>
