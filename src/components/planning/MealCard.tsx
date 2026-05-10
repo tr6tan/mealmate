@@ -24,7 +24,15 @@ export default function MealCard({ meal, onPress, period }: Props) {
         )}
         style={{
           background: 'linear-gradient(135deg, #001080 0%, #0022CC 40%, #2B50F0 58%, #0022CC 75%, #001080 100%)',
-          boxShadow: '0 0 0 2px rgba(255,255,255,0.85), 0 0 0 3.5px #0018A8, 0 8px 24px rgba(0,20,180,0.55), 0 1px 0 rgba(255,255,255,0.10) inset',
+          // contour blanc + halo bleu ciel brillant
+          boxShadow: [
+            '0 0 0 1.5px rgba(255,255,255,0.95)',          // liseré blanc net
+            '0 0 0 3px rgba(125,200,255,0.55)',            // halo bleu ciel brillant
+            '0 0 12px 2px rgba(125,200,255,0.45)',         // glow doux extérieur
+            '0 8px 24px rgba(0,20,180,0.50)',              // ombre portée
+            'inset 0 1px 0 rgba(255,255,255,0.18)',        // highlight intérieur haut
+            'inset 0 0 0 1px rgba(180,220,255,0.20)',      // liseré intérieur bleu pâle
+          ].join(', '),
         }}
       >
         {/* reflet brillant */}
@@ -38,7 +46,7 @@ export default function MealCard({ meal, onPress, period }: Props) {
         {/* ligne lumière haute */}
         <div
           className="absolute top-0 left-4 right-4 h-px pointer-events-none"
-          style={{ background: 'rgba(255,255,255,0.30)' }}
+          style={{ background: 'rgba(190,225,255,0.55)' }}
         />
         <div
           className="w-11 h-11 flex-shrink-0 flex items-center justify-center"
