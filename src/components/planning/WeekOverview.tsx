@@ -117,9 +117,19 @@ export default function WeekOverview({ onSelectDay, selectedIdx }: Props) {
                   )}
                 >
                   {meal ? (
-                    meal.emoji
-                      ? <span className="text-[18px] leading-none" title={meal.name}>{meal.emoji}</span>
-                      : <MealAvatar name={meal.name} size="sm" />
+                    meal.isRestaurant ? (
+                      <div
+                        className="w-6 h-6 rounded-full flex items-center justify-center text-[13px] leading-none"
+                        style={{ background: 'linear-gradient(135deg, #001080 0%, #2B50F0 100%)' }}
+                        title={meal.name}
+                      >
+                        🍴
+                      </div>
+                    ) : meal.emoji ? (
+                      <span className="text-[18px] leading-none" title={meal.name}>{meal.emoji}</span>
+                    ) : (
+                      <MealAvatar name={meal.name} size="sm" />
+                    )
                   ) : (
                     <span className={cn('w-2 h-2 rounded-full', isToday ? 'bg-terra/20' : 'bg-border')} />
                   )}
@@ -163,15 +173,27 @@ export default function WeekOverview({ onSelectDay, selectedIdx }: Props) {
               {hasAny ? (
                 <div className="flex-1 flex items-center gap-2 min-w-0">
                   {hasMidi && (
-                    <span className="flex items-center gap-1 text-[11px] font-semibold text-text1 truncate">
-                      <span className="w-1.5 h-1.5 rounded-full bg-terra flex-shrink-0" />
+                    <span className={cn(
+                      'flex items-center gap-1 text-[11px] font-semibold truncate',
+                      plan!.midi!.isRestaurant ? 'text-[#2B50F0] font-black' : 'text-text1',
+                    )}>
+                      <span className={cn(
+                        'w-1.5 h-1.5 rounded-full flex-shrink-0',
+                        plan!.midi!.isRestaurant ? 'bg-[#0022CC]' : 'bg-terra',
+                      )} />
                       {plan!.midi!.name}
                     </span>
                   )}
                   {hasMidi && hasSoir && <span className="text-sep font-bold">·</span>}
                   {hasSoir && (
-                    <span className="flex items-center gap-1 text-[11px] font-semibold text-text1 truncate">
-                      <span className="w-1.5 h-1.5 rounded-full bg-evening flex-shrink-0" />
+                    <span className={cn(
+                      'flex items-center gap-1 text-[11px] font-semibold truncate',
+                      plan!.soir!.isRestaurant ? 'text-[#2B50F0] font-black' : 'text-text1',
+                    )}>
+                      <span className={cn(
+                        'w-1.5 h-1.5 rounded-full flex-shrink-0',
+                        plan!.soir!.isRestaurant ? 'bg-[#0022CC]' : 'bg-evening',
+                      )} />
                       {plan!.soir!.name}
                     </span>
                   )}
