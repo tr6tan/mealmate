@@ -69,35 +69,31 @@ export default function MealCard({ meal, onPress, period }: Props) {
         'active:scale-[0.97] transition-all duration-150 text-left relative overflow-hidden',
       )}
       style={{
-        background: 'linear-gradient(145deg, #FFFFFF 0%, #F7F4EE 100%)',
-        boxShadow: '0 4px 18px rgba(0,0,0,0.10), 0 1px 0 rgba(255,255,255,0.95)',
+        background: 'linear-gradient(145deg, #FFFFFF 0%, #EEE8DC 100%)',
+        boxShadow: '0 8px 28px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,1)',
+        border: '1px solid rgba(255,255,255,0.9)',
       }}
     >
-      {/* reflet nacré diagonal */}
+      {/* reflet nacré diagonal fort */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'linear-gradient(155deg, rgba(255,255,255,0.70) 0%, rgba(255,255,255,0) 40%)',
+          background: 'linear-gradient(140deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.0) 45%)',
           borderRadius: 'inherit',
         }}
       />
-      {/* ligne lumière haute */}
       <div
-        className="absolute top-0 left-4 right-4 h-px pointer-events-none"
-        style={{ background: 'rgba(255,255,255,0.95)' }}
-      />
-      <div
-        className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center"
+        className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center relative z-10"
         style={{
-          background: 'linear-gradient(145deg, #FFF8F3 0%, #F0EAE0 100%)',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)',
+          background: 'linear-gradient(145deg, #FFF6ED 0%, #E8DFD0 100%)',
+          boxShadow: '0 3px 10px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9)',
         }}
       >
         {meal.emoji
           ? <span className="text-xl leading-none">{meal.emoji}</span>
           : <MealAvatar name={meal.name} size="md" />}
       </div>
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 relative z-10">
         <div className="text-[14px] font-black text-text1 tracking-tight truncate">{meal.name}</div>
         <div className="flex gap-1.5 mt-0.5 flex-wrap">
           {meal.time && (
@@ -114,7 +110,7 @@ export default function MealCard({ meal, onPress, period }: Props) {
           )}
         </div>
       </div>
-      <svg className="w-4 h-4 flex-shrink-0" style={{ color: 'rgba(0,0,0,0.18)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <svg className="w-4 h-4 flex-shrink-0 relative z-10" style={{ color: 'rgba(0,0,0,0.22)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
         <polyline points="9 18 15 12 9 6" />
       </svg>
     </button>
