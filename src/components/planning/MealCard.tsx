@@ -65,37 +65,18 @@ export default function MealCard({ meal, onPress, period }: Props) {
     <button
       onClick={onPress}
       className={cn(
-        'w-full rounded-2xl px-4 py-3 flex items-center gap-3',
-        'active:scale-[0.97] transition-all duration-150 text-left relative overflow-hidden',
+        'w-full rounded-xl px-3 py-2.5 flex items-center gap-3',
+        'active:scale-[0.98] transition-transform duration-150 text-left',
       )}
-      style={{
-        background: 'linear-gradient(145deg, #FFFFFF 0%, #EEE8DC 100%)',
-        boxShadow: '0 8px 28px rgba(0,0,0,0.18), 0 2px 6px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,1)',
-        border: '1px solid rgba(255,255,255,0.9)',
-      }}
     >
-      {/* reflet nacré diagonal fort */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'linear-gradient(140deg, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.0) 45%)',
-          borderRadius: 'inherit',
-        }}
-      />
-      <div
-        className="w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center relative z-10"
-        style={{
-          background: 'linear-gradient(145deg, #FFF6ED 0%, #E8DFD0 100%)',
-          boxShadow: '0 3px 10px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9)',
-        }}
-      >
+      <div className="w-9 h-9 rounded-[10px] flex-shrink-0 flex items-center justify-center">
         {meal.emoji
-          ? <span className="text-xl leading-none">{meal.emoji}</span>
+          ? <span className="text-lg leading-none">{meal.emoji}</span>
           : <MealAvatar name={meal.name} size="md" />}
       </div>
-      <div className="flex-1 min-w-0 relative z-10">
-        <div className="text-[14px] font-black text-text1 tracking-tight truncate">{meal.name}</div>
-        <div className="flex gap-1.5 mt-0.5 flex-wrap">
+      <div className="flex-1 min-w-0">
+        <div className="text-[13px] font-bold text-text1 truncate">{meal.name}</div>
+        <div className="flex gap-1.5 mt-1 flex-wrap">
           {meal.time && (
             <span className="text-[11px] font-semibold text-muted flex items-center gap-1">
               <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -110,7 +91,7 @@ export default function MealCard({ meal, onPress, period }: Props) {
           )}
         </div>
       </div>
-      <svg className="w-4 h-4 flex-shrink-0 relative z-10" style={{ color: 'rgba(0,0,0,0.22)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <svg className="w-4 h-4 text-muted/40 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
         <polyline points="9 18 15 12 9 6" />
       </svg>
     </button>
