@@ -98,59 +98,92 @@ export default function MealActionsSheet() {
     <BottomSheet name="meal-actions">
 
       {/* ── Hero ── */}
-      <div className="relative -mx-5 -mt-5 mb-5 px-5 pt-7 pb-5 rounded-t-[28px] overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, rgba(0,24,168,0.07), rgba(0,24,168,0.03))' }}>
+      {meal.isRestaurant ? (
+        /* Hero restaurant — version carte bleue immersive */
+        <div
+          className="relative -mx-5 -mt-5 mb-5 px-5 pt-8 pb-6 rounded-t-[28px] overflow-hidden"
+          style={{
+            background: 'linear-gradient(155deg, #001080 0%, #0022CC 40%, #2B50F0 60%, #0022CC 78%, #001080 100%)',
+            boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.20)',
+          }}
+        >
+          {/* reflet brillant diagonal */}
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(155deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 42%)', borderRadius: 'inherit' }} />
+          {/* ligne lumière haute */}
+          <div className="absolute top-0 left-6 right-6 h-px pointer-events-none" style={{ background: 'rgba(255,255,255,0.28)' }} />
 
-        <div className="flex items-start gap-4">
-          {/* Avatar */}
-          <div
-            className="w-[72px] h-[72px] rounded-[22px] flex items-center justify-center text-[38px] leading-none flex-shrink-0"
-            style={{ background: '#0018A8', boxShadow: '0 8px 24px rgba(0,24,168,0.35)' }}
-          >
-            {meal.emoji || '🍽'}
-          </div>
-
-          <div className="flex-1 min-w-0 pt-1">
-            <h2 className="text-[20px] font-black text-text1 leading-tight mb-2">{meal.name}</h2>
-
-            <div className="flex flex-wrap gap-1.5">
-              {meal.time && meal.time !== '?' && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/70 backdrop-blur text-neutral-600">
-                  <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                  {meal.time}
+          <div className="flex items-center gap-4">
+            <div
+              className="w-[68px] h-[68px] rounded-[20px] flex items-center justify-center text-[36px] leading-none flex-shrink-0"
+              style={{ background: 'rgba(255,255,255,0.15)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.25), 0 4px 16px rgba(0,0,0,0.20)' }}
+            >
+              🍽️
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[12px] font-bold mb-1" style={{ color: 'rgba(255,255,255,0.55)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>On mange dehors</p>
+              <h2 className="text-[22px] font-black text-white leading-tight truncate">
+                {meal.name && meal.name !== 'Restaurant' ? meal.name : 'Restaurant'}
+              </h2>
+              <div className="mt-2 flex gap-2">
+                <span
+                  className="inline-flex items-center gap-1.5 text-[11px] font-bold px-3 py-1 rounded-full"
+                  style={{ background: 'rgba(255,255,255,0.16)', color: 'rgba(255,255,255,0.85)' }}
+                >
+                  🌆 Soirée / Déjeuner
                 </span>
-              )}
-              {meal.isRestaurant && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/70 backdrop-blur text-neutral-600">
-                  🍴 Restaurant
-                </span>
-              )}
-              {recipe?.rapide && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full" style={{ background: '#FEF3C7', color: '#92400E' }}>
-                  ⚡ Rapide
-                </span>
-              )}
-              {recipe?.tags?.map((t) => (
-                <span key={t} className="inline-flex items-center text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/70 backdrop-blur text-neutral-600">
-                  {TAG_DISPLAY[t] ?? t}
-                </span>
-              ))}
+              </div>
             </div>
           </div>
         </div>
+      ) : (
+        /* Hero standard */
+        <div className="relative -mx-5 -mt-5 mb-5 px-5 pt-7 pb-5 rounded-t-[28px] overflow-hidden"
+          style={{ background: 'linear-gradient(135deg, rgba(0,24,168,0.07), rgba(0,24,168,0.03))' }}>
 
-        {/* Fav button */}
-        {recipe && (
-          <button
-            onClick={() => toggleFav(recipe.id)}
-            className="absolute top-4 right-5 w-9 h-9 rounded-full bg-white/60 backdrop-blur flex items-center justify-center active:scale-90 transition-transform"
-          >
-            <svg className="w-4 h-4" viewBox="0 0 24 24" fill={meal.fav ? '#0018A8' : 'none'} stroke={meal.fav ? '#0018A8' : '#9ca3af'} strokeWidth="2">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-          </button>
-        )}
-      </div>
+          <div className="flex items-start gap-4">
+            <div
+              className="w-[72px] h-[72px] rounded-[22px] flex items-center justify-center text-[38px] leading-none flex-shrink-0"
+              style={{ background: '#0018A8', boxShadow: '0 8px 24px rgba(0,24,168,0.35)' }}
+            >
+              {meal.emoji || '🍽'}
+            </div>
+
+            <div className="flex-1 min-w-0 pt-1">
+              <h2 className="text-[20px] font-black text-text1 leading-tight mb-2">{meal.name}</h2>
+
+              <div className="flex flex-wrap gap-1.5">
+                {meal.time && meal.time !== '?' && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/70 backdrop-blur text-neutral-600">
+                    <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    {meal.time}
+                  </span>
+                )}
+                {recipe?.rapide && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full" style={{ background: '#FEF3C7', color: '#92400E' }}>
+                    ⚡ Rapide
+                  </span>
+                )}
+                {recipe?.tags?.map((t) => (
+                  <span key={t} className="inline-flex items-center text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/70 backdrop-blur text-neutral-600">
+                    {TAG_DISPLAY[t] ?? t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {recipe && (
+            <button
+              onClick={() => toggleFav(recipe.id)}
+              className="absolute top-4 right-5 w-9 h-9 rounded-full bg-white/60 backdrop-blur flex items-center justify-center active:scale-90 transition-transform"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill={meal.fav ? '#0018A8' : 'none'} stroke={meal.fav ? '#0018A8' : '#9ca3af'} strokeWidth="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* ── Ingrédients condensés ── */}
       {hasIngredients && (
