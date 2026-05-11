@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import type { ShoppingItem } from '@/types'
 import { cn, ingredientEmoji } from '@/lib/utils'
+import FoodSticker from '@/components/ui/FoodSticker'
 
 interface Props {
   item: ShoppingItem
@@ -62,10 +63,14 @@ export default function ShoppingItemRow({ item }: Props) {
         )}
       </button>
 
-      {/* Emoji */}
-      <span className="text-[20px] leading-none flex-shrink-0 select-none" aria-hidden>
-        {ingredientEmoji(item.name)}
-      </span>
+      {/* Sticker / Emoji */}
+      <div className="w-8 h-8 flex items-center justify-center flex-shrink-0" aria-hidden>
+        <FoodSticker
+          name={item.name}
+          size={32}
+          fallback={<span className="text-[20px] leading-none select-none">{ingredientEmoji(item.name)}</span>}
+        />
+      </div>
 
       {/* Nom */}
       <span

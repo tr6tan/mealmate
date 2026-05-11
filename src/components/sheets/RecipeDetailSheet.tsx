@@ -3,6 +3,8 @@ import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import { showToast } from '@/components/ui/Toast'
 import MealAvatar from '@/components/ui/MealAvatar'
+import FoodSticker from '@/components/ui/FoodSticker'
+import { ingredientEmoji } from '@/lib/utils'
 
 function scaleQty(qty: string, factor: number): string {
   if (!qty || factor === 1) return qty
@@ -103,13 +105,22 @@ export default function RecipeDetailSheet() {
           </div>
         ) : (
           <div
-            className="w-full max-w-[280px] h-[140px] rounded-[24px] flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.08)]"
-            style={{ background: 'linear-gradient(135deg, #f0f0f0, #e0e0e0)' }}
+            className="w-full max-w-[280px] h-[160px] rounded-[24px] flex items-center justify-center shadow-[0_4px_16px_rgba(0,0,0,0.08)] overflow-hidden relative"
+            style={{ background: 'linear-gradient(135deg, #EEF0FF 0%, #DDE2FF 60%, #C7CFFF 100%)' }}
           >
-            {recipe.emoji
-              ? <span className="text-[72px] leading-none">{recipe.emoji}</span>
-              : <MealAvatar name={recipe.name} size="xl" />
-            }
+            {/* Watermark décoratif */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-10 scale-[2] pointer-events-none">
+              <FoodSticker name={recipe.name} size={160} shadow={false} />
+            </div>
+            <FoodSticker
+              name={recipe.name}
+              size={110}
+              fallback={
+                recipe.emoji
+                  ? <span className="text-[80px] leading-none">{recipe.emoji}</span>
+                  : <MealAvatar name={recipe.name} size="xl" />
+              }
+            />
           </div>
         )}
       </div>
@@ -128,7 +139,7 @@ export default function RecipeDetailSheet() {
           {recipe.rapide && <span className="ml-1 text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">⚡ Rapide</span>}
         </div>
         {/* Stars */}
-        <div className="flex gap-0.5">
+        <div className="flex gap-0.5 mb-3">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
               key={star}
@@ -145,6 +156,31 @@ export default function RecipeDetailSheet() {
             </button>
           ))}
         </div>
+
+        {/* Aperçu ingrédients */}
+        {hasIngredients && (
+          <div className="flex gap-1.5 flex-wrap">
+            {recipe.ingredients!.slice(0, 6).map((ing, i) => (
+              <div
+                key={i}
+                className="w-8 h-8 rounded-full bg-[#EEF0FF] flex items-center justify-center"
+                title={ing.name}
+              >
+                <FoodSticker
+                  name={ing.name}
+                  size={20}
+                  shadow={false}
+                  fallback={<span className="text-[14px] leading-none">{ingredientEmoji(ing.name)}</span>}
+                />
+              </div>
+            ))}
+            {recipe.ingredients!.length > 6 && (
+              <div className="w-8 h-8 rounded-full bg-[#EEF0FF] flex items-center justify-center text-[11px] font-bold text-[#001DC1]">
+                +{recipe.ingredients!.length - 6}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* ── CTA : Démarrer la cuisine ── */}
@@ -189,11 +225,15 @@ export default function RecipeDetailSheet() {
                 className="flex items-center gap-3 bg-white rounded-2xl px-3 py-3"
                 style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}
               >
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ background: '#001DC1' }}
-                >
-                  {CAT_ICONS[ing.category] ?? CAT_ICONS.epicerie}
+                <div className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center bg-[#EEF0FF]">
+                  <FoodSticker
+                    name={ing.name}
+                    size={28}
+                    shadow={false}
+                    fallback={
+                      <span className="text-[20px] leading-none">{ingredientEmoji(ing.name)}</span>
+                    }
+                  />
                 </div>
                 <div className="min-w-0">
                   <p className="text-[13px] font-semibold text-neutral-800 leading-snug truncate">{ing.name}</p>
@@ -208,11 +248,11 @@ export default function RecipeDetailSheet() {
           {/* Ajouter aux courses */}
           <button
             onClick={handleAddToCourses}
-            className="w-full py-3.5 rounded-2xl text-[14px] font-semibold text-[#001DC1] active:scale-[0.97] transition-all flex items-center justify-center gap-2"
-            style={{ background: 'white', boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}
+            className="w-full py-3.5 rounded-2xl text-[14px] font-semibold text-white active:scale-[0.97] transition-all flex items-center justify-center gap-2"
+            style={{ background: 'linear-gradient(135deg, #001DC1, #2B50F0)', boxShadow: '0 4px 16px rgba(0,29,193,0.22)' }}
           >
             <IcoCart />
-            + Ajouter à la liste de courses
+            Ajouter à la liste de courses
           </button>
         </div>
       )}
@@ -228,7 +268,7 @@ export default function RecipeDetailSheet() {
                 className="flex items-start gap-3.5 bg-white rounded-2xl px-4 py-3.5"
                 style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}
               >
-                <div className="w-6 h-6 rounded-full bg-neutral-900 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-6 h-6 rounded-full bg-[#001DC1] flex items-center justify-center flex-shrink-0 mt-0.5">
                   <span className="text-[11px] font-bold text-white">{i + 1}</span>
                 </div>
                 <p className="text-[13px] text-neutral-700 font-medium leading-relaxed flex-1">{step}</p>

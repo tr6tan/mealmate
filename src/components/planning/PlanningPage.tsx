@@ -6,6 +6,7 @@ import {
   haptic, cn,
 } from '@/lib/utils'
 import { showToast } from '@/components/ui/Toast'
+import FoodSticker from '@/components/ui/FoodSticker'
 import type { Meal, SlotKey } from '@/types'
 
 export default function PlanningPage() {
@@ -276,8 +277,15 @@ export default function PlanningPage() {
                         const isResto = meal && (meal.isRestaurant === true || meal.name === 'Restaurant')
                         if (isResto) return {
                           touchAction: 'none' as React.CSSProperties['touchAction'],
-                          background: 'linear-gradient(135deg, #001080 0%, #0022CC 40%, #2B50F0 58%, #0022CC 75%, #001080 100%)',
-                          boxShadow: '0 4px 16px rgba(0,20,180,0.50)',
+                          background: 'linear-gradient(135deg, #000E7A 0%, #0020CC 38%, #2B50F0 56%, #0020CC 74%, #000E7A 100%)',
+                          boxShadow: [
+                            '0 0 0 1.5px rgba(255,225,150,0.95)',
+                            '0 0 0 3px rgba(255,190,80,0.50)',
+                            '0 0 12px 2px rgba(255,175,55,0.40)',
+                            '0 6px 20px rgba(0,12,140,0.60)',
+                            'inset 0 1px 0 rgba(255,235,180,0.20)',
+                            'inset 0 0 0 1px rgba(255,210,130,0.15)',
+                          ].join(', '),
                         }
                         return { touchAction: (meal ? 'none' : 'auto') as React.CSSProperties['touchAction'] }
                       })()}
@@ -304,17 +312,27 @@ export default function PlanningPage() {
                                   {meal.name}
                                 </p>
                                 {isResto ? (
-                                  /* Reflet nacré + icône couverts pour restaurant */
                                   <>
-                                    <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(155deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0) 45%)', borderRadius: 'inherit' }} />
-                                    <div className="absolute top-0 left-3 right-3 h-px pointer-events-none" style={{ background: 'rgba(255,255,255,0.25)' }} />
-                                    <div className="absolute bottom-2 right-3 text-[32px] leading-none pointer-events-none select-none opacity-20">🍽️</div>
+                                    {/* reflet nacré haut-gauche */}
+                                    <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(155deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0) 48%)', borderRadius: 'inherit' }} />
+                                    {/* ligne lumière dorée haute */}
+                                    <div className="absolute top-0 left-3 right-3 h-px pointer-events-none" style={{ background: 'linear-gradient(90deg, rgba(255,230,160,0) 0%, rgba(255,230,160,0.55) 40%, rgba(255,230,160,0.55) 60%, rgba(255,230,160,0) 100%)' }} />
+                                    {/* ligne lumière bas atténuée */}
+                                    <div className="absolute bottom-0 left-6 right-6 h-px pointer-events-none" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                                    <div className="absolute bottom-1 right-2 pointer-events-none select-none" style={{ opacity: 0.35 }}>
+                                      <FoodSticker name="Restaurant" slug="restaurant" size={40} shadow={false} />
+                                    </div>
                                   </>
-                                ) : meal.emoji ? (
-                                  <div className="absolute -bottom-2 -right-2 text-[58px] leading-none pointer-events-none select-none" style={{ opacity: isToday ? 0.15 : 0.11 }}>
-                                    {meal.emoji}
+                                ) : (
+                                  <div className="absolute -bottom-1 -right-1 pointer-events-none select-none" style={{ opacity: isToday ? 0.22 : 0.18 }}>
+                                    <FoodSticker
+                                      name={meal.name}
+                                      size={48}
+                                      shadow={false}
+                                      fallback={meal.emoji ? <span className="text-[48px] leading-none">{meal.emoji}</span> : null}
+                                    />
                                   </div>
-                                ) : null}
+                                )}
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setMeal(dayIdx, slotKey, null) }}
                                   className="absolute top-2 right-2 w-5 h-5 rounded-full bg-white shadow flex items-center justify-center"

@@ -2,7 +2,8 @@ import { useState, useEffect, useMemo, useRef, type ReactNode } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import type { Recipe } from '@/types'
-import { DAY_LONG, haptic, fuzzyScore, getMondayByOffset, getWeekKey } from '@/lib/utils'
+import { DAY_LONG, haptic, fuzzyScore, getMondayByOffset, getWeekKey, ingredientEmoji } from '@/lib/utils'
+import FoodSticker from '@/components/ui/FoodSticker'
 import { showToast } from '@/components/ui/Toast'
 
 type TabMode = 'recette' | 'resto' | 'libre'
@@ -32,8 +33,13 @@ function RecipeRow({ recipe, onSelect, onDetail }: { recipe: Recipe; onSelect: (
       onKeyDown={(e) => e.key === 'Enter' && onSelect(recipe)}
       className="w-full flex items-center gap-3 px-1 py-2 text-left active:bg-black/[0.04] rounded-xl cursor-pointer transition-colors"
     >
-      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-[22px] leading-none" style={{ background: 'rgba(0,0,0,0.05)' }}>
-        {recipe.emoji || '🍽'}
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(0,0,0,0.05)' }}>
+        <FoodSticker
+          name={recipe.name}
+          size={28}
+          shadow={false}
+          fallback={<span className="text-[20px] leading-none">{recipe.emoji || ingredientEmoji(recipe.name)}</span>}
+        />
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-[14px] font-semibold text-text1 truncate">{recipe.name}</p>

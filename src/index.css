@@ -398,3 +398,26 @@
   from { opacity: 0; transform: translateX(-50%) translateY(12px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+
+/* Shopping – badge coché */
+@keyframes check-pop {
+  0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+  60%  { transform: scale(1.35) rotate(6deg); opacity: 1; }
+  80%  { transform: scale(0.88) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.animate-check-pop {
+  animation: check-pop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Shopping – sticker "tampon" au moment du cochage */
+@keyframes sticker-stamp {
+  0%   { transform: scale(1)    rotate(0deg); }
+  20%  { transform: scale(1.22) rotate(-7deg); }
+  55%  { transform: scale(0.78) rotate(4deg); }
+  80%  { transform: scale(0.86) rotate(-1deg); }
+  100% { transform: scale(0.82) rotate(0deg); }
+}
+.animate-sticker-stamp {
+  animation: sticker-stamp 0.44s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}

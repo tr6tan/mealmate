@@ -1,6 +1,7 @@
 import type { Recipe } from '@/types'
 import { ingredientEmoji } from '@/lib/utils'
 import { getStickerSlug, stickerUrl } from '@/lib/stickers'
+import FoodSticker from '@/components/ui/FoodSticker'
 
 interface Props {
   recipe: Recipe
@@ -76,10 +77,17 @@ export default function RecipeCard({ recipe, onClick, planCount = 0 }: Props) {
             {ingredients.map((ing) => (
               <span
                 key={ing.name}
-                className="text-[18px] leading-none"
+                className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-black/5"
                 title={ing.name}
               >
-                {ingredientEmoji(ing.name)}
+                <FoodSticker
+                  name={ing.name}
+                  size={22}
+                  shadow={false}
+                  fallback={
+                    <span className="text-[16px] leading-none">{ingredientEmoji(ing.name)}</span>
+                  }
+                />
               </span>
             ))}
             {(recipe.ingredients?.length ?? 0) > 5 && (

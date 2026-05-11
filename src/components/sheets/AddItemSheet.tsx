@@ -4,6 +4,7 @@ import { useAppStore } from '@/store/useAppStore'
 import type { ShoppingCategory } from '@/types'
 import { CAT_LABELS, ingredientEmoji } from '@/lib/utils'
 import { showToast } from '@/components/ui/Toast'
+import FoodSticker from '@/components/ui/FoodSticker'
 
 // ─── Catalogue d'articles ────────────────────────────────────────────────────
 
@@ -316,12 +317,15 @@ export default function AddItemSheet() {
                   >
                     <div className="relative">
                       <div
-                        className="w-[58px] h-[58px] rounded-full flex items-center justify-center select-none"
-                        style={{ background: sel ? '#001DC1' : '#F0F0F0' }}
+                        className="w-[58px] h-[58px] rounded-2xl flex items-center justify-center select-none transition-all"
+                        style={sel ? { boxShadow: '0 0 0 2.5px #001DC1, 0 0 0 5px rgba(0,29,193,0.15)' } : undefined}
                       >
-                        <span className="text-[26px] leading-none">
-                          {ingredientEmoji(item.name)}
-                        </span>
+                        <FoodSticker
+                          name={item.name}
+                          size={44}
+                          shadow={true}
+                          fallback={<span className="text-[32px] leading-none">{ingredientEmoji(item.name)}</span>}
+                        />
                       </div>
                       {sel && (
                         <div
@@ -336,7 +340,7 @@ export default function AddItemSheet() {
                       )}
                     </div>
                     <span className="text-[10px] font-semibold text-center leading-tight w-full"
-                      style={{ color: '#374151' }}>
+                      style={{ color: sel ? '#001DC1' : '#374151' }}>
                       {item.name}
                     </span>
                   </button>

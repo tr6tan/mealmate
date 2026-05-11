@@ -92,6 +92,7 @@ interface AppState {
   addShoppingItem: (item: Omit<ShoppingItem, 'id'>) => void
   toggleShoppingItem: (id: string) => void
   removeShoppingItem: (id: string) => void
+  updateShoppingItemQty: (id: string, qty: string) => void
   clearCheckedItems: () => void
   clearAllItems: () => void
   setAllChecked: (checked: boolean) => void
@@ -286,6 +287,11 @@ export const useAppStore = create<AppState>()(
 
       removeShoppingItem: (id) =>
         set((s) => ({ shoppingItems: s.shoppingItems.filter((i) => i.id !== id) })),
+
+      updateShoppingItemQty: (id, qty) =>
+        set((s) => ({
+          shoppingItems: s.shoppingItems.map((i) => i.id === id ? { ...i, qty } : i),
+        })),
 
       clearCheckedItems: () =>
         set((s) => ({ shoppingItems: s.shoppingItems.filter((i) => !i.checked) })),
