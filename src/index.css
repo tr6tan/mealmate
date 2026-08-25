@@ -203,7 +203,8 @@
     margin-bottom: 0;
   }
   .pb-nav-safe {
-    padding-bottom: calc(90px + env(safe-area-inset-bottom));
+    /* 12 (marge basse de la barre) + 54 (sa hauteur) + 12 de respiration */
+    padding-bottom: calc(78px + env(safe-area-inset-bottom));
   }
 }
 

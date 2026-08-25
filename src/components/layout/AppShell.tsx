@@ -27,6 +27,17 @@ export default function AppShell({ nav, children }: Props) {
         {nav}
       </main>
 
+      {/*
+        Bandeau opaque derrière la barre d'état.
+        `apple-mobile-web-app-status-bar-style: black-translucent` rend la
+        barre transparente : sans ce bandeau, le contenu défile sous l'heure
+        et les icônes système, qui deviennent illisibles.
+      */}
+      <div
+        className="fixed top-0 left-0 right-0 z-[45] pointer-events-none bg-bg"
+        style={{ height: 'env(safe-area-inset-top)' }}
+      />
+
       {/* Nav flottante (position:fixed, hors du flux) */}
       <BottomNav />
 
