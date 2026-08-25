@@ -41,19 +41,10 @@ export default function AppShell({ nav, children }: Props) {
       {/* Version badge */}
       <span
         className="fixed z-50 text-[10px] font-mono pointer-events-none select-none text-muted"
-        style={{ bottom: 6, left: 8 }}
+        style={{ bottom: 'calc(6px + env(safe-area-inset-bottom))', left: 8 }}
       >
         v{__APP_VERSION__} · {__BUILD_TIME__}
       </span>
-
-      {/* Peint la safe area bas en beige (iOS auto-offset annulé) */}
-      <div
-        className="fixed left-0 right-0 z-[49] pointer-events-none bg-bg"
-        style={{
-          bottom: 'calc(-1 * env(safe-area-inset-bottom))',
-          height: 'env(safe-area-inset-bottom)',
-        }}
-      />
 
       {/* Sheets & toasts */}
       {children}
