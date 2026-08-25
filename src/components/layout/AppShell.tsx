@@ -52,7 +52,7 @@ export default function AppShell({ nav, children }: Props) {
       {/* Version badge */}
       <span
         className="fixed z-50 text-[10px] font-mono pointer-events-none select-none text-muted"
-        style={{ bottom: 'calc(6px + env(safe-area-inset-bottom))', left: 8 }}
+        style={{ bottom: 'max(4px, calc(env(safe-area-inset-bottom) - 30px))', left: 8 }}
       >
         v{__APP_VERSION__} · {__BUILD_TIME__}
       </span>

@@ -211,8 +211,9 @@
     margin-bottom: 0;
   }
   .pb-nav-safe {
-    /* 12 (marge basse de la barre) + 54 (sa hauteur) + 12 de respiration */
-    padding-bottom: calc(78px + env(safe-area-inset-bottom));
+    /* Sommet de la barre (20 du bord + 54 de hauteur) + 12 de respiration.
+       L'inset est déjà absorbé par la position de la barre. */
+    padding-bottom: 90px;
   }
 }
 

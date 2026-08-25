@@ -25,9 +25,19 @@ export default function BottomNav() {
     <nav
       className="fixed left-1/2 -translate-x-1/2 rounded-full px-2 py-2 flex gap-1 z-50"
       style={{
-        // 12px au-dessus de la barre de gestes, pas du bord physique :
-        // sans l'inset, la barre empiétait de 22pt sur la home indicator.
-        bottom: 'calc(12px + env(safe-area-inset-bottom))',
+        /*
+         * Position basse de la barre flottante.
+         *
+         * 12px + tout l'inset la plaçait à 46pt du bord : trop haut, ça
+         * laissait un vide sous elle. On descend à 20pt du bord physique.
+         * La barre chevauche alors le bas de la zone de gestes, ce qui est
+         * permis — seuls les contrôles doivent en rester à l'écart, et les
+         * boutons, centrés dans les 54pt de hauteur, restent à ~47pt du bord.
+         *
+         * Sans zone de sécurité (navigateur, Android), `max()` retombe sur
+         * les 12px d'origine.
+         */
+        bottom: 'max(12px, calc(env(safe-area-inset-bottom) - 14px))',
         background: 'rgb(var(--c-terra))',
         boxShadow: '0 8px 32px rgba(0,24,168,0.40), 0 1px 0 rgba(255,255,255,0.14) inset',
         border: '1px solid rgba(0,50,220,0.35)',
