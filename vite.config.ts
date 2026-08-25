@@ -10,7 +10,18 @@ const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'))
 export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
-    __BUILD_TIME__: JSON.stringify(new Date().toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })),
+    // Fuseau explicite : les serveurs de build tournent en UTC, le badge
+    // affichait donc une heure en décalage de deux heures avec celle du
+    // téléphone, ce qui laisse croire que la mise à jour n'est pas passée.
+    __BUILD_TIME__: JSON.stringify(
+      new Date().toLocaleString('fr-FR', {
+        timeZone: 'Europe/Paris',
+        day: '2-digit',
+        month: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    ),
   },
   plugins: [
     react(),
