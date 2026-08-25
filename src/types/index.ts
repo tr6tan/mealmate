@@ -108,9 +108,24 @@ export interface SheetState {
 /** Données partagées dans Firestore (un doc par foyer) */
 export interface FoyerData {
   weekPlans: WeekPlans
-  recipes: Recipe[]
   shoppingItems: ShoppingItem[]
   settings: AppSettings
   /** Ids de recettes par défaut supprimées par le foyer : on ne les remet pas. */
   deletedDefaults?: string[]
+
+  // ── Carnet de recettes ────────────────────────────────────────────────────
+  // Seul le delta par rapport aux recettes livrées avec l'app est stocké : le
+  // carnet complet pesait ~72 Ko, dont 95 % de copies conformes du code, et
+  // repartait en entier à chaque clic sur un cœur.
+
+  /** Recettes créées par le foyer. */
+  recipesCustom?: Recipe[]
+  /** id d'une recette livrée → seuls les champs personnalisés. */
+  recipesOverrides?: Record<string, Partial<Omit<Recipe, 'id'>>>
+
+  /**
+   * Ancien format : le carnet complet.
+   * Lu puis migré vers `recipesCustom` / `recipesOverrides`, jamais réécrit.
+   */
+  recipes?: Recipe[]
 }

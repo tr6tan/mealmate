@@ -1,59 +1,86 @@
 import { useEffect, useRef } from 'react'
-import { doc, onSnapshot, setDoc } from 'firebase/firestore'
+import { deleteField, doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore'
 import { authReady, db } from '@/lib/firebase'
 import { COLLECTION, getFoyerId } from '@/lib/foyer'
 import { useAppStore } from '@/store/useAppStore'
 import { DEFAULT_RECIPES } from '@/data/defaultRecipes'
 import { deletePhoto, isDataUrl, savePhoto, subscribePhotos } from '@/lib/photos'
+import { diffRecipes, diffWeekPlans, mergeRecipes, type FieldWrites } from '@/lib/syncDiff'
 import type { FoyerData, Recipe } from '@/types'
 
 // Timers par champ — une file séparée par slice de données
 const _timers: Record<string, ReturnType<typeof setTimeout>> = {}
-// Derniers champs en attente d'écriture (pour le flush beforeunload)
-const _pendingFields: Record<string, Partial<FoyerData>> = {}
+// Dernières écritures en attente (pour le flush quand l'app passe en fond)
+const _pendingWrites: Record<string, FieldWrites> = {}
 
-/** Écriture debounced par champ : évite qu'un user écrase les données de l'autre. */
-function scheduleFieldWrite(
+/**
+ * Écriture debounced, par chemins de champs.
+ *
+ * On envoie `{ 'weekPlans.2026-08-24.1.midi': … }` plutôt que `weekPlans`
+ * entier : c'est Firestore qui fusionne, côté serveur. Sans ça, deux membres
+ * du foyer qui planifient en même temps s'écrasent mutuellement, puisque
+ * chacun renvoie une structure complète ignorant la modification de l'autre.
+ */
+function scheduleWrite(
   foyerId: string,
-  fields: Partial<FoyerData>,
+  cle: string,
+  writes: FieldWrites,
   onSaving: () => void,
   onSaved: () => void,
   onError: () => void,
   debounceMs = 300,
 ) {
-  const key = Object.keys(fields).join(',')
-  if (_timers[key]) clearTimeout(_timers[key])
-  _pendingFields[key] = fields
-  _timers[key] = setTimeout(async () => {
-    delete _pendingFields[key]
+  if (Object.keys(writes).length === 0) return
+
+  if (_timers[cle]) clearTimeout(_timers[cle])
+  // Les écritures en attente s'accumulent : deux modifications successives de
+  // créneaux différents doivent toutes deux partir.
+  _pendingWrites[cle] = { ...(_pendingWrites[cle] ?? {}), ...writes }
+
+  _timers[cle] = setTimeout(async () => {
+    const aEnvoyer = _pendingWrites[cle]
+    delete _pendingWrites[cle]
+    if (!aEnvoyer) return
     onSaving()
+
     const ref = doc(db, COLLECTION, foyerId)
-    let attempts = 0
-    const maxRetries = 3
-    while (attempts < maxRetries) {
+    let essais = 0
+    const maxEssais = 3
+    while (essais < maxEssais) {
       try {
-        await setDoc(ref, fields as Record<string, unknown>, { merge: true })
+        await updateDoc(ref, aEnvoyer)
         onSaved()
         return
       } catch (e) {
-        attempts++
-        console.error(`[MealMate] Firestore write attempt ${attempts}/${maxRetries}:`, e)
-        if (attempts < maxRetries) {
-          await new Promise((r) => setTimeout(r, 1000 * attempts))
+        // `updateDoc` exige un document existant : si le foyer vient d'être
+        // créé (ou a été supprimé), on retombe sur une écriture fusionnée.
+        if ((e as { code?: string }).code === 'not-found') {
+          try {
+            await setDoc(ref, aEnvoyer as Record<string, unknown>, { merge: true })
+            onSaved()
+            return
+          } catch { /* on repasse par la boucle de réessai */ }
         }
+        essais++
+        console.error(`[MealMate] Écriture Firestore ${essais}/${maxEssais}:`, e)
+        if (essais < maxEssais) await new Promise((r) => setTimeout(r, 1000 * essais))
       }
     }
     onError()
   }, debounceMs)
 }
 
-/**
- * Le carnet de recettes repart en entier à chaque écriture (~90 Ko) : un
- * simple clic sur un cœur renvoie tout le tableau. On groupe donc plus
- * largement que les autres champs. `flushPendingWrites` garantit qu'une
- * écriture en attente part quand même si l'app passe en arrière-plan.
- */
-const RECIPES_DEBOUNCE_MS = 1500
+/** Flush immédiat de tout ce qui est en attente (app mise en arrière-plan). */
+function flushPendingWrites(foyerId: string) {
+  const fusion: FieldWrites = {}
+  for (const writes of Object.values(_pendingWrites)) Object.assign(fusion, writes)
+  if (Object.keys(fusion).length === 0) return
+  Object.values(_timers).forEach(clearTimeout)
+  for (const cle of Object.keys(_pendingWrites)) delete _pendingWrites[cle]
+  // Firestore met l'écriture en file dans IndexedDB : elle repart au prochain
+  // lancement même si l'app est tuée avant la fin de la requête.
+  void updateDoc(doc(db, COLLECTION, foyerId), fusion)
+}
 
 /**
  * Sépare les photos base64 des recettes.
@@ -78,16 +105,10 @@ function extractPhotos(recipes: Recipe[]): {
   return { recipes: changed ? cleaned : recipes, photos, changed }
 }
 
-/** Flush immédiat de tous les champs en attente (appelé avant kill de l'app). */
-function flushPendingWrites(foyerId: string) {
-  const merged: Partial<FoyerData> = {}
-  for (const fields of Object.values(_pendingFields)) {
-    Object.assign(merged, fields)
-  }
-  if (Object.keys(merged).length === 0) return
-  Object.values(_timers).forEach(clearTimeout)
-  const ref = doc(db, COLLECTION, foyerId)
-  void setDoc(ref, merged as Record<string, unknown>, { merge: true })
+/** Écritures correspondant au carnet de recettes, réduites à leur delta. */
+function recipeWrites(recipes: Recipe[]): FieldWrites {
+  const { custom, overrides } = diffRecipes(recipes, DEFAULT_RECIPES)
+  return { recipesCustom: custom, recipesOverrides: overrides }
 }
 
 export function useFoyerSync() {
@@ -98,8 +119,8 @@ export function useFoyerSync() {
 
   // Compteur incrémenté pendant _hydrate → le subscriber ignore les changements
   const remoteUpdateDepth = useRef(0)
-  const isMergingRecipes = useRef(false)
-  // Bloque les écritures Store→Firestore tant qu'on n'a pas reçu un snapshot serveur
+  const isMigrating = useRef(false)
+  // Bloque les écritures Store→Firestore tant qu'on n'a pas reçu de snapshot
   const hasServerData = useRef(false)
 
   useEffect(() => {
@@ -116,52 +137,60 @@ export function useFoyerSync() {
     function subscribeAll(): Array<() => void> {
       const ref = doc(db, COLLECTION, foyerId)
 
-      // ── Firestore → Store ────────────────────────────────────────────────────
+      // ── Firestore → Store ──────────────────────────────────────────────────
       const unsubFirestore = onSnapshot(ref, { includeMetadataChanges: true }, (snap) => {
         setSyncStatus('synced')
 
-        // Snapshot depuis notre propre écriture en attente → ignorer
+        // Snapshot issu de notre propre écriture en attente → déjà appliqué
         if (snap.metadata.hasPendingWrites) return
 
         if (!snap.exists()) {
-          // Premier lancement : le doc n'existe pas encore, on l'initialise.
+          // Premier lancement : on initialise le document.
           const state = useAppStore.getState()
           const { darkMode: _dm, ...settingsToWrite } = state.settings
           void _dm
           setDoc(ref, {
             weekPlans:       state.weekPlans,
-            recipes:         state.recipes,
             deletedDefaults: state.deletedDefaults,
             shoppingItems:   state.shoppingItems,
             settings:        settingsToWrite,
+            ...recipeWrites(state.recipes),
           }).catch(() => setSyncStatus('error'))
           hasServerData.current = true
           return
         }
 
-        // Si c'est notre propre merge recettes, on ignore
-        if (isMergingRecipes.current) return
+        if (isMigrating.current) return
 
         const data = snap.data() as FoyerData
+        const supprimees = data.deletedDefaults ?? []
 
-        // ── Ajout des recettes par défaut manquantes ────────────────────────
-        // On n'ajoute QUE ce qui manque. Une recette déjà présente appartient au
-        // foyer : elle a pu être éditée, renommée ou vidée volontairement, on n'y
-        // touche jamais. Une recette par défaut supprimée reste supprimée (on
-        // mémorise son id dans `deletedDefaults`).
-        const existing = data.recipes ?? []
-        const existingIds = new Set(existing.map((r) => r.id))
-        const deletedDefaults = new Set(data.deletedDefaults ?? [])
-        const missingDefaults = DEFAULT_RECIPES.filter(
-          (r) => !existingIds.has(r.id) && !deletedDefaults.has(r.id),
-        )
+        // ── Carnet : ancien format (tableau complet) ou delta ────────────────
+        const ancienFormat = Array.isArray(data.recipes)
+        let recipes: Recipe[]
+        if (ancienFormat) {
+          // Les recettes livrées absentes du tableau n'ont jamais été
+          // supprimées volontairement (le champ `deletedDefaults` est récent) :
+          // on les réintroduit avant de calculer le delta.
+          const presentes = new Set(data.recipes!.map((r) => r.id))
+          const manquantes = DEFAULT_RECIPES.filter(
+            (r) => !presentes.has(r.id) && !supprimees.includes(r.id),
+          )
+          recipes = [...data.recipes!, ...manquantes]
+        } else {
+          recipes = mergeRecipes(
+            DEFAULT_RECIPES,
+            { custom: data.recipesCustom ?? [], overrides: data.recipesOverrides ?? {} },
+            supprimees,
+          )
+        }
 
-        // ── Migration : photos base64 → sous-collection `photos` ────────────
-        const split = extractPhotos([...existing, ...missingDefaults])
-        data.recipes = split.recipes
+        // ── Photos base64 encore dans le document → sous-collection ──────────
+        const split = extractPhotos(recipes)
+        recipes = split.recipes
 
-        if (missingDefaults.length > 0 || split.changed) {
-          isMergingRecipes.current = true
+        if (ancienFormat || split.changed) {
+          isMigrating.current = true
           Promise.all(
             Object.entries(split.photos).map(([recipeId, dataUrl]) =>
               savePhoto(recipeId, dataUrl).catch((e) =>
@@ -169,21 +198,45 @@ export function useFoyerSync() {
               ),
             ),
           )
-            .then(() => setDoc(ref, { recipes: data.recipes }, { merge: true }))
+            .then(() =>
+              updateDoc(ref, {
+                ...recipeWrites(recipes),
+                // Le tableau complet ne sert plus à rien : ~72 Ko de copies
+                // conformes du code, relues et réécrites à chaque changement.
+                ...(ancienFormat ? { recipes: deleteField() } : {}),
+              }),
+            )
+            .catch((e) => console.error('[MealMate] Migration du carnet:', e))
             .finally(() => {
-              isMergingRecipes.current = false
+              isMigrating.current = false
             })
         }
 
-        // ── Hydrate : marque le flag AVANT set() car le subscriber Zustand
-        //    est appelé synchronement pendant hydrate → il doit voir le flag ──
+        // ── Hydratation ─────────────────────────────────────────────────────
+        // Le flag est posé AVANT set() : le subscriber Zustand est appelé
+        // synchronement pendant l'hydratation et doit le voir.
         remoteUpdateDepth.current++
-        hydrate(data)
+        hydrate({ ...data, recipes })
         remoteUpdateDepth.current--
 
-        // Débloque les écritures Store→Firestore dès qu'on a reçu des données
-        // (y compris depuis le cache) pour éviter de perdre les modifications
-        // locales faites entre le snapshot cache et le snapshot serveur.
+        // ── Propagation de la purge des semaines anciennes ───────────────────
+        // Le store écarte les semaines de plus de 4 semaines, mais cette purge
+        // restait locale : l'écriture se faisait en `merge`, qui n'efface
+        // jamais de clé. Le document accumulait donc toutes les semaines
+        // jamais vues (11 semaines, 12 Ko, sur un foyer réel).
+        const gardees = new Set(Object.keys(useAppStore.getState().weekPlans))
+        const aPurger: FieldWrites = {}
+        for (const weekKey of Object.keys(data.weekPlans ?? {})) {
+          if (!gardees.has(weekKey)) aPurger[`weekPlans.${weekKey}`] = deleteField()
+        }
+        if (Object.keys(aPurger).length > 0) {
+          updateDoc(ref, aPurger).catch((e) =>
+            console.error('[MealMate] Purge des semaines anciennes:', e),
+          )
+        }
+
+        // Débloque les écritures dès la première donnée reçue (cache inclus),
+        // sinon les modifications locales faites entre-temps sont perdues.
         hasServerData.current = true
 
         if (!snap.metadata.fromCache) {
@@ -192,26 +245,34 @@ export function useFoyerSync() {
         }
       }, () => setSyncStatus('error'))
 
-      // ── Store → Firestore ────────────────────────────────────────────────────
+      // ── Store → Firestore ──────────────────────────────────────────────────
+      const saving = () => setSyncStatus('saving')
+      const saved = () => setSyncStatus('synced')
+      const failed = () => setSyncStatus('error')
+
       const unsubStore = useAppStore.subscribe((state, prev) => {
-        // Ignore les changements déclenchés par l'hydratation Firestore
+        // Changements provenant de l'hydratation : rien à renvoyer
         if (remoteUpdateDepth.current > 0) return
-        // Attend d'avoir reçu les données serveur avant d'écrire quoi que ce soit
         if (!hasServerData.current) return
 
         if (state.weekPlans !== prev.weekPlans) {
-          scheduleFieldWrite(foyerId, { weekPlans: state.weekPlans },
-            () => setSyncStatus('saving'), () => setSyncStatus('synced'), () => setSyncStatus('error'))
+          scheduleWrite(
+            foyerId,
+            'weekPlans',
+            diffWeekPlans(prev.weekPlans, state.weekPlans),
+            saving, saved, failed,
+          )
         }
+
         if (state.recipes !== prev.recipes) {
-          // Une recette supprimée emporte sa photo : sans ça le document
-          // `photos/{recipeId}` resterait orphelin dans Firestore.
-          const liveIds = new Set(state.recipes.map((r) => r.id))
+          // Une recette supprimée emporte sa photo, sinon le document
+          // `photos/{recipeId}` reste orphelin.
+          const vivantes = new Set(state.recipes.map((r) => r.id))
           for (const r of prev.recipes) {
-            if (!liveIds.has(r.id) && state.photos[r.id]) void deletePhoto(r.id)
+            if (!vivantes.has(r.id) && state.photos[r.id]) void deletePhoto(r.id)
           }
-          // Filet de sécurité : si une photo base64 se glisse dans une recette,
-          // elle part dans la sous-collection au lieu de gonfler le document.
+          // Filet : une photo base64 glissée dans une recette part dans la
+          // sous-collection au lieu de gonfler le document.
           const { recipes, photos, changed } = extractPhotos(state.recipes)
           if (changed) {
             for (const [recipeId, dataUrl] of Object.entries(photos)) {
@@ -220,34 +281,39 @@ export function useFoyerSync() {
               )
             }
           }
-          scheduleFieldWrite(foyerId, { recipes },
-            () => setSyncStatus('saving'), () => setSyncStatus('synced'), () => setSyncStatus('error'),
-            RECIPES_DEBOUNCE_MS)
+          scheduleWrite(foyerId, 'recipes', recipeWrites(recipes), saving, saved, failed)
         }
+
         if (state.deletedDefaults !== prev.deletedDefaults) {
-          scheduleFieldWrite(foyerId, { deletedDefaults: state.deletedDefaults },
-            () => setSyncStatus('saving'), () => setSyncStatus('synced'), () => setSyncStatus('error'))
+          scheduleWrite(
+            foyerId, 'deletedDefaults',
+            { deletedDefaults: state.deletedDefaults }, saving, saved, failed,
+          )
         }
+
         if (state.shoppingItems !== prev.shoppingItems) {
-          scheduleFieldWrite(foyerId, { shoppingItems: state.shoppingItems },
-            () => setSyncStatus('saving'), () => setSyncStatus('synced'), () => setSyncStatus('error'))
+          // La liste reste écrite en entier : c'est un tableau (~1 Ko), les
+          // chemins de champs ne s'y appliquent pas. Deux personnes qui
+          // cochent au même instant peuvent encore s'écraser.
+          scheduleWrite(
+            foyerId, 'shoppingItems',
+            { shoppingItems: state.shoppingItems }, saving, saved, failed,
+          )
         }
+
         if (state.settings !== prev.settings) {
           const { darkMode: _dm, ...settingsToWrite } = state.settings
           void _dm
-          scheduleFieldWrite(foyerId, { settings: settingsToWrite },
-            () => setSyncStatus('saving'), () => setSyncStatus('synced'), () => setSyncStatus('error'))
+          scheduleWrite(foyerId, 'settings', { settings: settingsToWrite }, saving, saved, failed)
         }
       })
 
-      // ── Photos (sous-collection dédiée) ──────────────────────────────────────
+      // ── Photos (sous-collection dédiée) ────────────────────────────────────
       const unsubPhotos = subscribePhotos(setPhotos)
 
-      // ── Flush avant kill ──
+      // ── Flush quand l'app passe en arrière-plan ────────────────────────────
       const handleVisibility = () => {
-        if (document.visibilityState === 'hidden') {
-          flushPendingWrites(foyerId)
-        }
+        if (document.visibilityState === 'hidden') flushPendingWrites(foyerId)
       }
       document.addEventListener('visibilitychange', handleVisibility)
 
@@ -266,4 +332,3 @@ export function useFoyerSync() {
     }
   }, [foyerId, hydrate, setPhotos, setSyncStatus])
 }
-

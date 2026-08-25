@@ -52,20 +52,34 @@ Un foyer est un document Firestore, plus deux sous-collections :
 
 ```
 foyers/{foyerId}
-  weekPlans        semaine (clé = lundi 'YYYY-MM-DD') → 7 jours → créneaux
-  recipes          carnet de recettes du foyer
-  deletedDefaults  recettes livrées avec l'app que le foyer a supprimées
-  shoppingItems    liste de courses
-  settings         régime, nom du foyer, thème
+  weekPlans         semaine (clé = lundi 'YYYY-MM-DD') → 7 jours → créneaux
+  recipesCustom     recettes créées par le foyer
+  recipesOverrides  id d'une recette livrée → champs personnalisés
+  deletedDefaults   recettes livrées que le foyer a supprimées
+  shoppingItems     liste de courses
+  settings          régime, nom du foyer, thème
   photos/{recipeId}    { data: dataURL }   une photo par document
   presence/{deviceId}  { lastSeen }        membres connectés
 ```
+
+**Le carnet n'est pas stocké en entier.** Les recettes livrées avec l'app sont
+déjà dans le bundle : Firestore ne garde que le delta (`recipesCustom` +
+`recipesOverrides`). Sur un foyer réel, le carnet est passé de 72 Ko à moins
+de 1 Ko. Le champ `recipes` de l'ancien format est migré puis supprimé au
+premier chargement.
+
+**Les écritures ciblent des chemins de champs** (`weekPlans.2026-08-24.1.midi`)
+plutôt que des champs entiers, pour que Firestore fusionne côté serveur : deux
+membres du foyer qui planifient au même moment ne s'écrasent plus. La liste de
+courses fait exception (c'est un tableau, ~1 Ko) et reste en dernier-écrivain-gagne.
 
 Un document Firestore plafonne à 1 Mio : les photos vivent **hors** du document
 foyer, une par document (`src/lib/photos.ts`). Une photo base64 qui se
 glisserait dans une recette est extraite automatiquement à l'écriture.
 
-Les semaines de plus de 4 semaines sont purgées à l'hydratation.
+Les semaines de plus de 4 semaines sont purgées à l'hydratation, et la purge
+est propagée à Firestore (elle restait locale, le document accumulait toutes
+les semaines jamais vues).
 
 ## Foyers
 
@@ -83,7 +97,7 @@ foyers multiples. Réglages → Foyer → « Créer un foyer privé » en sort.
 src/
   components/   pages et sheets, par domaine (planning, recipes, shopping…)
   hooks/        useFoyerSync (temps réel), useFoyerPresence
-  lib/          firebase, foyer, photos, stickers, utils, toast
+  lib/          firebase, foyer, photos, stickers, syncDiff, utils, toast
   store/        useAppStore (Zustand) — état et actions
   data/         recettes livrées avec l'app
   __tests__/    tests unitaires
