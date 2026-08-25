@@ -219,7 +219,9 @@ export const useAppStore = create<AppState>()(
           const toKey = getWeekKey(getMondayByOffset(s.weekOffset))
           const source = s.weekPlans[fromKey]
           if (!source) return {}
-          // Deep copy de chaque jour
+          // Copie de surface : chaque jour est un nouvel objet, mais les
+          // repas restent partagés avec la semaine source. C'est sans effet
+          // tant que les repas sont remplacés et jamais mutés en place.
           const copy: WeekPlan = {}
           for (let i = 0; i < 7; i++) copy[i] = source[i] ? { ...source[i] } : emptyDay()
           return { weekPlans: { ...s.weekPlans, [toKey]: copy } }
