@@ -133,20 +133,25 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
       touchInScrollable = false
       gestureDisabled = false
 
-      // Vérifie si le touch démarre dans un enfant scrollable
+      /*
+       * Cherche la zone défilante sous le doigt, `el` compris : c'est
+       * souvent le sheet lui-même qui défile, et l'ancienne boucle
+       * s'arrêtait juste avant de l'examiner. Le geste retombait alors sur
+       * le seuil permissif du handle, et la fiche se fermait dès qu'on
+       * tirait un peu vers le bas pour lire la suite.
+       */
       let node = e.target as HTMLElement | null
-      while (node && node !== el) {
+      while (node) {
         if (
-          node.scrollHeight > node.clientHeight &&
+          node.scrollHeight > node.clientHeight + 1 &&
           window.getComputedStyle(node).overflowY !== 'hidden'
         ) {
           touchInScrollable = true
-          // Si le contenu est déjà scrollé (pas en haut), on bloque le geste de fermeture
-          if (node.scrollTop > 2) {
-            gestureDisabled = true
-          }
+          // Contenu déjà défilé : on ne ferme pas, on laisse défiler.
+          if (node.scrollTop > 2) gestureDisabled = true
           break
         }
+        if (node === el) break
         node = node.parentElement
       }
     }
@@ -160,11 +165,12 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
       if (deltaY <= 0) return // swipe vers le haut → ignorer
 
       if (touchInScrollable) {
-        // Dans la zone scrollable (scrollTop=0) : exige un grand geste lent
-        if (deltaY > 140 && elapsed > 250) closeSheet()
+        // Haut d'une zone défilante : il faut un geste ample et délibéré,
+        // pour ne pas confondre avec une tentative de défilement.
+        if (deltaY > 180 && elapsed > 300) closeSheet()
       } else {
-        // Zone handle/header : seuil normal
-        if (deltaY > 80) closeSheet()
+        // Poignée ou en-tête : la fermeture est le seul geste attendu.
+        if (deltaY > 90) closeSheet()
       }
     }
 
