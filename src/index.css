@@ -125,9 +125,6 @@
     background-color: rgb(var(--c-bg));
   }
 
-  /* body::after supprimé — iOS auto-décale les fixed de la safe area,
-     le fill était lui aussi décalé et couvrait la nav */
-
   body {
     /*
      * ── MealMate type stack ─────────────────────────────────
@@ -149,7 +146,10 @@
     font-optical-sizing: auto;
     /* Active les formes alternatives (a, g, y single-story) */
     font-feature-settings: 'cv01' 1, 'cv04' 1, 'ss01' 1;
-    background-color: transparent;
+    /* Pas de `background-color` ici : cette seconde règle `body` écrasait le
+       fond déclaré plus haut et laissait le body transparent, donc le fond
+       par défaut du navigateur (blanc ou gris) visible partout où le shell
+       ne peint pas — notamment sous la zone de gestes. */
     color: rgb(var(--c-text1));
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
