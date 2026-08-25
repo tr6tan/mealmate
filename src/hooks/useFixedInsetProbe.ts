@@ -61,6 +61,19 @@ export function useFixedInsetProbe() {
       // ordinateur) ne doit pas décaler l'interface : on borne à 64pt.
       const ecart = Math.min(64, Math.max(0, ecartViewport, resteEcran))
       document.documentElement.style.setProperty('--fixed-bottom-gap', `${ecart}px`)
+
+      // Diagnostic temporaire : les valeurs sont affichées à côté du numéro
+      // de version, le temps de comprendre le décalage constaté sur un
+      // appareil que le simulateur ne reproduit pas.
+      document.documentElement.dataset.probe = [
+        `g${ecart}`,
+        `ih${window.innerHeight}`,
+        `sh${hauteurEcran}`,
+        `it${Math.round(insetHaut)}`,
+        `ev${ecartViewport}`,
+        autonome ? 'pwa' : 'web',
+      ].join(' ')
+      window.dispatchEvent(new Event('probe-updated'))
     }
 
     mesurer()

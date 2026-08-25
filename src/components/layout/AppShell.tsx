@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import BottomNav from './BottomNav'
 
@@ -8,6 +8,15 @@ interface Props {
 }
 
 export default function AppShell({ nav, children }: Props) {
+  // Diagnostic temporaire affiché à côté de la version (cf. useFixedInsetProbe)
+  const [probe, setProbe] = useState('')
+  useEffect(() => {
+    const lire = () => setProbe(document.documentElement.dataset.probe ?? '')
+    lire()
+    window.addEventListener('probe-updated', lire)
+    return () => window.removeEventListener('probe-updated', lire)
+  }, [])
+
   const sheetState = useAppStore((s) => s.sheetState)
   const closeSheet = useAppStore((s) => s.closeSheet)
 
@@ -54,7 +63,7 @@ export default function AppShell({ nav, children }: Props) {
         className="fixed z-50 text-[10px] font-mono pointer-events-none select-none text-muted"
         style={{ bottom: 'calc(4px - var(--fixed-bottom-gap, 0px))', left: 8 }}
       >
-        v{__APP_VERSION__} · {__BUILD_TIME__}
+        v{__APP_VERSION__} · {__BUILD_TIME__} · {probe}
       </span>
 
       {/* Sheets & toasts */}
