@@ -3,7 +3,8 @@ import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import type { Period, ShoppingCategory, Ingredient, DietaryTag } from '@/types'
 import { PERIOD_LABEL, cn, resizeToBase64 } from '@/lib/utils'
-import { showToast } from '@/components/ui/Toast'
+import { showToast } from '@/lib/toast'
+import { deletePhoto } from '@/lib/photos'
 
 const PERIODS: Period[] = ['pdej', 'midi', 'soir']
 const TIME_OPTIONS = ['5 min', '10 min', '15 min', '20 min', '30 min', '45 min', '1h', '1h30']
@@ -26,6 +27,7 @@ const TAG_OPTIONS: { id: DietaryTag; label: string }[] = [
 export default function EditRecipeSheet() {
   const updateRecipe = useAppStore((s) => s.updateRecipe)
   const closeSheet   = useAppStore((s) => s.closeSheet)
+  const photos     = useAppStore((s) => s.photos)
   const sheetState   = useAppStore((s) => s.sheetState)
 
   const recipe = sheetState.sheet === 'edit-recipe' ? sheetState.recipeContext : undefined
@@ -57,7 +59,7 @@ export default function EditRecipeSheet() {
       setFav(recipe.fav)
       setRapide(recipe.rapide)
       setSteps(recipe.steps?.length ? recipe.steps : [''])
-      setPhoto(recipe.photo)
+      setPhoto(photos[recipe.id] ?? recipe.photo)
       setIngredients(recipe.ingredients ?? [])
       setTags(recipe.tags ?? [])
       setNotes(recipe.notes ?? '')
@@ -90,6 +92,10 @@ export default function EditRecipeSheet() {
 
   const handleSave = () => {
     if (!name.trim() || !recipe) return
+    // La photo vit hors du document foyer : la retirer du formulaire doit
+    // aussi la supprimer de la sous-collection, sinon elle réapparaît au
+    // prochain snapshot.
+    if (!photo && photos[recipe.id]) void deletePhoto(recipe.id)
     const cleanSteps = steps.map((s) => s.trim()).filter(Boolean)
     const cleanIngredients = ingredients.filter((i) => i.name.trim())
     updateRecipe(recipe.id, {
@@ -116,7 +122,7 @@ export default function EditRecipeSheet() {
     <BottomSheet name="edit-recipe" className="max-h-[92dvh]">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-[17px] font-extrabold text-text1">Modifier la recette</h2>
-        <button onClick={closeSheet} className="text-muted flex items-center"><svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        <button onClick={closeSheet} aria-label="Fermer" className="text-muted flex items-center"><svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
 
       <div className="space-y-2.5 mb-4">

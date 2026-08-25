@@ -80,7 +80,10 @@ export default function CookingSheet() {
   const onTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX }
   const onTouchEnd   = (e: React.TouchEvent) => {
     const dx = e.changedTouches[0].clientX - touchStartX.current
-    if (Math.abs(dx) > 50) dx < 0 ? goNext() : goPrev()
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) goNext()
+      else goPrev()
+    }
   }
 
   if (!isOpen || !recipe) return null
@@ -105,6 +108,7 @@ export default function CookingSheet() {
         </div>
         <button
           onClick={closeSheet}
+          aria-label="Quitter le mode cuisine"
           className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center text-white active:bg-white/25 transition shrink-0"
         >
           <IcoClose />
@@ -115,6 +119,7 @@ export default function CookingSheet() {
       <div className="flex items-center justify-center gap-4 py-3 shrink-0">
         <button
           onClick={resetChrono}
+          aria-label="Remettre le minuteur à zéro"
           className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white/70 active:bg-white/20"
         >
           <IcoReset />

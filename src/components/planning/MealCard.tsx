@@ -14,7 +14,7 @@ function isResto(meal: Meal) {
   return meal.isRestaurant === true || meal.name === 'Restaurant'
 }
 
-export default function MealCard({ meal, onPress, period }: Props) {
+export default function MealCard({ meal, onPress }: Props) {
   if (isResto(meal)) {
     return (
       <button

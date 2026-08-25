@@ -5,7 +5,7 @@ import {
   getMondayByOffset, getDayFromMonday, getTodayIndex, getWeekKey,
   haptic, cn,
 } from '@/lib/utils'
-import { showToast } from '@/components/ui/Toast'
+import { showToast } from '@/lib/toast'
 import FoodSticker from '@/components/ui/FoodSticker'
 import type { Meal, SlotKey } from '@/types'
 
@@ -269,9 +269,11 @@ export default function PlanningPage() {
                       }}
                       onClick={() => {
                         if (wasDraggingRef.current) { wasDraggingRef.current = false; return }
-                        meal
-                          ? openMealDetail(dayIdx, slotKey, meal)
-                          : openSheet({ sheet: 'add-meal', addMealPeriod: slotKey, mealContext: { dayIdx, slotKey } })
+                        if (meal) {
+                          openMealDetail(dayIdx, slotKey, meal)
+                        } else {
+                          openSheet({ sheet: 'add-meal', addMealPeriod: slotKey, mealContext: { dayIdx, slotKey } })
+                        }
                       }}
                       style={(() => {
                         const isResto = meal && (meal.isRestaurant === true || meal.name === 'Restaurant')
@@ -335,6 +337,7 @@ export default function PlanningPage() {
                                 )}
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setMeal(dayIdx, slotKey, null) }}
+                                  aria-label={`Retirer ${meal.name}`}
                                   className="absolute top-2 right-2 w-5 h-5 rounded-full bg-white shadow flex items-center justify-center"
                                 >
                                   <svg className="w-2.5 h-2.5 text-neutral-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">

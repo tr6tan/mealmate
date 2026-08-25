@@ -303,8 +303,12 @@ export function fuzzyFilter<T>(
     .sort((a, b) => b._fuzzyScore - a._fuzzyScore)
 }
 
-/** Redimensionne + compresse une image (File) en base64 JPEG */
-export function resizeToBase64(file: File, maxW = 800, quality = 0.72): Promise<string> {
+/**
+ * Redimensionne + compresse une image (File) en base64 JPEG.
+ * 640px / q0.62 vise ~40 Ko : les photos partent dans la sous-collection
+ * `photos` (un document Firestore par photo, plafonné à 1 Mio).
+ */
+export function resizeToBase64(file: File, maxW = 640, quality = 0.62): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = (e) => {

@@ -21,14 +21,18 @@ import { nanoid } from '@/lib/nanoid'
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 /** Parse qty string into number + unit, e.g. "250g" → [250, "g"], "2 pièces" → [2, "pièces"] */
-function parseQty(qty: string): { num: number; unit: string } | null {
+export function parseQty(qty: string): { num: number; unit: string } | null {
   const m = qty.trim().match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/)
   if (!m) return null
   return { num: parseFloat(m[1].replace(',', '.')), unit: m[2].trim().toLowerCase() }
 }
 
-/** Merge two qty strings intelligently: "250g" + "100g" → "350g", incompatible → "250g + 100g" */
-function mergeQty(a: string, b: string): string {
+/**
+ * Additionne deux quantités quand l'unité est la même, les juxtapose sinon.
+ * L'unité ressort normalisée (minuscules, précédée d'une espace) :
+ * "250g" + "100g" → "350 g", "250g" + "2 pièces" → "250g + 2 pièces".
+ */
+export function mergeQty(a: string, b: string): string {
   if (!a) return b
   if (!b) return a
   const pa = parseQty(a)
@@ -40,6 +44,38 @@ function mergeQty(a: string, b: string): string {
   return `${a} + ${b}`
 }
 
+/** Lit une clé de semaine 'YYYY-MM-DD' comme une date locale (pas UTC). */
+function parseWeekKey(key: string): Date {
+  const [y, m, d] = key.split('-').map(Number)
+  return new Date(y, (m ?? 1) - 1, d ?? 1)
+}
+
+/**
+ * Retire le champ `photo` des repas planifiés.
+ * Il recopiait la photo de la recette dans chaque créneau du planning sans
+ * jamais être affiché — du poids mort dans le document Firestore.
+ */
+function stripMealPhotos(weekPlans: WeekPlans): WeekPlans {
+  const out: WeekPlans = {}
+  for (const [weekKey, week] of Object.entries(weekPlans)) {
+    const nextWeek: WeekPlan = {}
+    for (const [dayIdx, day] of Object.entries(week ?? {})) {
+      if (!day) continue
+      const nextDay = { ...day } as Record<string, Meal | null>
+      for (const [slot, meal] of Object.entries(nextDay)) {
+        if (meal && 'photo' in meal) {
+          const { photo: _photo, ...rest } = meal as Meal & { photo?: string }
+          void _photo
+          nextDay[slot] = rest as Meal
+        }
+      }
+      nextWeek[Number(dayIdx)] = nextDay as unknown as DayPlan
+    }
+    out[weekKey] = nextWeek
+  }
+  return out
+}
+
 function buildInitialWeek(): WeekPlan {
   const plan: WeekPlan = {}
   for (let i = 0; i < 7; i++) plan[i] = emptyDay()
@@ -48,6 +84,10 @@ function buildInitialWeek(): WeekPlan {
 
 // Référence stable pour une semaine vide (évite les re-renders infinis)
 const EMPTY_WEEK: WeekPlan = buildInitialWeek()
+
+// Ids des recettes livrées avec l'app — sert à distinguer une suppression de
+// recette par défaut (à mémoriser) d'une suppression de recette perso.
+const DEFAULT_IDS = new Set(DEFAULT_RECIPES.map((r) => r.id))
 
 // ── Store interface ───────────────────────────────────────────────────────────
 
@@ -62,6 +102,10 @@ interface AppState {
   // Data
   weekPlans: WeekPlans
   recipes: Recipe[]
+  /** Ids de recettes par défaut supprimées : elles ne sont jamais réinjectées. */
+  deletedDefaults: string[]
+  /** Photos locales, hors document foyer : recipeId → dataURL. */
+  photos: Record<string, string>
   shoppingItems: ShoppingItem[]
   settings: AppSettings
 
@@ -100,8 +144,9 @@ interface AppState {
   // Actions — Settings
   updateSettings: (patch: Partial<AppSettings>) => void
 
-  // Action interne — hydratation depuis Firestore
+  // Actions internes — hydratation depuis Firestore
   _hydrate: (data: FoyerData) => void
+  _setPhotos: (photos: Record<string, string>) => void
 }
 
 // ── Helpers darkMode (préférence locale uniquement) ──────────────────────────
@@ -132,6 +177,8 @@ export const useAppStore = create<AppState>()(
 
       weekPlans: {},
       recipes: DEFAULT_RECIPES,
+      deletedDefaults: [],
+      photos: {},
       shoppingItems: [],
       settings: {
         personnes: 2,
@@ -247,7 +294,12 @@ export const useAppStore = create<AppState>()(
         })),
 
       deleteRecipe: (id) =>
-        set((s) => ({ recipes: s.recipes.filter((r) => r.id !== id) })),
+        set((s) => ({
+          recipes: s.recipes.filter((r) => r.id !== id),
+          deletedDefaults: DEFAULT_IDS.has(id) && !s.deletedDefaults.includes(id)
+            ? [...s.deletedDefaults, id]
+            : s.deletedDefaults,
+        })),
 
       duplicateRecipe: (id) =>
         set((s) => {
@@ -270,7 +322,7 @@ export const useAppStore = create<AppState>()(
           recipes: s.recipes.map((r) => (r.id === id ? { ...r, fav: !r.fav } : r)),
         })),
 
-      resetRecipes: () => set({ recipes: DEFAULT_RECIPES }),
+      resetRecipes: () => set({ recipes: DEFAULT_RECIPES, deletedDefaults: [] }),
 
       // ── Shopping ──
       addShoppingItem: (item) =>
@@ -308,6 +360,8 @@ export const useAppStore = create<AppState>()(
         set((s) => ({ settings: { ...s.settings, ...patch } }))
       },
 
+      _setPhotos: (photos) => set({ photos }),
+
       // ── Hydratation Firestore ──
       _hydrate: (data) => {
         // Migration : anciens docs Firestore avaient weekPlan (flat), nouveaux ont weekPlans
@@ -320,19 +374,25 @@ export const useAppStore = create<AppState>()(
             weekPlans = { [key]: oldWeekPlan }
           }
         }
-        // Purge des semaines > 4 semaines passées
+        // Purge des semaines > 4 semaines passées.
+        // parseWeekKey lit la clé en heure LOCALE : `new Date('2026-08-24')`
+        // aurait donné minuit UTC, soit un décalage d'un jour selon le fuseau.
         const cutoff = new Date()
         cutoff.setDate(cutoff.getDate() - 28)
         cutoff.setHours(0, 0, 0, 0)
         weekPlans = Object.fromEntries(
-          Object.entries(weekPlans).filter(([key]) => new Date(key) >= cutoff)
+          Object.entries(weekPlans).filter(([key]) => parseWeekKey(key) >= cutoff)
         )
+        // Les repas planifiés dupliquaient la photo de la recette (jamais
+        // affichée) : on la retire pour alléger le document foyer.
+        weekPlans = stripMealPhotos(weekPlans)
         // darkMode est une préférence locale : on la préserve lors des mises à jour distantes
         const localDarkMode = get().settings.darkMode
         set({
           weekPlans,
-          recipes:       data.recipes       ?? get().recipes,
-          shoppingItems: data.shoppingItems ?? get().shoppingItems,
+          recipes:         data.recipes         ?? get().recipes,
+          deletedDefaults: data.deletedDefaults ?? get().deletedDefaults,
+          shoppingItems:   data.shoppingItems   ?? get().shoppingItems,
           settings: {
             ...(data.settings ?? get().settings),
             darkMode: localDarkMode,
@@ -348,6 +408,13 @@ export const selectCurrentWeekPlan = (s: AppState): WeekPlan => {
   const key = getWeekKey(getMondayByOffset(s.weekOffset))
   return s.weekPlans[key] ?? EMPTY_WEEK
 }
+
+/**
+ * Photo à afficher pour une recette : la photo locale (sous-collection
+ * `photos`) prime, sinon l'URL distante portée par la recette.
+ */
+export const selectRecipePhoto = (recipeId: string) => (s: AppState): string | undefined =>
+  s.photos[recipeId] ?? s.recipes.find((r) => r.id === recipeId)?.photo
 
 export const selectItemsByCategory = (category: ShoppingCategory) => (s: AppState) =>
   s.shoppingItems.filter((i) => i.category === category)

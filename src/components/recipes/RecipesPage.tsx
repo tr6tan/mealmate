@@ -6,6 +6,8 @@ import RecipeCard from './RecipeCard'
 
 type FilterKey = 'all' | Period | 'fav' | 'rapide' | DietaryTag
 
+const DIETARY_TAGS: DietaryTag[] = ['vegetarien', 'vegan', 'sans-gluten', 'sans-lactose']
+
 const FILTERS: { key: FilterKey; label: string }[] = [
   { key: 'all',    label: 'Tout' },
   { key: 'pdej',  label: 'Petit-dej' },
@@ -47,14 +49,18 @@ export default function RecipesPage() {
     return counts
   }, [weekPlans, recipes])
 
-  const DIETARY_TAGS: DietaryTag[] = ['vegetarien', 'vegan', 'sans-gluten', 'sans-lactose']
+  // Recettes retenues par le régime global (réglages) : c'est l'univers commun
+  // à la liste ET aux compteurs des chips, sinon l'en-tête affiche « 7 recettes »
+  // pendant que le chip « Tout » en annonce 100.
+  const inDiet = useMemo(() => recipes.filter((r) => {
+    if (!r || typeof r.name !== 'string') return false
+    if (diet === 'vegan' && !r.tags?.includes('vegan')) return false
+    if (diet === 'vege'  && !r.tags?.some(t => t === 'vegetarien' || t === 'vegan')) return false
+    return true
+  }), [recipes, diet])
 
   const filtered = useMemo(() => {
-    let list = recipes.filter((r) => {
-      if (!r || typeof r.name !== 'string') return false
-      // filtre régime alimentaire global (depuis profil)
-      if (diet === 'vegan' && !r.tags?.includes('vegan')) return false
-      if (diet === 'vege'  && !r.tags?.some(t => t === 'vegetarien' || t === 'vegan')) return false
+    let list = inDiet.filter((r) => {
       const matchFilter =
         filter === 'all' ||
         filter === r.period ||
@@ -66,20 +72,20 @@ export default function RecipesPage() {
     })
     if (favFirst) list = [...list.filter((r) => r.fav), ...list.filter((r) => !r.fav)]
     return list
-  }, [recipes, filter, search, favFirst, diet])
+  }, [inDiet, filter, search, favFirst])
 
   const counts = useMemo<Record<string, number>>(() => ({
-    all: recipes.length,
-    pdej: recipes.filter((r) => r.period === 'pdej').length,
-    midi: recipes.filter((r) => r.period === 'midi').length,
-    soir: recipes.filter((r) => r.period === 'soir').length,
-    fav: recipes.filter((r) => r.fav).length,
-    rapide: recipes.filter((r) => r.rapide).length,
-    vegetarien: recipes.filter((r) => r.tags?.includes('vegetarien')).length,
-    vegan: recipes.filter((r) => r.tags?.includes('vegan')).length,
-    'sans-gluten': recipes.filter((r) => r.tags?.includes('sans-gluten')).length,
-    'sans-lactose': recipes.filter((r) => r.tags?.includes('sans-lactose')).length,
-  }), [recipes])
+    all: inDiet.length,
+    pdej: inDiet.filter((r) => r.period === 'pdej').length,
+    midi: inDiet.filter((r) => r.period === 'midi').length,
+    soir: inDiet.filter((r) => r.period === 'soir').length,
+    fav: inDiet.filter((r) => r.fav).length,
+    rapide: inDiet.filter((r) => r.rapide).length,
+    vegetarien: inDiet.filter((r) => r.tags?.includes('vegetarien')).length,
+    vegan: inDiet.filter((r) => r.tags?.includes('vegan')).length,
+    'sans-gluten': inDiet.filter((r) => r.tags?.includes('sans-gluten')).length,
+    'sans-lactose': inDiet.filter((r) => r.tags?.includes('sans-lactose')).length,
+  }), [inDiet])
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar">

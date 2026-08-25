@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, type ReactNode } from 'react'
 import ErrorBoundary from '@/components/ui/ErrorBoundary'
 import { useAppStore } from '@/store/useAppStore'
 import { getTodayIndex, getWeekMonday } from '@/lib/utils'

@@ -3,7 +3,7 @@ import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import type { Period, SlotKey } from '@/types'
 import { DAY_SHORT, PERIOD_LABEL, MONTHS, getMondayByOffset, getDayFromMonday, cn } from '@/lib/utils'
-import { showToast } from '@/components/ui/Toast'
+import { showToast } from '@/lib/toast'
 
 const PERIODS: Period[] = ['pdej', 'midi', 'soir']
 const SLOT_MAP: Record<Period, SlotKey> = { pdej: 'pdej', midi: 'midi', soir: 'soir' }

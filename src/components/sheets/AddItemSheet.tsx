@@ -3,7 +3,7 @@ import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import type { ShoppingCategory } from '@/types'
 import { CAT_LABELS, ingredientEmoji } from '@/lib/utils'
-import { showToast } from '@/components/ui/Toast'
+import { showToast } from '@/lib/toast'
 import FoodSticker from '@/components/ui/FoodSticker'
 
 // ─── Catalogue d'articles ────────────────────────────────────────────────────
@@ -228,7 +228,8 @@ export default function AddItemSheet() {
   const toggleItem = (item: CatalogItem) => {
     setSelected(prev => {
       const next = new Map(prev)
-      next.has(item.name) ? next.delete(item.name) : next.set(item.name, item)
+      if (next.has(item.name)) next.delete(item.name)
+      else next.set(item.name, item)
       return next
     })
   }

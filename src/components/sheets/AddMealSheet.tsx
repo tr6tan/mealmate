@@ -4,7 +4,7 @@ import { useAppStore } from '@/store/useAppStore'
 import type { Recipe } from '@/types'
 import { DAY_LONG, haptic, fuzzyScore, getMondayByOffset, getWeekKey, ingredientEmoji } from '@/lib/utils'
 import FoodSticker from '@/components/ui/FoodSticker'
-import { showToast } from '@/components/ui/Toast'
+import { showToast } from '@/lib/toast'
 
 type TabMode = 'recette' | 'resto' | 'libre'
 
@@ -159,7 +159,7 @@ export default function AddMealSheet() {
     if (!context) return
     haptic(10)
     setMeal(context.dayIdx, context.slotKey, {
-      name: recipe.name, emoji: recipe.emoji, time: recipe.time, fav: recipe.fav, photo: recipe.photo,
+      name: recipe.name, emoji: recipe.emoji, time: recipe.time, fav: recipe.fav,
     })
     closeSheet()
     showToast(`${recipe.name} ajouté !`)

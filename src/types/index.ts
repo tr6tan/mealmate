@@ -21,7 +21,6 @@ export interface Meal {
   emoji: string
   time: string
   fav: boolean
-  photo?: string
   isRestaurant?: boolean
 }
 
@@ -112,4 +111,6 @@ export interface FoyerData {
   recipes: Recipe[]
   shoppingItems: ShoppingItem[]
   settings: AppSettings
+  /** Ids de recettes par défaut supprimées par le foyer : on ne les remet pas. */
+  deletedDefaults?: string[]
 }

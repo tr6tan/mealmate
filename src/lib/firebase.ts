@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase/app'
+import { getAuth, signInAnonymously } from 'firebase/auth'
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore'
 
 // Colle ici ta config Firebase (console.firebase.google.com → Ton projet → </> → Config)
@@ -22,3 +23,26 @@ export const db = initializeFirestore(app, {
     tabManager: persistentMultipleTabManager(),
   }),
 })
+
+/**
+ * Authentification anonyme.
+ *
+ * Elle donne à chaque appareil un uid stable, ce qui permet aux règles
+ * Firestore (cf. firestore.rules) d'exiger `request.auth != null` au lieu de
+ * laisser la base ouverte à tous. Aucune inscription n'est demandée à
+ * l'utilisateur.
+ *
+ * Best-effort : si la méthode « Anonyme » n'est pas activée dans la console
+ * Firebase, on journalise et l'app continue de fonctionner comme avant.
+ */
+export const auth = getAuth(app)
+
+export const authReady: Promise<void> = signInAnonymously(auth)
+  .then(() => undefined)
+  .catch((e) => {
+    console.warn(
+      '[MealMate] Connexion anonyme impossible. Active « Anonymous » dans ' +
+        'Firebase Console → Authentication → Sign-in method.',
+      e,
+    )
+  })

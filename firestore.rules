@@ -1,0 +1,70 @@
+rules_version = '2';
+
+// Règles Firestore MealMate
+//
+// Modèle : un foyer = un document `foyers/{foyerId}`, plus deux
+// sous-collections (`photos`, `presence`). L'id du foyer est un secret de 21
+// caractères aléatoires qui circule par le lien d'invitation.
+//
+// Ces règles exigent une session authentifiée. L'app ouvre une session anonyme
+// au démarrage (cf. src/lib/firebase.ts), donc aucune inscription n'est
+// demandée à l'utilisateur — mais un client qui n'est pas passé par l'app ne
+// peut plus écrire.
+//
+// Déploiement :
+//     firebase deploy --only firestore:rules
+// ou : Firebase Console → Firestore Database → Règles → coller → Publier
+//
+// Prérequis : Firebase Console → Authentication → Sign-in method → activer
+// « Anonyme ». Sans ça, `request.auth` est null et l'app perd l'écriture.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Un id de foyer doit rester long : ça évite qu'on énumère les foyers
+    // en tentant des identifiants courts.
+    function validFoyerId(id) {
+      return id.size() >= 16 && id.size() <= 64;
+    }
+
+    // Plafond par photo, aligné sur MAX_PHOTO_BYTES (src/lib/photos.ts).
+    function photoWithinLimit() {
+      return request.resource.data.data is string
+          && request.resource.data.data.size() <= 700 * 1024;
+    }
+
+    match /foyers/{foyerId} {
+      allow read, write: if signedIn() && validFoyerId(foyerId);
+
+      match /photos/{recipeId} {
+        allow read: if signedIn();
+        // create/update explicites : `write` engloberait le delete, pour lequel
+        // `request.resource` est null et le contrôle de taille échouerait.
+        allow create, update: if signedIn() && photoWithinLimit();
+        allow delete: if signedIn();
+      }
+
+      match /presence/{deviceId} {
+        allow read, write: if signedIn();
+      }
+    }
+
+    // Collection de test, mêmes règles.
+    match /foyers_dev/{foyerId} {
+      allow read, write: if signedIn() && validFoyerId(foyerId);
+
+      match /{sub=**} {
+        allow read, write: if signedIn();
+      }
+    }
+
+    // Tout le reste est fermé.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -4,7 +4,7 @@ import { useAppStore } from '@/store/useAppStore'
 import type { ShoppingCategory } from '@/types'
 import { CAT_LABELS } from '@/lib/utils'
 import ShoppingCategorySection from './ShoppingCategorySection'
-import { showToast } from '@/components/ui/Toast'
+import { showToast } from '@/lib/toast'
 
 const CATEGORIES: { id: ShoppingCategory }[] = [
   { id: 'legumes' },

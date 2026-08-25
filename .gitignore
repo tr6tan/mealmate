@@ -1,8 +1,19 @@
 node_modules
 dist
 dist-ssr
+dev-dist
 *.local
+
+# Secrets — la config Firebase vit dans .env.local (cf. .env.example)
+.env
+.env.*
+!.env.example
+
 .DS_Store
 
 # Playwright MCP
 .playwright-mcp/
+
+# Firebase CLI
+firebase-debug.log
+firestore-debug.log

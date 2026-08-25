@@ -3,7 +3,7 @@ import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import { haptic } from '@/lib/utils'
 import type { Period, SlotKey } from '@/types'
-import { showToast } from '@/components/ui/Toast'
+import { showToast } from '@/lib/toast'
 
 function periodFromSlot(slotKey: SlotKey): Period {
   if (slotKey.startsWith('pdej')) return 'pdej'

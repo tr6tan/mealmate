@@ -11,7 +11,7 @@
   --c-border:      200 205 223; /* #C8CDDF — bleu-gris medium */
   --c-text1:        13  17  23; /* #0D1117 — quasi-noir cool */
   --c-text2:        61  74 110; /* #3D4A6E — bleu slate */
-  --c-muted:       123 132 163; /* #7B84A3 — bleu muted */
+  --c-muted:       100 108 136; /* #646C88 — bleu muted (4.6:1 sur le beige, WCAG AA) */
   --c-terra:         0  24 168; /* #0018A8 — ios blue */
   --c-terra-light: 220 224 255; /* #DCE0FF — bleu très clair */
   --c-terra-dark:    0  18 140; /* #00128C — bleu foncé */
@@ -49,7 +49,7 @@
   --c-border:      203 213 225; /* #CBD5E1 — bordure slate */
   --c-text1:        15  23  42; /* #0F172A — slate 900 */
   --c-text2:        71  85 105; /* #475569 — slate 600 */
-  --c-muted:       148 163 184; /* #94A3B8 — slate 400 */
+  --c-muted:        94 109 131; /* #5E6D83 — slate assombri (4.8:1 sur le fond, WCAG AA) */
   --c-terra:        37  99 235; /* #2563EB — ocean blue */
   --c-terra-light: 219 234 254; /* #DBEAFE — blue 100 */
   --c-terra-dark:   29  78 216; /* #1D4ED8 — blue 700 */

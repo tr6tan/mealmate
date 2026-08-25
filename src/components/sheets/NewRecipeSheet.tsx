@@ -3,7 +3,7 @@ import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import type { Period, ShoppingCategory, Ingredient, DietaryTag } from '@/types'
 import { PERIOD_LABEL, cn, resizeToBase64 } from '@/lib/utils'
-import { showToast } from '@/components/ui/Toast'
+import { showToast } from '@/lib/toast'
 
 const PERIODS: Period[] = ['pdej', 'midi', 'soir']
 const TIME_OPTIONS = ['5 min', '10 min', '15 min', '20 min', '30 min', '45 min', '1h', '1h30']
@@ -50,7 +50,7 @@ function parseSteps(instructions: string): string[] {
   if (!instructions) return []
   const byNewline = instructions
     .split(/\r?\n/)
-    .map((s) => s.replace(/^\d+[\.\)]\s*/, '').trim())
+    .map((s) => s.replace(/^\d+[.)]\s*/, '').trim())
     .filter((s) => s.length > 5)
   if (byNewline.length >= 2) return byNewline.slice(0, 15)
   return instructions
@@ -199,7 +199,7 @@ export default function NewRecipeSheet() {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-[17px] font-extrabold text-text1">Nouvelle recette</h2>
-        <button onClick={closeSheet} className="text-muted p-1">
+        <button onClick={closeSheet} aria-label="Fermer" className="text-muted p-1">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>

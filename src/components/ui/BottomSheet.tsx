@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import type { SheetName } from '@/types'
 import { cn } from '@/lib/utils'
@@ -34,12 +34,32 @@ function useKeyboardHeight() {
   return height
 }
 
+/** Durée de l'animation de fermeture — le contenu reste monté le temps de glisser. */
+const CLOSE_ANIMATION_MS = 400
+
 export default function BottomSheet({ name, children, className, noScroll }: Props) {
   const sheetState = useAppStore((s) => s.sheetState)
   const closeSheet = useAppStore((s) => s.closeSheet)
   const isOpen = sheetState.sheet === name
   const ref = useRef<HTMLDivElement>(null)
   const keyboardHeight = useKeyboardHeight()
+
+  /**
+   * Le contenu n'existe dans le DOM que pendant l'ouverture (plus l'animation
+   * de sortie). Les huit sheets de l'app restant montées en permanence, les
+   * garder rendues laissait ~330 éléments focusables hors écran sur le chemin
+   * de tabulation, et sept `role="dialog"` déclarés en même temps.
+   */
+  const [mounted, setMounted] = useState(isOpen)
+
+  useEffect(() => {
+    if (isOpen) {
+      setMounted(true)
+      return
+    }
+    const t = setTimeout(() => setMounted(false), CLOSE_ANIMATION_MS)
+    return () => clearTimeout(t)
+  }, [isOpen])
 
   // Ferme le clavier iOS quand le sheet se ferme
   useEffect(() => {
@@ -48,6 +68,51 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
       active?.blur?.()
     }
   }, [isOpen])
+
+  // ── Clavier : Échap ferme, Tab reste piégé dans le sheet ──────────────────
+  const focusables = useCallback((): HTMLElement[] => {
+    const el = ref.current
+    if (!el) return []
+    return Array.from(
+      el.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      ),
+    ).filter((n) => !n.hasAttribute('disabled') && n.offsetParent !== null)
+  }, [])
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    // Mémorise le déclencheur pour lui rendre le focus à la fermeture.
+    const previous = document.activeElement as HTMLElement | null
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        closeSheet()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const items = focusables()
+      if (items.length === 0) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      const active = document.activeElement
+      if (e.shiftKey && (active === first || !ref.current?.contains(active))) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('keydown', onKeyDown)
+      previous?.focus?.()
+    }
+  }, [isOpen, closeSheet, focusables])
 
   // Swipe to close — ne ferme que si :
   //  • le touch démarre depuis le handle/header (hors zone scrollable)
@@ -127,6 +192,8 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
         ref={ref}
         role="dialog"
         aria-modal={isOpen}
+        aria-hidden={!isOpen}
+        {...(!isOpen ? { inert: '' } : {})}
         className={cn(
           'fixed left-0 right-0 z-50',
           'bg-card rounded-t-[28px]',
@@ -152,7 +219,7 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
       >
         {/* Handle */}
         <div className="w-10 h-1 bg-border rounded-full mx-auto mb-4 flex-shrink-0" />
-        {children}
+        {mounted && children}
       </div>
     </>
   )

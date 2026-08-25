@@ -5,14 +5,13 @@ import MealAvatar from '@/components/ui/MealAvatar'
 
 const ROWS = ['midi', 'soir'] as const
 const ROW_LABEL = { midi: 'Déj', soir: 'Dîner' } as const
-const ROW_DOT   = { midi: 'bg-terra', soir: 'bg-evening' } as const
 
 interface Props {
   onSelectDay: (idx: number) => void
   selectedIdx: number
 }
 
-export default function WeekOverview({ onSelectDay, selectedIdx }: Props) {
+export default function WeekOverview({ onSelectDay }: Props) {
   const weekPlan   = useAppStore(selectCurrentWeekPlan)
   const weekOffset = useAppStore((s) => s.weekOffset)
   const monday     = getMondayByOffset(weekOffset)

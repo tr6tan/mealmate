@@ -1,14 +1,16 @@
 import { useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
-import { getSiteUrl } from '@/lib/foyer'
-import { showToast } from '@/components/ui/Toast'
+import { getInviteUrl } from '@/lib/foyer'
+import { showToast } from '@/lib/toast'
 
 interface InviteCardProps {
   onlineCount: number
 }
 
 export default function InviteCard({ onlineCount }: InviteCardProps) {
-  const url = getSiteUrl()
+  // Lien porteur de l'id de foyer : l'appareil qui l'ouvre rejoint CE foyer,
+  // au lieu de tomber sur le foyer partagé par défaut.
+  const url = getInviteUrl()
   const [copied, setCopied] = useState(false)
 
   const handleCopy = async () => {
@@ -50,7 +52,7 @@ export default function InviteCard({ onlineCount }: InviteCardProps) {
           />
         </div>
         <p className="text-xs text-muted font-semibold text-center max-w-[220px] leading-snug">
-          Scanne ce QR code pour ouvrir l’app sur un autre appareil
+          Scanne ce QR code pour rejoindre ce foyer sur un autre appareil
         </p>
       </div>
 

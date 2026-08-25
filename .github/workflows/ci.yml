@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Tests
+        run: npm test
+
+      # Le build a besoin des variables Firebase pour typer import.meta.env,
+      # mais aucune valeur réelle n'est nécessaire à la compilation.
+      - name: Build
+        run: npm run build
+        env:
+          VITE_FIREBASE_API_KEY: ci
+          VITE_FIREBASE_AUTH_DOMAIN: ci
+          VITE_FIREBASE_PROJECT_ID: ci
+          VITE_FIREBASE_STORAGE_BUCKET: ci
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ci
+          VITE_FIREBASE_APP_ID: ci
+          VITE_APP_ENV: dev

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useAppStore, selectCurrentWeekPlan } from '@/store/useAppStore'
 import type { Period, SlotKey } from '@/types'
-import { haptic, getTodayIndex, getMondayByOffset, DAY_SHORT, cn } from '@/lib/utils'
-import { showToast } from '@/components/ui/Toast'
+import { haptic, DAY_SHORT, cn } from '@/lib/utils'
+import { showToast } from '@/lib/toast'
 import MealCard from './MealCard'
 import MealAddSlot from './MealAddSlot'
 import OptionalSlot from './OptionalSlot'
@@ -33,12 +33,11 @@ export default function DayView({ dayIdx }: Props) {
   const openSheet  = useAppStore((s) => s.openSheet)
   const setMeal    = useAppStore((s) => s.setMeal)
   const copyDay    = useAppStore((s) => s.copyDay)
-  const weekOffset = useAppStore((s) => s.weekOffset)
   const plan       = useAppStore((s) => selectCurrentWeekPlan(s)[dayIdx])
   const recipes    = useAppStore((s) => s.recipes)
   const [showCopyPicker, setShowCopyPicker] = useState(false)
 
-  const openMealDetail = (dIdx: number, sk: SlotKey, meal: import('@/types').Meal, period: Period) => {
+  const openMealDetail = (dIdx: number, sk: SlotKey, meal: import('@/types').Meal) => {
     const recipe = recipes.find((r) => r.name === meal.name)
     if (recipe) {
       openSheet({ sheet: 'recipe-detail', recipeContext: recipe })
@@ -53,8 +52,6 @@ export default function DayView({ dayIdx }: Props) {
     !plan.midi && !plan.soir &&
     !plan.midi_entree && !plan.midi_dessert && !plan.soir_entree && !plan.soir_dessert
 
-  const todayIdx = getTodayIndex(getMondayByOffset(weekOffset))
-  const isToday  = weekOffset === 0 && dayIdx === todayIdx
 
   return (
     <div className="flex flex-col gap-4">
@@ -79,7 +76,7 @@ export default function DayView({ dayIdx }: Props) {
               meal={entreeMeal ?? null}
               onPress={() =>
                 entreeMeal
-                  ? openMealDetail(dayIdx, entreeKey, entreeMeal, period)
+                  ? openMealDetail(dayIdx, entreeKey, entreeMeal)
                   : openSheet({ sheet: 'add-meal', addMealPeriod: period, mealContext: { dayIdx, slotKey: entreeKey } })
               }
             />
@@ -89,7 +86,7 @@ export default function DayView({ dayIdx }: Props) {
               <MealCard
                 meal={mainMeal}
                 period={period}
-                onPress={() => openMealDetail(dayIdx, slotKey, mainMeal, period)}
+                onPress={() => openMealDetail(dayIdx, slotKey, mainMeal)}
               />
             ) : (
               <MealAddSlot
@@ -110,7 +107,7 @@ export default function DayView({ dayIdx }: Props) {
               meal={dessertMeal ?? null}
               onPress={() =>
                 dessertMeal
-                  ? openMealDetail(dayIdx, dessertKey, dessertMeal, period)
+                  ? openMealDetail(dayIdx, dessertKey, dessertMeal)
                   : openSheet({ sheet: 'add-meal', addMealPeriod: period, mealContext: { dayIdx, slotKey: dessertKey } })
               }
             />

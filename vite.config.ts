@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -38,8 +39,29 @@ export default defineConfig({
         enabled: false, // SW désactivé en dev pour éviter le cache stale
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        // Les 245 stickers Icons8 (~2,8 Mo) sont exclus du precache : ils sont
+        // mis en cache à la première utilisation (cf. runtimeCaching), sinon le
+        // service worker télécharge 5,4 Mo à chaque mise à jour de l'app.
+        globPatterns: ['**/*.{js,css,html,ico,svg,woff,woff2}'],
+        globIgnores: ['**/icons/stickers/**'],
+        // Les icônes d'app (manifeste, favicon) restent précachées.
+        additionalManifestEntries: [
+          { url: '/icons/manifest-icon-192.maskable.png', revision: null },
+          { url: '/icons/manifest-icon-512.maskable.png', revision: null },
+          { url: '/icons/apple-icon-180.png', revision: null },
+          { url: '/icons/favicon-196.png', revision: null },
+        ],
         runtimeCaching: [
+          {
+            // Stickers : mis en cache au premier affichage, gardés un an.
+            urlPattern: /\/icons\/stickers\/.*\.png$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'food-stickers',
+              expiration: { maxEntries: 300, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
           {
             // Fonts Google — CacheFirst : téléchargées une fois, servies depuis le cache
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -62,9 +84,25 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        // Firebase pèse l'essentiel du bundle et bouge rarement : dans son
+        // propre chunk, il reste en cache navigateur d'une version à l'autre.
+        manualChunks: {
+          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+          react: ['react', 'react-dom'],
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+  },
+  test: {
+    environment: 'jsdom',
+    include: ['src/**/*.test.ts'],
   },
 })

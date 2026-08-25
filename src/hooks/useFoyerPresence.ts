@@ -8,11 +8,8 @@ import {
   serverTimestamp,
   type Timestamp,
 } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
-import { getFoyerId } from '@/lib/foyer'
-
-// Même logique que useFoyerSync : dev vs prod
-const COLLECTION = import.meta.env.VITE_APP_ENV === 'dev' ? 'foyers_dev' : 'foyers'
+import { authReady, db } from '@/lib/firebase'
+import { COLLECTION, getFoyerId } from '@/lib/foyer'
 
 // ── ID stable par appareil (ne change pas au refresh) ────────────────────────
 const DEVICE_KEY = 'mealmate-device-id'
@@ -46,7 +43,8 @@ export function useFoyerPresence(): number {
       setDoc(presenceRef, { lastSeen: serverTimestamp() }).catch(() => {})
     }
 
-    ping()
+    // Les règles Firestore exigent une session authentifiée.
+    void authReady.then(ping)
     const interval = setInterval(ping, 30_000)
 
     // Écoute la sous-collection pour compter les membres actifs AUTRES que soi

@@ -1,16 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
-
-type ToastOptions = {
-  action?: { label: string; onClick: () => void }
-  duration?: number
-}
-
-let _setToast: ((msg: string, opts?: ToastOptions) => void) | null = null
-
-export function showToast(msg: string, opts?: ToastOptions) {
-  _setToast?.(msg, opts)
-}
+import { setToastHandler, type ToastOptions } from '@/lib/toast'
 
 export default function Toast() {
   const [msg, setMsg] = useState('')
@@ -19,15 +9,15 @@ export default function Toast() {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    _setToast = (m, opts) => {
+    setToastHandler((m, opts) => {
       if (timerRef.current) clearTimeout(timerRef.current)
       setMsg(m)
       setAction(opts?.action)
       setVisible(true)
       const duration = opts?.duration ?? (opts?.action ? 3500 : 2200)
       timerRef.current = setTimeout(() => setVisible(false), duration)
-    }
-    return () => { _setToast = null }
+    })
+    return () => setToastHandler(null)
   }, [])
 
   return (
