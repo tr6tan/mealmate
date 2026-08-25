@@ -34,8 +34,8 @@ export default function AppShell({ nav, children }: Props) {
         et les icônes système, qui deviennent illisibles.
       */}
       <div
-        className="fixed top-0 left-0 right-0 z-[45] pointer-events-none bg-bg"
-        style={{ height: 'env(safe-area-inset-top)' }}
+        className="fixed left-0 right-0 z-[45] pointer-events-none bg-bg"
+        style={{ top: 0, height: 'env(safe-area-inset-top)' }}
       />
 
       {/* Nav flottante (position:fixed, hors du flux) */}
@@ -52,7 +52,7 @@ export default function AppShell({ nav, children }: Props) {
       {/* Version badge */}
       <span
         className="fixed z-50 text-[10px] font-mono pointer-events-none select-none text-muted"
-        style={{ bottom: 'max(4px, calc(env(safe-area-inset-bottom) - 30px))', left: 8 }}
+        style={{ bottom: 'calc(4px - var(--fixed-bottom-gap, 0px))', left: 8 }}
       >
         v{__APP_VERSION__} · {__BUILD_TIME__}
       </span>

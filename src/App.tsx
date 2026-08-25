@@ -3,6 +3,7 @@ import ErrorBoundary from '@/components/ui/ErrorBoundary'
 import { useAppStore } from '@/store/useAppStore'
 import { getTodayIndex, getWeekMonday } from '@/lib/utils'
 import { useFoyerSync } from '@/hooks/useFoyerSync'
+import { useFixedInsetProbe } from '@/hooks/useFixedInsetProbe'
 import AppShell from '@/components/layout/AppShell'
 import Toast from '@/components/ui/Toast'
 import SyncBanner from '@/components/ui/SyncBanner'
@@ -39,6 +40,9 @@ export default function App() {
       document.documentElement.classList.add('theme-ocean')
     }
   }, [theme])
+
+  // Mesure le comportement des `position: fixed` (cf. le hook)
+  useFixedInsetProbe()
 
   // Synchronisation Firestore ↔ store
   useFoyerSync()

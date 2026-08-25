@@ -26,18 +26,14 @@ export default function BottomNav() {
       className="fixed left-1/2 -translate-x-1/2 rounded-full px-2 py-2 flex gap-1 z-50"
       style={{
         /*
-         * Position basse de la barre flottante.
+         * 20px du bord PHYSIQUE de l'écran.
          *
-         * 12px + tout l'inset la plaçait à 46pt du bord : trop haut, ça
-         * laissait un vide sous elle. On descend à 20pt du bord physique.
-         * La barre chevauche alors le bas de la zone de gestes, ce qui est
-         * permis — seuls les contrôles doivent en rester à l'écart, et les
-         * boutons, centrés dans les 54pt de hauteur, restent à ~47pt du bord.
-         *
-         * Sans zone de sécurité (navigateur, Android), `max()` retombe sur
-         * les 12px d'origine.
+         * `--fixed-bottom-gap` vaut 0 quand les `position: fixed` atteignent
+         * ce bord, et la hauteur de la zone de gestes quand le navigateur les
+         * y contraint (cf. useFixedInsetProbe). La soustraire ramène la barre
+         * au même endroit dans les deux cas.
          */
-        bottom: 'max(12px, calc(env(safe-area-inset-bottom) - 14px))',
+        bottom: 'calc(20px - var(--fixed-bottom-gap, 0px))',
         background: 'rgb(var(--c-terra))',
         boxShadow: '0 8px 32px rgba(0,24,168,0.40), 0 1px 0 rgba(255,255,255,0.14) inset',
         border: '1px solid rgba(0,50,220,0.35)',
