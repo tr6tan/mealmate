@@ -99,8 +99,16 @@
 
   html, body, #root {
     height: 100%;
-    /* Fallback pour iOS Safari qui comptait la barre d'adresse dans 100vh */
-    height: -webkit-fill-available;
+    /*
+     * `100dvh` remplace `-webkit-fill-available`.
+     *
+     * Les deux règlent le problème historique de la barre d'adresse comptée
+     * dans `100vh` sur iOS Safari, mais `-webkit-fill-available` retranche en
+     * plus les zones de sécurité en PWA autonome : le conteneur racine
+     * s'arrêtait au-dessus de la barre de gestes, laissant une bande vide en
+     * bas de l'écran où l'app ne descendait pas.
+     */
+    height: 100dvh;
     margin: 0;
     padding: 0;
     overscroll-behavior: none;
