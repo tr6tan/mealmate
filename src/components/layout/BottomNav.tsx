@@ -23,7 +23,13 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="flex-shrink-0 self-center rounded-full px-2 py-2 flex gap-1 z-50 mb-3"
+      /*
+       * `absolute`, pas `fixed` : la barre se cale sur le conteneur de l'app,
+       * dont le bas est connu, au lieu du viewport dont le bord varie d'un
+       * appareil à l'autre. Elle flotte donc à nouveau au-dessus du contenu,
+       * qui continue de défiler dessous.
+       */
+      className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full px-2 py-2 flex gap-1 z-50"
       style={{
         background: 'rgb(var(--c-terra))',
         boxShadow: '0 8px 32px rgba(0,24,168,0.40), 0 1px 0 rgba(255,255,255,0.14) inset',

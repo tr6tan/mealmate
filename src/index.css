@@ -211,9 +211,10 @@
     margin-bottom: 0;
   }
   .pb-nav-safe {
-    /* La barre de navigation occupe sa propre place dans le flux : le
-       contenu n'a plus besoin de réserver de la hauteur sous lui. */
-    padding-bottom: 12px;
+    /* La barre flotte au-dessus du contenu : 12 (sa marge basse) + 54 (sa
+       hauteur) + 12 de respiration. La zone de gestes est déjà réservée par
+       le conteneur de l'app. */
+    padding-bottom: 78px;
   }
 }
 
