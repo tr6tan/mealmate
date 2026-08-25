@@ -23,17 +23,8 @@ export default function BottomNav() {
 
   return (
     <nav
-      className="fixed left-1/2 -translate-x-1/2 rounded-full px-2 py-2 flex gap-1 z-50"
+      className="flex-shrink-0 self-center rounded-full px-2 py-2 flex gap-1 z-50 mb-3"
       style={{
-        /*
-         * 20px du bord PHYSIQUE de l'écran.
-         *
-         * `--fixed-bottom-gap` vaut 0 quand les `position: fixed` atteignent
-         * ce bord, et la hauteur de la zone de gestes quand le navigateur les
-         * y contraint (cf. useFixedInsetProbe). La soustraire ramène la barre
-         * au même endroit dans les deux cas.
-         */
-        bottom: 'calc(20px - var(--fixed-bottom-gap, 0px))',
         background: 'rgb(var(--c-terra))',
         boxShadow: '0 8px 32px rgba(0,24,168,0.40), 0 1px 0 rgba(255,255,255,0.14) inset',
         border: '1px solid rgba(0,50,220,0.35)',

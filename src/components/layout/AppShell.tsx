@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { useAppStore } from '@/store/useAppStore'
 import BottomNav from './BottomNav'
 
@@ -8,15 +8,6 @@ interface Props {
 }
 
 export default function AppShell({ nav, children }: Props) {
-  // Diagnostic temporaire affiché à côté de la version (cf. useFixedInsetProbe)
-  const [probe, setProbe] = useState('')
-  useEffect(() => {
-    const lire = () => setProbe(document.documentElement.dataset.probe ?? '')
-    lire()
-    window.addEventListener('probe-updated', lire)
-    return () => window.removeEventListener('probe-updated', lire)
-  }, [])
-
   const sheetState = useAppStore((s) => s.sheetState)
   const closeSheet = useAppStore((s) => s.closeSheet)
 
@@ -29,6 +20,14 @@ export default function AppShell({ nav, children }: Props) {
         right: 0,
         bottom: 0,
         left: 0,
+        /*
+         * La zone de gestes est réservée ici, une fois pour toutes. La barre
+         * de navigation vit dans le flux (dernier enfant de ce conteneur
+         * flex) : elle se pose donc juste au-dessus, sans dépendre de la
+         * façon dont le navigateur traite les `position: fixed`, qui varie
+         * d'un appareil à l'autre.
+         */
+        paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
       {/* Contenu — chaque page gère son propre scroll */}
@@ -60,10 +59,10 @@ export default function AppShell({ nav, children }: Props) {
 
       {/* Version badge */}
       <span
-        className="fixed z-50 text-[10px] font-mono pointer-events-none select-none text-muted"
-        style={{ bottom: 'calc(4px - var(--fixed-bottom-gap, 0px))', left: 8 }}
+        className="absolute z-50 text-[10px] font-mono pointer-events-none select-none text-muted"
+        style={{ bottom: 2, left: 8 }}
       >
-        v{__APP_VERSION__} · {__BUILD_TIME__} · {probe}
+        v{__APP_VERSION__} · {__BUILD_TIME__}
       </span>
 
       {/* Sheets & toasts */}

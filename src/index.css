@@ -211,9 +211,9 @@
     margin-bottom: 0;
   }
   .pb-nav-safe {
-    /* Sommet de la barre (20 du bord + 54 de hauteur) + 12 de respiration.
-       L'inset est déjà absorbé par la position de la barre. */
-    padding-bottom: 90px;
+    /* La barre de navigation occupe sa propre place dans le flux : le
+       contenu n'a plus besoin de réserver de la hauteur sous lui. */
+    padding-bottom: 12px;
   }
 }
 
