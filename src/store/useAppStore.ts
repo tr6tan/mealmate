@@ -16,6 +16,7 @@ import type {
 } from '@/types'
 import { DEFAULT_RECIPES } from '@/data/defaultRecipes'
 import { emptyDay, getMondayByOffset, getWeekKey } from '@/lib/utils'
+import { readShoppingItems } from '@/lib/syncDiff'
 import { nanoid } from '@/lib/nanoid'
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -264,6 +265,7 @@ export const useAppStore = create<AppState>()(
                 qty: ing.qty,
                 category: ing.category,
                 checked: false,
+                addedAt: Date.now(),
               })
             })
           })
@@ -327,7 +329,7 @@ export const useAppStore = create<AppState>()(
       // ── Shopping ──
       addShoppingItem: (item) =>
         set((s) => ({
-          shoppingItems: [{ ...item, id: nanoid() }, ...s.shoppingItems],
+          shoppingItems: [{ ...item, id: nanoid(), addedAt: Date.now() }, ...s.shoppingItems],
         })),
 
       toggleShoppingItem: (id) =>
@@ -392,7 +394,7 @@ export const useAppStore = create<AppState>()(
           weekPlans,
           recipes:         data.recipes         ?? get().recipes,
           deletedDefaults: data.deletedDefaults ?? get().deletedDefaults,
-          shoppingItems:   data.shoppingItems   ?? get().shoppingItems,
+          shoppingItems:   data.shoppingItems ? readShoppingItems(data.shoppingItems) : get().shoppingItems,
           settings: {
             ...(data.settings ?? get().settings),
             darkMode: localDarkMode,

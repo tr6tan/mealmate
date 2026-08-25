@@ -40,8 +40,8 @@ export default function AppShell({ nav, children }: Props) {
 
       {/* Version badge */}
       <span
-        className="fixed z-50 text-[10px] font-mono opacity-30 pointer-events-none select-none"
-        style={{ bottom: 6, left: 8, color: 'rgb(var(--c-terra))' }}
+        className="fixed z-50 text-[10px] font-mono pointer-events-none select-none text-muted"
+        style={{ bottom: 6, left: 8 }}
       >
         v{__APP_VERSION__} · {__BUILD_TIME__}
       </span>

@@ -92,6 +92,11 @@ export default defineConfig({
         manualChunks: {
           firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
           react: ['react', 'react-dom'],
+          // Les recettes livrées pèsent 73 Ko minifiés, soit plus d'un tiers
+          // du bundle applicatif, et ne changent presque jamais. Dans leur
+          // propre chunk, elles restent en cache navigateur d'un déploiement
+          // à l'autre au lieu d'être retéléchargées à chaque version.
+          recettes: ['./src/data/defaultRecipes.ts'],
         },
       },
     },

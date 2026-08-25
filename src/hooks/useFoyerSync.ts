@@ -5,7 +5,15 @@ import { COLLECTION, getFoyerId } from '@/lib/foyer'
 import { useAppStore } from '@/store/useAppStore'
 import { DEFAULT_RECIPES } from '@/data/defaultRecipes'
 import { deletePhoto, isDataUrl, savePhoto, subscribePhotos } from '@/lib/photos'
-import { diffRecipes, diffWeekPlans, mergeRecipes, type FieldWrites } from '@/lib/syncDiff'
+import {
+  diffRecipes,
+  diffShoppingItems,
+  diffWeekPlans,
+  mergeRecipes,
+  readShoppingItems,
+  toShoppingMap,
+  type FieldWrites,
+} from '@/lib/syncDiff'
 import type { FoyerData, Recipe } from '@/types'
 
 // Timers par champ — une file séparée par slice de données
@@ -152,7 +160,7 @@ export function useFoyerSync() {
           setDoc(ref, {
             weekPlans:       state.weekPlans,
             deletedDefaults: state.deletedDefaults,
-            shoppingItems:   state.shoppingItems,
+            shoppingItems:   toShoppingMap(state.shoppingItems),
             settings:        settingsToWrite,
             ...recipeWrites(state.recipes),
           }).catch(() => setSyncStatus('error'))
@@ -182,6 +190,27 @@ export function useFoyerSync() {
             DEFAULT_RECIPES,
             { custom: data.recipesCustom ?? [], overrides: data.recipesOverrides ?? {} },
             supprimees,
+          )
+        }
+
+        // ── Liste de courses : tableau (ancien format) → map indexée ─────────
+        // Un tableau ne permet pas d'adresser un article : la liste repartait
+        // en entier à chaque coche, et deux personnes en courses ensemble
+        // s'écrasaient mutuellement.
+        // Ordre d'affichage : il venait de la position dans le tableau, une map
+        // n'en garantit aucun. On le fige dans `addedAt`, pour les listes en
+        // ancien format comme pour les articles créés avant ce champ.
+        const coursesLues = readShoppingItems(data.shoppingItems)
+        const sansHorodatage = coursesLues.filter((i) => !i.addedAt)
+        if (Array.isArray(data.shoppingItems) || sansHorodatage.length > 0) {
+          const base = Date.now()
+          const horodates = coursesLues.map((item, i) => ({
+            ...item,
+            addedAt: item.addedAt ?? base - i,
+          }))
+          data.shoppingItems = toShoppingMap(horodates)
+          updateDoc(ref, { shoppingItems: data.shoppingItems }).catch((e) =>
+            console.error('[MealMate] Horodatage de la liste de courses:', e),
           )
         }
 
@@ -292,12 +321,10 @@ export function useFoyerSync() {
         }
 
         if (state.shoppingItems !== prev.shoppingItems) {
-          // La liste reste écrite en entier : c'est un tableau (~1 Ko), les
-          // chemins de champs ne s'y appliquent pas. Deux personnes qui
-          // cochent au même instant peuvent encore s'écraser.
           scheduleWrite(
             foyerId, 'shoppingItems',
-            { shoppingItems: state.shoppingItems }, saving, saved, failed,
+            diffShoppingItems(prev.shoppingItems, state.shoppingItems),
+            saving, saved, failed,
           )
         }
 

@@ -67,6 +67,12 @@ export interface ShoppingItem {
   qty: string
   category: ShoppingCategory
   checked: boolean
+  /**
+   * Horodatage d'ajout. Firestore stocke la liste sous forme de map indexée
+   * par id (pour que deux personnes puissent cocher en même temps sans
+   * s'écraser) : l'ordre d'affichage ne peut donc plus venir du tableau.
+   */
+  addedAt?: number
 }
 
 export type ActiveTab = 'planning' | 'recettes' | 'courses' | 'settings'
@@ -108,7 +114,11 @@ export interface SheetState {
 /** Données partagées dans Firestore (un doc par foyer) */
 export interface FoyerData {
   weekPlans: WeekPlans
-  shoppingItems: ShoppingItem[]
+  /**
+   * Map indexée par id, pour des écritures ciblées (`shoppingItems.{id}`).
+   * Un tableau signale l'ancien format et déclenche la migration.
+   */
+  shoppingItems: Record<string, ShoppingItem> | ShoppingItem[]
   settings: AppSettings
   /** Ids de recettes par défaut supprimées par le foyer : on ne les remet pas. */
   deletedDefaults?: string[]

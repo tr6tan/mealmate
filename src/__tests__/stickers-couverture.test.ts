@@ -2,6 +2,7 @@ import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { getStickerSlug } from '@/lib/stickers'
+import { CATALOG } from '@/data/shoppingCatalog'
 
 const root = process.cwd()
 
@@ -15,17 +16,9 @@ const ingredients = [
   ...new Set([...source.matchAll(/\{ name: '([^']+)', qty/g)].map((m) => m[1])),
 ]
 
-const catalogueSrc = readFileSync(
-  resolve(root, 'src/components/sheets/AddItemSheet.tsx'),
-  'utf8',
-)
-const catalogue = [
-  ...new Set(
-    [...catalogueSrc.matchAll(/\b[lvcesm]\(\[([\s\S]*?)\]\)/g)]
-      .flatMap((m) => [...m[1].matchAll(/'([^']+)'/g)].map((x) => x[1]))
-      .filter((n) => n.length > 2 && !n.includes(',')),
-  ),
-]
+// Le catalogue est désormais une donnée importable, plus un bloc à extraire
+// du composant à coups d'expression régulière.
+const catalogue = [...new Set(CATALOG.flatMap((s) => s.items.map((i) => i.name)))]
 
 describe('couverture des stickers', () => {
   it('ne référence que des fichiers qui existent', () => {

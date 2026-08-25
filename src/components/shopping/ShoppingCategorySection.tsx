@@ -136,7 +136,7 @@ function ShoppingCard({ item }: { item: ShoppingItem }) {
           style={{ touchAction: 'manipulation' }}
           aria-label={item.qty ? `Modifier la quantité de ${item.name}` : `Ajouter une quantité à ${item.name}`}
         >
-          <span className={item.qty ? 'text-accent' : 'text-muted opacity-70'}>
+          <span className={item.qty ? 'text-accent' : 'text-muted'}>
             {item.qty || '+'}
           </span>
         </button>

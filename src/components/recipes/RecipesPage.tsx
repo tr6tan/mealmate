@@ -158,8 +158,10 @@ export default function RecipesPage() {
               style={filter === f.key ? { background: 'rgb(var(--c-terra))' } : {}}
             >
               {f.label}
+              {/* Pas d'opacité sur le compteur : elle le ramenait à 2.2:1 sur
+                  le fond de la puce. La hiérarchie passe par la taille. */}
               {(counts[f.key] ?? 0) > 0 && (
-                <span className={cn('text-[10px] font-bold', filter === f.key ? 'opacity-70' : 'opacity-45')}>
+                <span className={cn('text-[10px] font-bold', filter === f.key ? 'text-white/80' : 'text-muted')}>
                   {counts[f.key]}
                 </span>
               )}

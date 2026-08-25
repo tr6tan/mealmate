@@ -2,6 +2,7 @@ import { useState } from 'react'
 import InviteCard from './InviteCard'
 import { createFoyer, getFoyerId, isLegacyFoyer } from '@/lib/foyer'
 import { useFoyerPresence } from '@/hooks/useFoyerPresence'
+import { useAppStore } from '@/store/useAppStore'
 import { showToast } from '@/lib/toast'
 
 /**
@@ -17,6 +18,9 @@ export default function FoyerCard() {
   const [confirming, setConfirming] = useState(false)
   const legacy = isLegacyFoyer()
   const foyerId = getFoyerId()
+  // `nomFoyer` existait dans le modèle sans jamais être ni réglable ni affiché.
+  const nomFoyer = useAppStore((s) => s.settings.nomFoyer)
+  const updateSettings = useAppStore((s) => s.updateSettings)
 
   const handleCreate = () => {
     if (!confirming) {
@@ -36,6 +40,19 @@ export default function FoyerCard() {
         <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-2">
           Foyer
         </p>
+
+        <label className="block mb-3">
+          <span className="sr-only">Nom du foyer</span>
+          <input
+            type="text"
+            value={nomFoyer}
+            onChange={(e) => updateSettings({ nomFoyer: e.target.value })}
+            placeholder="Nom du foyer"
+            maxLength={40}
+            className="w-full px-3 py-2.5 min-h-[44px] rounded-xl bg-bg border border-border text-sm font-semibold text-text1 placeholder:text-muted outline-none focus:border-terra"
+          />
+        </label>
+
         <p className="text-[11px] font-bold text-muted font-mono truncate mb-3">{foyerId}</p>
 
         {legacy && (

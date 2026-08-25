@@ -55,14 +55,17 @@ export default function RecipeCard({ recipe, onClick, planCount = 0 }: Props) {
           </svg>
           {recipe.time}
           {recipe.rapide && (
-            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: '#F5C06528', color: '#92400E' }}>
+            <span
+              className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full text-text1"
+              style={{ background: 'rgb(var(--c-morning) / 0.25)' }}
+            >
               ⚡ Rapide
             </span>
           )}
           {planCount > 0 && (
             <span
               className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
-              style={{ background: 'rgba(0,24,168,0.08)', color: 'rgb(var(--c-terra))' }}
+              style={{ background: 'rgb(var(--c-terra) / 0.1)', color: 'rgb(var(--c-accent))' }}
             >
               {planCount}× planifié
             </span>
@@ -92,8 +95,8 @@ export default function RecipeCard({ recipe, onClick, planCount = 0 }: Props) {
             ))}
             {(recipe.ingredients?.length ?? 0) > 5 && (
               <span
-                className="text-[11px] font-semibold px-2 py-1 rounded-full self-center"
-                style={{ background: 'rgba(0,0,0,0.05)', color: '#6B7280' }}
+                className="text-[11px] font-semibold px-2 py-1 rounded-full self-center bg-fill/60 text-text2"
+                aria-label={`et ${(recipe.ingredients?.length ?? 0) - 5} autres ingrédients`}
               >
                 +{(recipe.ingredients?.length ?? 0) - 5}
               </span>

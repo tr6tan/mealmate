@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
   diffRecipes,
+  diffShoppingItems,
   diffWeekPlans,
   mergeRecipes,
+  readShoppingItems,
   stableStringify,
+  toShoppingMap,
 } from '@/lib/syncDiff'
-import type { DayPlan, Meal, Recipe, WeekPlans } from '@/types'
+import type { DayPlan, Meal, Recipe, ShoppingItem, WeekPlans } from '@/types'
 
 const repas = (name: string): Meal => ({ name, emoji: '🍽', time: '20 min', fav: false })
 
@@ -177,5 +180,61 @@ describe('mergeRecipes', () => {
     const carnet = base.map((r, i) => ({ ...r, fav: i === 0, notes: i === 1 ? 'à tester' : undefined }))
     const recompose = mergeRecipes(base, diffRecipes(carnet, base))
     expect(diffRecipes(recompose, base)).toEqual(diffRecipes(carnet, base))
+  })
+})
+
+// ── Liste de courses ────────────────────────────────────────────────────────
+
+const article = (id: string, nom: string, coche = false, addedAt = 1000): ShoppingItem => ({
+  id, name: nom, qty: '', category: 'legumes', checked: coche, addedAt,
+})
+
+describe('diffShoppingItems', () => {
+  it('ne cible que l’article coché', () => {
+    const avant = [article('a', 'Tomate'), article('b', 'Carotte')]
+    const apres = [article('a', 'Tomate', true), article('b', 'Carotte')]
+    const writes = diffShoppingItems(avant, apres)
+    expect(Object.keys(writes)).toEqual(['shoppingItems.a'])
+  })
+
+  /**
+   * Le scénario réel : deux personnes cochent des articles différents en
+   * faisant les courses ensemble. Aucun chemin commun, donc aucune perte.
+   */
+  it('n’écrase pas la coche simultanée d’un autre article', () => {
+    const commun = [article('a', 'Tomate'), article('b', 'Carotte')]
+    const deA = [article('a', 'Tomate', true), article('b', 'Carotte')]
+    const deB = [article('a', 'Tomate'), article('b', 'Carotte', true)]
+    const wA = diffShoppingItems(commun, deA)
+    const wB = diffShoppingItems(commun, deB)
+    expect(Object.keys(wA).filter((k) => k in wB)).toEqual([])
+  })
+
+  it('supprime l’article retiré', () => {
+    const writes = diffShoppingItems([article('a', 'Tomate')], [])
+    expect(Object.keys(writes)).toEqual(['shoppingItems.a'])
+  })
+
+  it('ne renvoie rien sans changement', () => {
+    const l = [article('a', 'Tomate')]
+    expect(diffShoppingItems(l, structuredClone(l))).toEqual({})
+  })
+})
+
+describe('readShoppingItems', () => {
+  it('accepte les deux formats de stockage', () => {
+    const l = [article('a', 'Tomate', false, 2), article('b', 'Carotte', false, 1)]
+    expect(readShoppingItems(l).map((i) => i.id)).toEqual(['a', 'b'])
+    expect(readShoppingItems(toShoppingMap(l)).map((i) => i.id)).toEqual(['a', 'b'])
+  })
+
+  it('remet le plus récent en tête', () => {
+    const map = toShoppingMap([article('vieux', 'Pain', false, 1), article('neuf', 'Lait', false, 9)])
+    expect(readShoppingItems(map).map((i) => i.id)).toEqual(['neuf', 'vieux'])
+  })
+
+  it('tolère une liste absente ou des entrées abîmées', () => {
+    expect(readShoppingItems(undefined)).toEqual([])
+    expect(readShoppingItems({ a: null as unknown as ShoppingItem })).toEqual([])
   })
 })

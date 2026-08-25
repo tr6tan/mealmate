@@ -16,7 +16,7 @@
  *    avec l'app a besoin d'être stocké.
  */
 import { deleteField, type FieldValue } from 'firebase/firestore'
-import type { DayPlan, Meal, Recipe, SlotKey, WeekPlans } from '@/types'
+import type { DayPlan, Meal, Recipe, ShoppingItem, SlotKey, WeekPlans } from '@/types'
 
 /** Les sept créneaux d'une journée, dans l'ordre du modèle. */
 const SLOTS: SlotKey[] = [
@@ -182,4 +182,52 @@ export function mergeRecipes(
   // apparaître deux fois.
   const idsBase = new Set(base.map((r) => r.id))
   return [...base, ...delta.custom.filter((r) => !idsBase.has(r.id))]
+}
+
+// ── Liste de courses ────────────────────────────────────────────────────────
+
+/**
+ * La liste était écrite en entier à chaque coche : deux personnes en train de
+ * faire les courses ensemble s'écrasaient mutuellement. Firestore la stocke
+ * désormais en map indexée par id, ce qui permet d'adresser un seul article.
+ */
+export function diffShoppingItems(
+  avant: ShoppingItem[],
+  apres: ShoppingItem[],
+): FieldWrites {
+  const writes: FieldWrites = {}
+  const avantParId = new Map(avant.map((i) => [i.id, i]))
+  const apresParId = new Map(apres.map((i) => [i.id, i]))
+
+  for (const item of apres) {
+    const precedent = avantParId.get(item.id)
+    if (!precedent || !sameValue(precedent, item)) {
+      writes[`shoppingItems.${item.id}`] = item
+    }
+  }
+  for (const item of avant) {
+    if (!apresParId.has(item.id)) writes[`shoppingItems.${item.id}`] = deleteField()
+  }
+  return writes
+}
+
+/**
+ * Lit la liste quel que soit son format de stockage.
+ * L'ordre d'affichage vient de `addedAt` (le plus récent en tête) : une map
+ * Firestore n'a pas d'ordre garanti. Les articles antérieurs à ce champ
+ * gardent l'ordre dans lequel ils arrivent.
+ */
+export function readShoppingItems(
+  stored: Record<string, ShoppingItem> | ShoppingItem[] | undefined,
+): ShoppingItem[] {
+  if (!stored) return []
+  const items = Array.isArray(stored) ? stored : Object.values(stored)
+  return [...items]
+    .filter((i) => i && typeof i.id === 'string')
+    .sort((a, b) => (b.addedAt ?? 0) - (a.addedAt ?? 0))
+}
+
+/** Convertit la liste en map pour l'écriture initiale ou la migration. */
+export function toShoppingMap(items: ShoppingItem[]): Record<string, ShoppingItem> {
+  return Object.fromEntries(items.map((i) => [i.id, i]))
 }

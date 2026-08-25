@@ -56,7 +56,7 @@ foyers/{foyerId}
   recipesCustom     recettes créées par le foyer
   recipesOverrides  id d'une recette livrée → champs personnalisés
   deletedDefaults   recettes livrées que le foyer a supprimées
-  shoppingItems     liste de courses
+  shoppingItems     liste de courses, map indexée par id
   settings          régime, nom du foyer, thème
   photos/{recipeId}    { data: dataURL }   une photo par document
   presence/{deviceId}  { lastSeen }        membres connectés
@@ -68,10 +68,12 @@ déjà dans le bundle : Firestore ne garde que le delta (`recipesCustom` +
 de 1 Ko. Le champ `recipes` de l'ancien format est migré puis supprimé au
 premier chargement.
 
-**Les écritures ciblent des chemins de champs** (`weekPlans.2026-08-24.1.midi`)
-plutôt que des champs entiers, pour que Firestore fusionne côté serveur : deux
-membres du foyer qui planifient au même moment ne s'écrasent plus. La liste de
-courses fait exception (c'est un tableau, ~1 Ko) et reste en dernier-écrivain-gagne.
+**Les écritures ciblent des chemins de champs** (`weekPlans.2026-08-24.1.midi`,
+`shoppingItems.{id}`) plutôt que des champs entiers, pour que Firestore fusionne
+côté serveur : deux membres du foyer qui planifient ou cochent au même moment ne
+s'écrasent plus. La liste de courses est stockée en map indexée par id pour la
+même raison ; son ordre d'affichage vient du champ `addedAt`, une map n'ayant
+pas d'ordre garanti.
 
 Un document Firestore plafonne à 1 Mio : les photos vivent **hors** du document
 foyer, une par document (`src/lib/photos.ts`). Une photo base64 qui se
@@ -97,9 +99,9 @@ foyers multiples. Réglages → Foyer → « Créer un foyer privé » en sort.
 src/
   components/   pages et sheets, par domaine (planning, recipes, shopping…)
   hooks/        useFoyerSync (temps réel), useFoyerPresence
-  lib/          firebase, foyer, photos, stickers, syncDiff, utils, toast
+  lib/          firebase, foyer, photos, stickers, syncDiff, mealdb, utils, toast
   store/        useAppStore (Zustand) — état et actions
-  data/         recettes livrées avec l'app
+  data/         recettes livrées avec l'app, catalogue de courses
   __tests__/    tests unitaires
 ```
 
