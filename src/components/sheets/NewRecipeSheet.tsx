@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import type { Period, ShoppingCategory, Ingredient, DietaryTag } from '@/types'
 import { PERIOD_LABEL, cn, resizeToBase64 } from '@/lib/utils'
 import { showToast } from '@/lib/toast'
+import { parseRecipe } from '@/lib/parseRecipe'
 import {
   guessPeriod,
   parseMealIngredients,
@@ -33,7 +34,10 @@ export default function NewRecipeSheet() {
   const closeSheet = useAppStore((s) => s.closeSheet)
 
   // Mode
-  const [mode, setMode] = useState<'create' | 'import'>('create')
+  // « Écrire » d'abord : sept sections à remplir avant le premier ingrédient
+  // décourageaient la création. Le formulaire détaillé reste à un geste.
+  const [mode, setMode] = useState<'write' | 'create' | 'import'>('write')
+  const [freeText, setFreeText] = useState('')
 
   // Import
   const [importQuery,   setImportQuery]   = useState('')
@@ -54,6 +58,42 @@ export default function NewRecipeSheet() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([])
   const [tags,        setTags]        = useState<DietaryTag[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Relu à chaque frappe : la personne voit ce qui est compris avant d'enregistrer.
+  const draft = useMemo(() => parseRecipe(freeText), [freeText])
+
+  /** Reporte le texte lu dans les champs détaillés. */
+  const appliquerDraft = () => {
+    setName(draft.name)
+    setTime(draft.time)
+    setTimeCustom(!TIME_OPTIONS.includes(draft.time))
+    setPeriod(draft.period)
+    setRapide(draft.rapide)
+    setIngredients(draft.ingredients)
+    setSteps(draft.steps.length ? draft.steps : [''])
+    setTags(draft.tags)
+  }
+
+  const enregistrerDepuisTexte = () => {
+    if (!draft.name.trim()) return
+    addRecipe({
+      name: draft.name.trim(),
+      emoji: '',
+      period: draft.period,
+      time: draft.time,
+      fav: false,
+      rapide: draft.rapide,
+      ingredients: draft.ingredients.length ? draft.ingredients : undefined,
+      steps: draft.steps.length ? draft.steps : undefined,
+      tags: draft.tags.length ? draft.tags : undefined,
+      photo: photo ?? photoUrl,
+    })
+    showToast(`${draft.name.trim()} ajoutée !`)
+    setFreeText('')
+    setPhoto(undefined)
+    setPhotoUrl(undefined)
+    closeSheet()
+  }
 
   const toggleTag = (tag: DietaryTag) =>
     setTags((prev) => prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag])
@@ -154,8 +194,17 @@ export default function NewRecipeSheet() {
         </button>
       </div>
 
-      {/* Onglets Créer / Importer */}
+      {/* Onglets Écrire / Détaillé / Importer */}
       <div className="flex gap-2 mb-5 p-1 bg-bg rounded-2xl">
+        <button
+          onClick={() => setMode('write')}
+          className={cn(
+            'flex-1 py-2 rounded-xl text-xs font-extrabold transition-all duration-200',
+            mode === 'write' ? 'bg-card text-text1 shadow-card' : 'text-muted',
+          )}
+        >
+          Écrire
+        </button>
         <button
           onClick={() => setMode('create')}
           className={cn(
@@ -163,7 +212,7 @@ export default function NewRecipeSheet() {
             mode === 'create' ? 'bg-card text-text1 shadow-card' : 'text-muted',
           )}
         >
-          Créer
+          Détaillé
         </button>
         <button
           onClick={() => setMode('import')}
@@ -175,6 +224,90 @@ export default function NewRecipeSheet() {
           Importer
         </button>
       </div>
+
+      {/* ══════ MODE ÉCRIRE ═════════════════════════════════════════════════ */}
+      {mode === 'write' && (
+        <div>
+          <textarea
+            value={freeText}
+            onChange={(e) => setFreeText(e.target.value)}
+            placeholder={'Tarte aux poireaux\n40 min\n\n3 poireaux\n1 pâte brisée\n20 cl de crème\n2 œufs\n\nÉmincer les poireaux et les faire fondre.\nBattre les œufs avec la crème.\nEnfourner 30 min à 180°.'}
+            rows={11}
+            autoFocus
+            className="w-full bg-bg border border-border rounded-2xl px-4 py-3.5 text-[15px] text-text1 placeholder:text-muted outline-none focus:border-terra resize-none leading-relaxed transition-colors"
+          />
+          <p className="text-[12px] text-muted mt-2 leading-snug">
+            Le titre sur la première ligne, puis les ingrédients, puis les étapes.
+            Une ligne par élément.
+          </p>
+
+          {/* Aperçu : rien n'est enregistré sans que la lecture soit montrée */}
+          {freeText.trim() && (
+            <div className="mt-5 rounded-2xl border border-border bg-bg p-4">
+              <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-3">
+                Ce qui sera enregistré
+              </p>
+
+              <p className="text-[17px] font-bold text-text1 leading-tight">
+                {draft.name || <span className="text-muted">Sans titre</span>}
+              </p>
+              <p className="text-[12px] text-muted mt-0.5">
+                {draft.time}
+                {draft.rapide && ' · Rapide'}
+                {' · '}
+                {draft.period === 'pdej' ? 'Petit-déj' : draft.period === 'soir' ? 'Soir' : 'Midi'}
+              </p>
+
+              {draft.ingredients.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-[11px] font-bold text-text2 mb-1">
+                    {draft.ingredients.length} ingrédient{draft.ingredients.length > 1 ? 's' : ''}
+                  </p>
+                  <ul className="flex flex-col gap-0.5">
+                    {draft.ingredients.map((ing, i) => (
+                      <li key={i} className="flex justify-between gap-3 text-[13px]">
+                        <span className="text-text1">{ing.name}</span>
+                        <span className="text-muted tabular-nums flex-shrink-0">{ing.qty}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {draft.steps.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-[11px] font-bold text-text2 mb-1">
+                    {draft.steps.length} étape{draft.steps.length > 1 ? 's' : ''}
+                  </p>
+                  <ol className="flex flex-col gap-0.5">
+                    {draft.steps.map((st, i) => (
+                      <li key={i} className="text-[13px] text-text1 flex gap-2">
+                        <span className="text-muted tabular-nums">{i + 1}.</span>
+                        <span className="line-clamp-1">{st}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+
+              <button
+                onClick={() => { appliquerDraft(); setMode('create') }}
+                className="mt-4 text-[12px] font-bold text-accent underline underline-offset-2"
+              >
+                Ajuster en détail
+              </button>
+            </div>
+          )}
+
+          <button
+            onClick={enregistrerDepuisTexte}
+            disabled={!draft.name.trim()}
+            className="btn-primary w-full mt-5 min-h-[52px] disabled:opacity-40"
+          >
+            Ajouter la recette
+          </button>
+        </div>
+      )}
 
       {/* ══════ MODE IMPORT ══════════════════════════════════════════════════ */}
       {mode === 'import' && (
