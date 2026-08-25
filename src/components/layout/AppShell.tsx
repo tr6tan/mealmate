@@ -57,14 +57,6 @@ export default function AppShell({ nav, children }: Props) {
         />
       )}
 
-      {/* Version badge */}
-      <span
-        className="absolute z-50 text-[10px] font-mono pointer-events-none select-none text-muted"
-        style={{ bottom: 2, left: 8 }}
-      >
-        v{__APP_VERSION__} · {__BUILD_TIME__}
-      </span>
-
       {/* Sheets & toasts */}
       {children}
     </div>

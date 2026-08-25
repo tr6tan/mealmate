@@ -102,6 +102,12 @@ export default function SettingsPage() {
           Icônes par <a href="https://icons8.com" target="_blank" rel="noopener noreferrer" className="underline">Icons8</a>
         </p>
 
+        {/* Version : ici plutôt qu'en surimpression de l'écran principal, où
+            elle n'apportait rien à l'usage. */}
+        <p className="text-[10px] text-muted text-center font-mono opacity-70">
+          v{__APP_VERSION__} · {__BUILD_TIME__}
+        </p>
+
       </div>
     </div>
   )
