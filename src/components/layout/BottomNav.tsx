@@ -26,7 +26,7 @@ export default function BottomNav() {
       className="fixed left-1/2 -translate-x-1/2 rounded-full px-2 py-2 flex gap-1 z-50"
       style={{
         bottom: '12px',
-        background: '#0018A8',
+        background: 'rgb(var(--c-terra))',
         boxShadow: '0 8px 32px rgba(0,24,168,0.40), 0 1px 0 rgba(255,255,255,0.14) inset',
         border: '1px solid rgba(0,50,220,0.35)',
       }}
@@ -41,14 +41,14 @@ export default function BottomNav() {
             aria-label={item.label}
             className={`relative flex items-center gap-2 px-3 py-2 rounded-full transition-colors duration-200 active:scale-95 ${
               active
-                ? 'bg-white text-[#0018A8]'
+                ? 'bg-white text-terra'
                 : 'text-white/70 hover:text-white'
             }`}
           >
             <Icon size={18} />
             {active && <span className="text-sm font-semibold">{item.label}</span>}
             {item.id === 'courses' && remaining > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-white text-[#0018A8] text-[9px] font-black rounded-full flex items-center justify-center px-1 leading-none shadow-sm">
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-white text-terra text-[9px] font-black rounded-full flex items-center justify-center px-1 leading-none shadow-sm">
                 {remaining}
               </span>
             )}

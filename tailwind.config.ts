@@ -26,6 +26,11 @@ const config: Config = {
         text1:  'rgb(var(--c-text1)  / <alpha-value>)',
         text2:  'rgb(var(--c-text2)  / <alpha-value>)',
         muted:  'rgb(var(--c-muted)  / <alpha-value>)',
+        // Texte accentué : suit le thème pour rester lisible sur fond sombre,
+        // là où `terra` (fond de bouton) tomberait à 1.37:1.
+        accent: 'rgb(var(--c-accent) / <alpha-value>)',
+        // Surface de contrôle posée sur une carte (segments, steppers).
+        fill:   'rgb(var(--c-fill)   / <alpha-value>)',
         terra: {
           DEFAULT: 'rgb(var(--c-terra)       / <alpha-value>)',
           light:   'rgb(var(--c-terra-light) / <alpha-value>)',

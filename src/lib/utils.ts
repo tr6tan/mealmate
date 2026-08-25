@@ -304,6 +304,34 @@ export function fuzzyFilter<T>(
 }
 
 /**
+ * Nombre de personnes pour lequel les quantités des recettes sont écrites.
+ * Sert de base au calcul des portions : une recette affichée pour 4 personnes
+ * voit ses quantités multipliées par 4 / BASE_PORTIONS.
+ */
+export const BASE_PORTIONS = 2
+
+/**
+ * Met une quantité à l'échelle d'un nombre de convives.
+ * "200g" pour 4 personnes → "400 g". Une quantité sans nombre (« un peu de
+ * sel ») est renvoyée telle quelle.
+ *
+ * Cette fonction était dupliquée dans RecipeDetailSheet et MealActionsSheet,
+ * avec deux conventions incompatibles (multiplicateur d'un côté, nombre de
+ * personnes de l'autre) : la même recette affichait donc des quantités
+ * différentes selon l'écran par lequel on l'ouvrait.
+ */
+export function scaleQty(qty: string, people: number): string {
+  const factor = people / BASE_PORTIONS
+  if (!qty || factor === 1) return qty
+  const m = qty.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/)
+  if (!m) return qty
+  const num = parseFloat(m[1].replace(',', '.'))
+  const unit = m[2].trim()
+  const scaled = Math.round(num * factor * 10) / 10
+  return unit ? `${scaled} ${unit}` : `${scaled}`
+}
+
+/**
  * Redimensionne + compresse une image (File) en base64 JPEG.
  * 640px / q0.62 vise ~40 Ko : les photos partent dans la sous-collection
  * `photos` (un document Firestore par photo, plafonné à 1 Mio).

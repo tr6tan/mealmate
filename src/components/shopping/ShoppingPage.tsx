@@ -104,13 +104,30 @@ export default function ShoppingPage() {
       <div className="flex-shrink-0 pt-safe" />
       <div className="px-5 pt-4 pb-nav-safe">
 
-        {/* Status */}
-        <p className="text-sm text-neutral-500 mb-5">
-          {remaining > 0
-            ? `${remaining} article${remaining > 1 ? 's' : ''} restant${remaining > 1 ? 's' : ''} sur ${total}`
-            : total > 0 ? '✅ Tout est coché !' : 'La liste est vide'
-          }
-        </p>
+        {/* Progression */}
+        <div className="mb-5">
+          <p className="text-sm text-text2 font-semibold">
+            {remaining > 0
+              ? `${remaining} article${remaining > 1 ? 's' : ''} restant${remaining > 1 ? 's' : ''} sur ${total}`
+              : total > 0 ? 'Tout est coché' : 'La liste est vide'
+            }
+          </p>
+          {total > 0 && (
+            <div
+              className="mt-2 h-1.5 rounded-full bg-sep overflow-hidden"
+              role="progressbar"
+              aria-valuenow={pct}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label="Progression des courses"
+            >
+              <div
+                className="h-full rounded-full bg-success transition-all duration-500"
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+          )}
+        </div>
 
         {/* CTA buttons */}
         <div className="grid grid-cols-2 gap-2 mb-3">
@@ -126,28 +143,28 @@ export default function ShoppingPage() {
 
         {/* Action links */}
         {total > 0 && (
-          <div className="flex gap-3 mb-6 flex-wrap">
+          <div className="flex gap-4 mb-4 items-center">
             <button
               onClick={() => remaining === 0 ? setAllChecked(false) : setAllChecked(true)}
-              className="text-xs flex items-center gap-1 text-neutral-500 underline"
+              className="text-xs font-semibold flex items-center gap-1.5 text-text2 py-2.5 px-1 min-h-[44px] active:opacity-60"
             >
-              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
               {remaining === 0 ? 'Tout décocher' : 'Tout cocher'}
             </button>
             {checked > 0 && (
               <button
                 onClick={() => { clearCheckedItems(); showToast('Articles cochés supprimés') }}
-                className="text-xs flex items-center gap-1 text-neutral-500 underline"
+                className="text-xs font-semibold flex items-center gap-1.5 text-text2 py-2.5 px-1 min-h-[44px] active:opacity-60"
               >
-                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
-                Vider les cochés ({checked})
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                Vider ({checked})
               </button>
             )}
             <button
               onClick={handleCopy}
-              className="text-xs flex items-center gap-1 text-neutral-500 underline ml-auto"
+              className="text-xs font-semibold flex items-center gap-1.5 text-text2 py-2.5 px-1 min-h-[44px] ml-auto flex-shrink-0 active:opacity-60"
             >
-              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
               Partager
             </button>
           </div>
@@ -156,12 +173,12 @@ export default function ShoppingPage() {
         {/* Empty state */}
         {total === 0 ? (
           <div className="glass rounded-[32px] px-8 py-10 text-center mt-4 flex flex-col items-center gap-3">
-            <svg className="w-9 h-9 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="w-9 h-9 text-muted opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
             </svg>
             <div>
-              <p className="text-sm text-neutral-700 mb-1">Votre panier est vide</p>
-              <p className="text-xs text-neutral-400 leading-relaxed">Ajoutez des articles ou importez<br/>votre planning de la semaine.</p>
+              <p className="text-sm text-text1 font-semibold mb-1">Votre panier est vide</p>
+              <p className="text-xs text-muted leading-relaxed">Ajoutez des articles ou importez<br/>votre planning de la semaine.</p>
             </div>
           </div>
         ) : (

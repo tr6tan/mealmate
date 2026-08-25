@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
-import { haptic } from '@/lib/utils'
+import { haptic, scaleQty } from '@/lib/utils'
 import type { Period, SlotKey } from '@/types'
 import { showToast } from '@/lib/toast'
 
@@ -9,16 +9,6 @@ function periodFromSlot(slotKey: SlotKey): Period {
   if (slotKey.startsWith('pdej')) return 'pdej'
   if (slotKey.startsWith('midi')) return 'midi'
   return 'soir'
-}
-
-function scaleQty(qty: string, factor: number): string {
-  if (!qty || factor === 1) return qty
-  const m = qty.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/)
-  if (!m) return qty
-  const num = parseFloat(m[1].replace(',', '.'))
-  const unit = m[2].trim()
-  const scaled = Math.round(num * factor * 10) / 10
-  return unit ? `${scaled} ${unit}` : `${scaled}`
 }
 
 const TAG_DISPLAY: Record<string, string> = {
@@ -45,8 +35,9 @@ export default function MealActionsSheet() {
   const toggleFav       = useAppStore((s) => s.toggleFav)
   const addShoppingItem = useAppStore((s) => s.addShoppingItem)
   const recipes         = useAppStore((s) => s.recipes)
+  const personnes       = useAppStore((s) => s.settings.personnes)
 
-  const [portions, setPortions] = useState(2)
+  const [portions, setPortions] = useState(personnes)
 
   const ctx = sheetState.actionContext
   if (!ctx) return <BottomSheet name="meal-actions"><div /></BottomSheet>
@@ -87,9 +78,8 @@ export default function MealActionsSheet() {
 
   const handleAddToCourses = () => {
     if (!recipe?.ingredients?.length) return
-    const factor = portions / 2
     recipe.ingredients.forEach((ing) => {
-      addShoppingItem({ name: ing.name, qty: scaleQty(ing.qty, factor), category: ing.category, checked: false })
+      addShoppingItem({ name: ing.name, qty: scaleQty(ing.qty, portions), category: ing.category, checked: false })
     })
     showToast(`${recipe.ingredients.length} ingrédients ajoutés aux courses !`)
   }
@@ -143,7 +133,7 @@ export default function MealActionsSheet() {
           <div className="flex items-start gap-4">
             <div
               className="w-[72px] h-[72px] rounded-[22px] flex items-center justify-center text-[38px] leading-none flex-shrink-0"
-              style={{ background: '#0018A8', boxShadow: '0 8px 24px rgba(0,24,168,0.35)' }}
+              style={{ background: 'rgb(var(--c-terra))', boxShadow: '0 8px 24px rgba(0,24,168,0.35)' }}
             >
               {meal.emoji || '🍽'}
             </div>
@@ -153,7 +143,7 @@ export default function MealActionsSheet() {
 
               <div className="flex flex-wrap gap-1.5">
                 {meal.time && meal.time !== '?' && (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/70 backdrop-blur text-neutral-600">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-fill/70 backdrop-blur text-text2">
                     <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                     {meal.time}
                   </span>
@@ -164,7 +154,7 @@ export default function MealActionsSheet() {
                   </span>
                 )}
                 {recipe?.tags?.map((t) => (
-                  <span key={t} className="inline-flex items-center text-[11px] font-bold px-2.5 py-1 rounded-full bg-white/70 backdrop-blur text-neutral-600">
+                  <span key={t} className="inline-flex items-center text-[11px] font-bold px-2.5 py-1 rounded-full bg-fill/70 backdrop-blur text-text2">
                     {TAG_DISPLAY[t] ?? t}
                   </span>
                 ))}
@@ -175,9 +165,9 @@ export default function MealActionsSheet() {
           {recipe && (
             <button
               onClick={() => toggleFav(recipe.id)}
-              className="absolute top-4 right-5 w-9 h-9 rounded-full bg-white/60 backdrop-blur flex items-center justify-center active:scale-90 transition-transform"
+              className="absolute top-4 right-5 w-9 h-9 rounded-full bg-fill/60 backdrop-blur flex items-center justify-center active:scale-90 transition-transform"
             >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill={meal.fav ? '#0018A8' : 'none'} stroke={meal.fav ? '#0018A8' : '#9ca3af'} strokeWidth="2">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill={meal.fav ? 'rgb(var(--c-terra))' : 'none'} stroke={meal.fav ? 'rgb(var(--c-terra))' : 'rgb(var(--c-muted))'} strokeWidth="2">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
               </svg>
             </button>
@@ -193,7 +183,7 @@ export default function MealActionsSheet() {
               🧂 {recipe!.ingredients!.length} ingrédients
             </p>
             {/* Portions stepper */}
-            <div className="flex items-center gap-1 bg-black/[0.05] rounded-full px-1">
+            <div className="flex items-center gap-1 bg-fill/60 rounded-full px-1">
               <button onClick={() => setPortions(p => Math.max(1, p - 1))}
                 className="w-7 h-7 flex items-center justify-center text-text2 font-black text-base active:scale-90 transition-transform">−</button>
               <span className="text-[13px] font-bold text-text1 min-w-[28px] text-center">{portions}</span>
@@ -207,14 +197,14 @@ export default function MealActionsSheet() {
               const cat = CAT_META[ing.category] ?? { color: '#888', bg: '#f0f0f0' }
               return (
                 <div key={i} className="rounded-2xl p-2.5 text-center" style={{ background: cat.bg }}>
-                  <p className="text-[12px] font-semibold leading-tight mb-0.5 text-neutral-700">{ing.name}</p>
-                  <p className="text-[11px] font-bold" style={{ color: cat.color }}>{scaleQty(ing.qty, portions / 2) || '—'}</p>
+                  <p className="text-[12px] font-semibold leading-tight mb-0.5 text-text2">{ing.name}</p>
+                  <p className="text-[11px] font-bold" style={{ color: cat.color }}>{scaleQty(ing.qty, portions) || '—'}</p>
                 </div>
               )
             })}
           </div>
           {recipe!.ingredients!.length > 6 && (
-            <p className="text-[11px] text-neutral-400 text-center mb-2">+ {recipe!.ingredients!.length - 6} autres ingrédients</p>
+            <p className="text-[11px] text-muted text-center mb-2">+ {recipe!.ingredients!.length - 6} autres ingrédients</p>
           )}
           <button
             onClick={handleAddToCourses}

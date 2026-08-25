@@ -4,17 +4,7 @@ import { useAppStore } from '@/store/useAppStore'
 import { showToast } from '@/lib/toast'
 import MealAvatar from '@/components/ui/MealAvatar'
 import FoodSticker from '@/components/ui/FoodSticker'
-import { ingredientEmoji } from '@/lib/utils'
-
-function scaleQty(qty: string, factor: number): string {
-  if (!qty || factor === 1) return qty
-  const match = qty.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/)
-  if (!match) return qty
-  const num = parseFloat(match[1].replace(',', '.'))
-  const unit = match[2].trim()
-  const scaled = Math.round(num * factor * 10) / 10
-  return unit ? `${scaled} ${unit}` : `${scaled}`
-}
+import { ingredientEmoji, scaleQty } from '@/lib/utils'
 
 // ── Icônes SVG ──────────────────────────────────────────────────────────────
 const IcoBack  = () => <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -37,7 +27,10 @@ export default function RecipeDetailSheet() {
   const openSheet       = useAppStore((s) => s.openSheet)
   const closeSheet      = useAppStore((s) => s.closeSheet)
   const photos          = useAppStore((s) => s.photos)
-  const [portions, setPortions]     = useState(1)
+  // Le nombre de convives du foyer sert de valeur de départ, au lieu d'un
+  // multiplicateur reparti de zéro à chaque ouverture.
+  const personnes       = useAppStore((s) => s.settings.personnes)
+  const [portions, setPortions]     = useState(personnes)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [localNotes, setLocalNotes] = useState('')
 
@@ -120,13 +113,13 @@ export default function RecipeDetailSheet() {
 
       {/* ── TITRE + MÉTA ── */}
       <div className="mb-5">
-        <h2 className="text-[26px] font-bold text-neutral-900 leading-tight tracking-[-0.03em] mb-1.5">
+        <h2 className="text-[26px] font-bold text-text1 leading-tight tracking-[-0.03em] mb-1.5">
           {recipe.name}
         </h2>
         {recipe.notes && (
-          <p className="text-[14px] text-neutral-400 leading-relaxed mb-3">{recipe.notes}</p>
+          <p className="text-[14px] text-muted leading-relaxed mb-3">{recipe.notes}</p>
         )}
-        <div className="flex items-center gap-1.5 text-[13px] text-neutral-400 mb-3">
+        <div className="flex items-center gap-1.5 text-[13px] text-muted mb-3">
           <IcoClock />
           <span>{recipe.time}</span>
           {recipe.rapide && <span className="ml-1 text-[11px] font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">⚡ Rapide</span>}
@@ -140,8 +133,8 @@ export default function RecipeDetailSheet() {
               className="active:scale-110 transition-transform"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24"
-                fill={(recipe.rating ?? 0) >= star ? '#001DC1' : 'none'}
-                stroke={(recipe.rating ?? 0) >= star ? '#001DC1' : '#D1D5DB'}
+                fill={(recipe.rating ?? 0) >= star ? 'rgb(var(--c-terra))' : 'none'}
+                stroke={(recipe.rating ?? 0) >= star ? 'rgb(var(--c-terra))' : 'rgb(var(--c-border))'}
                 strokeWidth="1.5"
               >
                 <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
@@ -168,7 +161,7 @@ export default function RecipeDetailSheet() {
               </div>
             ))}
             {recipe.ingredients!.length > 6 && (
-              <div className="w-8 h-8 rounded-full bg-[#EEF0FF] flex items-center justify-center text-[11px] font-bold text-[#001DC1]">
+              <div className="w-8 h-8 rounded-full bg-[#EEF0FF] flex items-center justify-center text-[11px] font-bold text-terra">
                 +{recipe.ingredients!.length - 6}
               </div>
             )}
@@ -180,7 +173,7 @@ export default function RecipeDetailSheet() {
       <button
         onClick={() => openSheet({ sheet: 'cook-mode', recipeContext: recipe })}
         className="w-full py-4 rounded-2xl text-white text-[15px] font-semibold tracking-[-0.01em] active:scale-[0.97] transition-all flex items-center justify-center gap-2.5 mb-6"
-        style={{ background: '#001DC1', boxShadow: '0 4px 20px rgba(0,29,193,0.28)' }}
+        style={{ background: 'rgb(var(--c-terra))', boxShadow: '0 4px 20px rgba(0,29,193,0.28)' }}
       >
         <IcoCookHat />
         Démarrer la cuisine
@@ -190,21 +183,23 @@ export default function RecipeDetailSheet() {
       {hasIngredients && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[17px] font-bold text-neutral-900 tracking-[-0.02em]">Ingrédients</h3>
-            {/* Portions ×1 ×2 ×4 */}
+            <div>
+              <h3 className="text-[17px] font-bold text-text1 tracking-[-0.02em]">Ingrédients</h3>
+              <p className="text-[11px] text-muted font-semibold">pour {portions} personnes</p>
+            </div>
+            {/* Nombre de convives */}
             <div className="flex gap-1.5">
-              {([1, 2, 4] as const).map((p) => (
+              {([2, 4, 6] as const).map((p) => (
                 <button
                   key={p}
                   onClick={() => setPortions(p)}
-                  className="w-9 h-9 rounded-full text-[13px] font-bold transition-all active:scale-90"
-                  style={
-                    portions === p
-                      ? { background: '#001DC1', color: 'white' }
-                      : { background: '#F3F4F6', color: '#6B7280' }
-                  }
+                  aria-label={`${p} personnes`}
+                  aria-pressed={portions === p}
+                  className={`w-11 h-11 rounded-full text-[13px] font-bold transition-all active:scale-90 ${
+                    portions === p ? 'bg-terra text-white' : 'bg-sep text-text2'
+                  }`}
                 >
-                  ×{p}
+                  {p}
                 </button>
               ))}
             </div>
@@ -215,7 +210,7 @@ export default function RecipeDetailSheet() {
             {recipe.ingredients!.map((ing, i) => (
               <div
                 key={i}
-                className="flex items-center gap-3 bg-white rounded-2xl px-3 py-3"
+                className="flex items-center gap-3 bg-card rounded-2xl px-3 py-3"
                 style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}
               >
                 <div className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center bg-[#EEF0FF]">
@@ -229,8 +224,8 @@ export default function RecipeDetailSheet() {
                   />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[13px] font-semibold text-neutral-800 leading-snug truncate">{ing.name}</p>
-                  <p className="text-[11px] text-neutral-400 leading-none mt-0.5">
+                  <p className="text-[13px] font-semibold text-text1 leading-snug truncate">{ing.name}</p>
+                  <p className="text-[11px] text-muted leading-none mt-0.5">
                     {scaleQty(ing.qty, portions) || '—'}
                   </p>
                 </div>
@@ -242,7 +237,7 @@ export default function RecipeDetailSheet() {
           <button
             onClick={handleAddToCourses}
             className="w-full py-3.5 rounded-2xl text-[14px] font-semibold text-white active:scale-[0.97] transition-all flex items-center justify-center gap-2"
-            style={{ background: 'linear-gradient(135deg, #001DC1, #2B50F0)', boxShadow: '0 4px 16px rgba(0,29,193,0.22)' }}
+            style={{ background: 'linear-gradient(135deg, rgb(var(--c-terra)), rgb(var(--c-terra-dark)))', boxShadow: '0 4px 16px rgba(0,29,193,0.22)' }}
           >
             <IcoCart />
             Ajouter à la liste de courses
@@ -253,18 +248,18 @@ export default function RecipeDetailSheet() {
       {/* ── ÉTAPES ── */}
       {hasSteps && (
         <div className="mb-6">
-          <h3 className="text-[17px] font-bold text-neutral-900 tracking-[-0.02em] mb-4">Étapes</h3>
+          <h3 className="text-[17px] font-bold text-text1 tracking-[-0.02em] mb-4">Étapes</h3>
           <div className="space-y-3">
             {recipe.steps!.map((step, i) => (
               <div
                 key={i}
-                className="flex items-start gap-3.5 bg-white rounded-2xl px-4 py-3.5"
+                className="flex items-start gap-3.5 bg-card rounded-2xl px-4 py-3.5"
                 style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}
               >
-                <div className="w-6 h-6 rounded-full bg-[#001DC1] flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-6 h-6 rounded-full bg-terra flex items-center justify-center flex-shrink-0 mt-0.5">
                   <span className="text-[11px] font-bold text-white">{i + 1}</span>
                 </div>
-                <p className="text-[13px] text-neutral-700 font-medium leading-relaxed flex-1">{step}</p>
+                <p className="text-[13px] text-text2 font-medium leading-relaxed flex-1">{step}</p>
               </div>
             ))}
           </div>
@@ -273,7 +268,7 @@ export default function RecipeDetailSheet() {
 
       {/* ── NOTES PERSONNELLES ── */}
       <div className="mb-6">
-        <h3 className="text-[17px] font-bold text-neutral-900 tracking-[-0.02em] mb-3">Notes personnelles</h3>
+        <h3 className="text-[17px] font-bold text-text1 tracking-[-0.02em] mb-3">Notes personnelles</h3>
         <textarea
           value={localNotes || recipe.notes || ''}
           onChange={(e) => {
@@ -282,7 +277,7 @@ export default function RecipeDetailSheet() {
           }}
           placeholder="Ajoutez vos remarques, astuces ou modifications..."
           rows={4}
-          className="w-full bg-white rounded-2xl px-4 py-3.5 text-[13px] font-medium text-neutral-700 placeholder:text-neutral-300 outline-none resize-none leading-relaxed"
+          className="w-full bg-card rounded-2xl px-4 py-3.5 text-[13px] font-medium text-text2 placeholder:text-muted outline-none resize-none leading-relaxed"
           style={{
             boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
             WebkitUserSelect: 'text',
@@ -295,7 +290,7 @@ export default function RecipeDetailSheet() {
       <div className="flex gap-2 mb-4">
         <button
           onClick={() => openSheet({ sheet: 'edit-recipe', recipeContext: recipe })}
-          className="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl text-[13px] font-semibold text-neutral-500 bg-neutral-100 active:scale-95 transition-transform"
+          className="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl text-[13px] font-semibold text-muted bg-neutral-100 active:scale-95 transition-transform"
         >
           <IcoPen /> Modifier
         </button>

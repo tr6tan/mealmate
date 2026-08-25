@@ -31,7 +31,7 @@ function RecipeRow({ recipe, onSelect, onDetail }: { recipe: Recipe; onSelect: (
       tabIndex={0}
       onClick={() => onSelect(recipe)}
       onKeyDown={(e) => e.key === 'Enter' && onSelect(recipe)}
-      className="w-full flex items-center gap-3 px-1 py-2 text-left active:bg-black/[0.04] rounded-xl cursor-pointer transition-colors"
+      className="w-full flex items-center gap-3 px-1 py-2 text-left active:bg-fill/50 rounded-xl cursor-pointer transition-colors"
     >
       <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(0,0,0,0.05)' }}>
         <FoodSticker
@@ -44,14 +44,14 @@ function RecipeRow({ recipe, onSelect, onDetail }: { recipe: Recipe; onSelect: (
       <div className="flex-1 min-w-0">
         <p className="text-[14px] font-semibold text-text1 truncate">{recipe.name}</p>
         <div className="flex items-center gap-2 mt-0.5">
-          {recipe.time && <span className="text-[12px] text-neutral-400">{recipe.time}</span>}
+          {recipe.time && <span className="text-[12px] text-muted">{recipe.time}</span>}
           {isVege && <LeafIcon />}
           {recipe.rapide && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md" style={{ background: '#FEF3C7', color: '#92400E' }}>⚡</span>}
         </div>
       </div>
       <button
         onClick={(e) => { e.stopPropagation(); onDetail() }}
-        className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform text-neutral-300"
+        className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 active:scale-90 transition-transform text-muted"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
           <circle cx="12" cy="12" r="10"/>
@@ -190,7 +190,7 @@ export default function AddMealSheet() {
       <div className="flex-shrink-0 pb-1">
         <h2 className="text-[22px] font-black text-text1 mb-0.5">Que mangez-vous ?</h2>
         {dayLabel && (
-          <p className="text-[13px] text-neutral-400 font-medium mb-4">{dayLabel} — {slotLabel}</p>
+          <p className="text-[13px] text-muted font-medium mb-4">{dayLabel} · {slotLabel}</p>
         )}
 
         {/* 3 onglets */}
@@ -202,7 +202,7 @@ export default function AddMealSheet() {
               className="flex-1 flex flex-col items-center gap-1.5 py-2.5 rounded-2xl text-xs font-bold transition-all active:scale-[0.97]"
               style={
                 tab === t.key
-                  ? { background: '#0018A8', color: '#fff', boxShadow: '0 4px 14px rgba(0,24,168,0.28)' }
+                  ? { background: 'rgb(var(--c-terra))', color: '#fff', boxShadow: '0 4px 14px rgba(0,24,168,0.28)' }
                   : { background: 'rgba(0,0,0,0.05)', color: '#9ca3af' }
               }
             >
@@ -214,16 +214,16 @@ export default function AddMealSheet() {
 
         {/* Barre de recherche — visible uniquement onglet Recette */}
         <div className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl mb-1${tab !== 'recette' ? ' hidden' : ''}`} style={{ background: 'rgba(0,0,0,0.05)' }}>
-            <svg className="w-4 h-4 text-neutral-400 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <svg className="w-4 h-4 text-muted flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input
               type="search" inputMode="search" placeholder="Chercher une recette…"
               value={search} onChange={(e) => updateSearch(e.target.value)}
               autoComplete="on" autoCorrect="on" autoCapitalize="sentences" spellCheck={true} enterKeyHint="search"
-              className="flex-1 bg-transparent outline-none text-[14px] font-medium text-text1 placeholder:text-neutral-400"
+              className="flex-1 bg-transparent outline-none text-[14px] font-medium text-text1 placeholder:text-muted"
             />
             {search && (
               <button onClick={() => updateSearch('')} className="active:scale-90 transition-transform">
-                <svg className="w-4 h-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <svg className="w-4 h-4 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             )}
           </div>
@@ -235,13 +235,13 @@ export default function AddMealSheet() {
       <div className={`flex-1 overflow-y-auto overscroll-contain no-scrollbar${tab !== 'recette' ? ' hidden' : ''}`} style={{ touchAction: 'pan-y' }}>
         {!debouncedSearch && suggestions.length > 0 && (
           <>
-            <p className="text-[11px] text-neutral-400 font-semibold px-1 pt-1 pb-2">Suggestions</p>
+            <p className="text-[11px] text-muted font-semibold px-1 pt-1 pb-2">Suggestions</p>
             {suggestions.map(recipe => (
               <RecipeRow key={recipe.id} recipe={recipe} onSelect={handleSelect}
                 onDetail={() => openSheet({ sheet: 'recipe-detail', recipeContext: recipe })} />
             ))}
-            <div className="mx-1 my-2 h-px bg-black/[0.06]" />
-            <p className="text-[11px] text-neutral-400 font-semibold px-1 pb-2">Toutes les recettes</p>
+            <div className="mx-1 my-2 h-px bg-fill/60" />
+            <p className="text-[11px] text-muted font-semibold px-1 pb-2">Toutes les recettes</p>
           </>
         )}
         <div className="pb-6">
@@ -250,7 +250,7 @@ export default function AddMealSheet() {
               onDetail={() => openSheet({ sheet: 'recipe-detail', recipeContext: recipe })} />
           ))}
           {filtered.length === 0 && (
-            <div className="text-center py-10 text-neutral-400">
+            <div className="text-center py-10 text-muted">
               <p className="text-3xl mb-2">🔍</p>
               <p className="text-sm font-semibold">Aucune recette trouvée</p>
             </div>
@@ -264,7 +264,7 @@ export default function AddMealSheet() {
           type="text" inputMode="text" placeholder="Nom du restaurant…"
           value={restoName} onChange={(e) => setRestoName(e.target.value)}
           autoComplete="on" autoCorrect="on" autoCapitalize="sentences" spellCheck={true} enterKeyHint="done"
-          className="w-full px-4 py-3.5 rounded-2xl text-[15px] font-medium text-text1 outline-none placeholder:text-neutral-400"
+          className="w-full px-4 py-3.5 rounded-2xl text-[15px] font-medium text-text1 outline-none placeholder:text-muted"
           style={{ background: 'rgba(0,0,0,0.05)' }}
         />
         <button onClick={handleResto} className="btn-primary w-full">
@@ -278,7 +278,7 @@ export default function AddMealSheet() {
           type="text" inputMode="text" placeholder="Nom du repas…"
           value={freeName} onChange={(e) => setFreeName(e.target.value)}
           autoComplete="on" autoCorrect="on" autoCapitalize="sentences" spellCheck={true} enterKeyHint="done"
-          className="w-full px-4 py-3.5 rounded-2xl text-[15px] font-medium text-text1 outline-none placeholder:text-neutral-400"
+          className="w-full px-4 py-3.5 rounded-2xl text-[15px] font-medium text-text1 outline-none placeholder:text-muted"
           style={{ background: 'rgba(0,0,0,0.05)' }}
         />
         <button onClick={handleFree} disabled={!freeName.trim()} className="btn-primary w-full" style={!freeName.trim() ? { opacity: 0.4 } : {}}>

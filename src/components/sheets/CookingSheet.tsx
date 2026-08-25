@@ -93,7 +93,7 @@ export default function CookingSheet() {
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col"
-      style={{ background: '#001DC1' }}
+      style={{ background: 'rgb(var(--c-terra))' }}
     >
       {/* ── HEADER ── */}
       <div className="flex items-center justify-between px-5 pt-safe pt-4 pb-3 shrink-0">
@@ -109,7 +109,7 @@ export default function CookingSheet() {
         <button
           onClick={closeSheet}
           aria-label="Quitter le mode cuisine"
-          className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center text-white active:bg-white/25 transition shrink-0"
+          className="w-9 h-9 rounded-full bg-fill/15 flex items-center justify-center text-white active:bg-fill/25 transition shrink-0"
         >
           <IcoClose />
         </button>
@@ -120,13 +120,13 @@ export default function CookingSheet() {
         <button
           onClick={resetChrono}
           aria-label="Remettre le minuteur à zéro"
-          className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white/70 active:bg-white/20"
+          className="w-9 h-9 rounded-full bg-fill/10 flex items-center justify-center text-white/70 active:bg-fill/20"
         >
           <IcoReset />
         </button>
         <button
           onClick={() => setRunning((r) => !r)}
-          className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-white/15 active:bg-white/25 transition"
+          className="flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-fill/15 active:bg-fill/25 transition"
         >
           <span className="text-white/70">{running ? <IcoPause /> : <IcoPlay />}</span>
           <span
@@ -173,7 +173,7 @@ export default function CookingSheet() {
                 <div
                   className="w-10 h-10 rounded-full bg-white flex items-center justify-center shrink-0"
                 >
-                  <span className="text-[15px] font-black" style={{ color: '#001DC1' }}>{stepIdx + 1}</span>
+                  <span className="text-[15px] font-black" style={{ color: 'rgb(var(--c-terra))' }}>{stepIdx + 1}</span>
                 </div>
                 <span className="text-[13px] font-semibold text-white/50">
                   Étape {stepIdx + 1} sur {steps.length}
@@ -202,14 +202,14 @@ export default function CookingSheet() {
             {isDone ? (
               <button
                 onClick={closeSheet}
-                className="flex-1 py-4 rounded-2xl flex items-center justify-center text-[#001DC1] text-[15px] font-bold bg-white active:scale-95 transition"
+                className="flex-1 py-4 rounded-2xl flex items-center justify-center text-terra text-[15px] font-bold bg-white active:scale-95 transition"
               >
                 Terminé 🎉
               </button>
             ) : (
               <button
                 onClick={goNext}
-                className="flex-1 py-4 rounded-2xl flex items-center justify-center text-[#001DC1] text-[15px] font-bold bg-white active:scale-95 transition"
+                className="flex-1 py-4 rounded-2xl flex items-center justify-center text-terra text-[15px] font-bold bg-white active:scale-95 transition"
               >
                 <span>Suivant</span>
                 <IcoChevR />
@@ -225,7 +225,7 @@ export default function CookingSheet() {
           </p>
           <button
             onClick={closeSheet}
-            className="px-8 py-4 rounded-2xl bg-white text-[#001DC1] text-[15px] font-bold active:scale-95 transition"
+            className="px-8 py-4 rounded-2xl bg-white text-terra text-[15px] font-bold active:scale-95 transition"
           >
             Fermer
           </button>

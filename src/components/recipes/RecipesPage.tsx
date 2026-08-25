@@ -100,7 +100,7 @@ export default function RecipesPage() {
           <button
             onClick={() => setFavFirst((v) => !v)}
             className={cn(
-              'w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-90',
+              'w-11 h-11 rounded-full flex items-center justify-center transition-all active:scale-90',
               favFirst ? 'text-white' : 'glass text-muted',
             )}
             style={favFirst ? { background: '#31603D' } : {}}
@@ -136,7 +136,7 @@ export default function RecipesPage() {
             autoCapitalize="sentences"
             spellCheck={true}
             enterKeyHint="search"
-            className="flex-1 bg-transparent border-none outline-none text-sm font-semibold text-text1 placeholder:text-muted"
+            className="flex-1 min-h-[40px] bg-transparent border-none outline-none text-sm font-semibold text-text1 placeholder:text-muted"
           />
           {search && (
             <button onClick={() => setSearch('')} className="text-muted" aria-label="Effacer">
@@ -152,10 +152,10 @@ export default function RecipesPage() {
               key={f.key}
               onClick={() => setFilter(f.key)}
               className={cn(
-                'flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-1',
+                'flex-shrink-0 px-4 py-2.5 min-h-[40px] rounded-full text-xs font-semibold transition-all whitespace-nowrap flex items-center gap-1',
                 filter === f.key ? 'text-white' : 'glass text-text2',
               )}
-              style={filter === f.key ? { background: '#0018A8' } : {}}
+              style={filter === f.key ? { background: 'rgb(var(--c-terra))' } : {}}
             >
               {f.label}
               {(counts[f.key] ?? 0) > 0 && (
@@ -170,8 +170,8 @@ export default function RecipesPage() {
         {/* Recipe list */}
         {recipes.length === 0 ? (
           <div className="flex flex-col items-center gap-4 text-center pt-6">
-            <div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ background: '#0018A812' }}>
-              <svg className="w-9 h-9" style={{ color: '#0018A860' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v4M8 11v6M12 3v10M12 17v4M16 3v4M16 11v6" /></svg>
+            <div className="w-20 h-20 rounded-full flex items-center justify-center" style={{ background: 'rgb(var(--c-terra) / 0.07)' }}>
+              <svg className="w-9 h-9" style={{ color: 'rgb(var(--c-terra) / 0.38)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3v4M8 11v6M12 3v10M12 17v4M16 3v4M16 11v6" /></svg>
             </div>
             <div>
               <p className="text-base font-extrabold text-text1 mb-1">Aucune recette</p>
@@ -185,7 +185,7 @@ export default function RecipesPage() {
             <button
               onClick={() => { setSearch(''); setFilter('all') }}
               className="px-4 py-2 rounded-full text-xs font-semibold active:scale-95 transition-transform"
-              style={{ background: '#0018A812', color: '#0018A8' }}
+              style={{ background: 'rgb(var(--c-terra) / 0.07)', color: 'rgb(var(--c-terra))' }}
             >
               Réinitialiser
             </button>

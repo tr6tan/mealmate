@@ -39,8 +39,8 @@ export default function RecipeCard({ recipe, onClick, planCount = 0 }: Props) {
 
       {/* Fav indicator */}
       {recipe.fav && (
-        <div className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/50 backdrop-blur flex items-center justify-center">
-          <svg className="w-3.5 h-3.5 text-[#0018A8]" viewBox="0 0 24 24" fill="currentColor">
+        <div className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-fill/50 backdrop-blur flex items-center justify-center">
+          <svg className="w-3.5 h-3.5 text-terra" viewBox="0 0 24 24" fill="currentColor">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
           </svg>
         </div>
@@ -48,7 +48,7 @@ export default function RecipeCard({ recipe, onClick, planCount = 0 }: Props) {
 
       <div className={recipe.fav ? 'pr-10' : 'pr-4'}>
         {/* Méta : temps + rapide */}
-        <div className="flex items-center gap-2 text-xs text-neutral-500 mb-2">
+        <div className="flex items-center gap-2 text-xs text-muted mb-2">
           <svg className="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <circle cx="12" cy="12" r="10"/>
             <polyline points="12 6 12 12 16 14"/>
@@ -62,7 +62,7 @@ export default function RecipeCard({ recipe, onClick, planCount = 0 }: Props) {
           {planCount > 0 && (
             <span
               className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full"
-              style={{ background: 'rgba(0,24,168,0.08)', color: '#0018A8' }}
+              style={{ background: 'rgba(0,24,168,0.08)', color: 'rgb(var(--c-terra))' }}
             >
               {planCount}× planifié
             </span>
@@ -77,7 +77,7 @@ export default function RecipeCard({ recipe, onClick, planCount = 0 }: Props) {
             {ingredients.map((ing) => (
               <span
                 key={ing.name}
-                className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-black/5"
+                className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-fill/60"
                 title={ing.name}
               >
                 <FoodSticker

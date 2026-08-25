@@ -35,7 +35,7 @@ export default function Toast() {
       {action && (
         <button
           onClick={() => { action.onClick(); setVisible(false) }}
-          className="text-terra font-extrabold text-[13px] bg-white/15 px-2.5 py-1 rounded-xl active:scale-95 transition-transform"
+          className="text-terra font-extrabold text-[13px] bg-fill/15 px-2.5 py-1 rounded-xl active:scale-95 transition-transform"
         >
           {action.label}
         </button>

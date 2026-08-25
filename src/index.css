@@ -23,6 +23,8 @@
   --c-danger-light:253 232 240; /* #FDE8F0 — fond danger clair */
   --c-success:      46 125  50; /* #2E7D32 — vert succès */
   --c-success-light:232 245 233; /* #E8F5E9 — fond succès clair */
+  --c-accent:        0  24 168; /* texte accentué : ici identique à terra (11:1) */
+  --c-fill:        255 255 255; /* surface de contrôle sur une carte */
 }
 
 /* ── Design tokens — Dark ── */
@@ -38,6 +40,17 @@
   --c-danger-light: 50  20  25; /* dark bg danger */
   --c-success:      48 209  88; /* #30D158 — success iOS dark */
   --c-success-light: 20  50  30; /* dark bg success */
+  --c-accent:      138 152 255; /* #8A98FF — 6.5:1 sur le fond sombre */
+  --c-fill:         96 112 170; /* surface de contrôle : sombre mais détachée du fond */
+  /* terra sert de fond de bouton : on l'éclaircit un peu pour qu'il se
+     détache du noir sans casser le blanc posé dessus. */
+  --c-terra:         0  45 214; /* #002DD6 */
+  --c-terra-light:  30  38  92; /* fond bleu sourd */
+  --c-terra-dark:    0  30 160;
+  --c-sage:        124 179 133;
+  --c-sage-light:   32  58  38;
+  --c-morning:     245 192 101;
+  --c-evening:     193 138 128;
 }
 
 /* ── Design tokens — Ocean (thème alternatif) ── */
@@ -57,6 +70,8 @@
   --c-sage-light:  204 251 241; /* #CCFBF1 — teal 100 */
   --c-morning:     251 191  36; /* #FBBF24 — amber */
   --c-evening:      71  85 105; /* #475569 — slate 600 */
+  --c-accent:       29  78 216; /* #1D4ED8 — blue 700 */
+  --c-fill:        255 255 255;
 }
 .theme-ocean.dark {
   --c-bg:          15  23  42;  /* #0F172A — slate 900 */
@@ -66,6 +81,12 @@
   --c-text1:       248 250 252; /* #F8FAFC — slate 50 */
   --c-text2:       203 213 225; /* #CBD5E1 — slate 300 */
   --c-muted:       148 163 184; /* #94A3B8 — slate 400 */
+  --c-accent:      125 185 255; /* #7DB9FF — 8.7:1 sur le fond slate 900 */
+  --c-fill:         94 116 150; /* slate éclairci, visible sur le fond slate 900 */
+  --c-terra:        37  99 235; /* #2563EB — ocean blue */
+  --c-terra-light:  30  58 110;
+  --c-sage:         45 212 191; /* teal 300 */
+  --c-sage-light:   19  78  74;
 }
 
 @layer base {

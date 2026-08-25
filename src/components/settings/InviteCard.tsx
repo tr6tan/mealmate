@@ -42,7 +42,7 @@ export default function InviteCard({ onlineCount }: InviteCardProps) {
 
       {/* QR code */}
       <div className="flex flex-col items-center gap-3 mb-4">
-        <div className="p-3 bg-white rounded-2xl shadow-card border border-sep">
+        <div className="p-3 bg-card rounded-2xl shadow-card border border-sep">
           <QRCodeSVG
             value={url}
             size={160}

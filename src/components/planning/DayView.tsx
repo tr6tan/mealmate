@@ -18,7 +18,7 @@ interface PeriodConfig {
 
 const PERIOD_STYLE = {
   pdej: { dot: '#F5C065', bg: '#F5C06518', label: '#9B6A00' },
-  midi: { dot: '#0018A8', bg: 'rgba(0,24,168,0.08)', label: '#0018A8' },
+  midi: { dot: 'rgb(var(--c-terra))', bg: 'rgb(var(--c-terra) / 0.08)', label: 'rgb(var(--c-terra))' },
   soir: { dot: '#6E433D', bg: '#6E433D14', label: '#6E433D' },
 } as const
 

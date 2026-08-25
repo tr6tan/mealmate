@@ -94,7 +94,7 @@ export default function PlanningPage() {
         <div className="flex items-center gap-2 mb-5">
           <button
             onClick={() => changeWeek(-1)}
-            className="w-10 h-10 rounded-full glass flex items-center justify-center text-xl font-bold text-neutral-600 active:scale-90 transition-transform"
+            className="w-10 h-10 rounded-full glass flex items-center justify-center text-xl font-bold text-text2 active:scale-90 transition-transform"
             aria-label="Semaine précédente"
           ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><polyline points="15 18 9 12 15 6"/></svg></button>
           <div
@@ -106,7 +106,7 @@ export default function PlanningPage() {
           </div>
           <button
             onClick={() => changeWeek(1)}
-            className="w-10 h-10 rounded-full glass flex items-center justify-center text-xl font-bold text-neutral-600 active:scale-90 transition-transform"
+            className="w-10 h-10 rounded-full glass flex items-center justify-center text-xl font-bold text-text2 active:scale-90 transition-transform"
             aria-label="Semaine suivante"
           ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><polyline points="9 18 15 12 9 6"/></svg></button>
         </div>
@@ -133,7 +133,7 @@ export default function PlanningPage() {
                   <span className="text-[11px] font-bold text-muted tabular-nums w-16 shrink-0">
                     {DAY_SHORT[dayIdx]}. {date.getDate()}
                   </span>
-                  <div className="flex-1 h-px bg-white/50 rounded-full" />
+                  <div className="flex-1 h-px bg-fill/50 rounded-full" />
                   {[midiMeal, soirMeal].filter(Boolean).map((_, i) => (
                     <span
                       key={i}
@@ -156,7 +156,7 @@ export default function PlanningPage() {
               <div
                 key={dayIdx}
                 className={cardClass}
-                style={isToday ? { background: '#0018A8', boxShadow: '0 12px 32px rgba(0,24,168,0.35)' } : undefined}
+                style={isToday ? { background: 'rgb(var(--c-terra))', boxShadow: '0 12px 32px rgba(0,24,168,0.35)' } : undefined}
               >
                 {/* Day header – tap to collapse */}
                 <div
@@ -165,7 +165,7 @@ export default function PlanningPage() {
                 >
                   <div className={cn(
                     'w-12 h-12 rounded-2xl flex flex-col items-center justify-center shrink-0',
-                    isToday ? 'bg-white/20' : 'bg-white/50',
+                    isToday ? 'bg-fill/20' : 'bg-fill/50',
                   )}>
                     <span className={`text-[9px] font-bold uppercase tracking-wider ${isToday ? 'text-white/70' : 'text-muted'}`}>
                       {DAY_SHORT[dayIdx]}
@@ -179,7 +179,7 @@ export default function PlanningPage() {
                       {DAY_LONG[dayIdx]}
                     </p>
                     {isToday && (
-                      <span className="inline-block mt-0.5 px-2 py-0.5 bg-white text-[#0018A8] rounded-full text-[10px] font-bold">
+                      <span className="inline-block mt-0.5 px-2 py-0.5 bg-white text-terra rounded-full text-[10px] font-bold">
                         Aujourd'hui
                       </span>
                     )}
@@ -294,10 +294,10 @@ export default function PlanningPage() {
                       className={cn(
                         'min-h-[88px] rounded-2xl p-3 relative overflow-hidden cursor-pointer select-none transition',
                         !(meal && (meal.isRestaurant === true || meal.name === 'Restaurant')) && (
-                          isToday ? 'bg-white/15 active:bg-white/25' : 'bg-white/40 backdrop-blur active:bg-white/60'
+                          isToday ? 'bg-fill/15 active:bg-fill/25' : 'bg-fill/40 backdrop-blur active:bg-fill/60'
                         ),
                         dragSrc?.dayIdx === dayIdx && dragSrc?.slotKey === slotKey && 'opacity-40 scale-95',
-                        dropTarget?.dayIdx === dayIdx && dropTarget?.slotKey === slotKey && 'ring-2 ring-[#0018A8]/50 ring-inset',
+                        dropTarget?.dayIdx === dayIdx && dropTarget?.slotKey === slotKey && 'ring-2 ring-terra/50 ring-inset',
                       )}
                     >
                       {(() => {
@@ -340,14 +340,14 @@ export default function PlanningPage() {
                                   aria-label={`Retirer ${meal.name}`}
                                   className="absolute top-2 right-2 w-5 h-5 rounded-full bg-white shadow flex items-center justify-center"
                                 >
-                                  <svg className="w-2.5 h-2.5 text-neutral-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                                  <svg className="w-2.5 h-2.5 text-text2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
                                     <line x1="18" y1="6" x2="6" y2="18"/>
                                     <line x1="6" y1="6" x2="18" y2="18"/>
                                   </svg>
                                 </button>
                               </>
                             ) : (
-                              <div className={`flex items-center gap-1.5 text-sm ${isToday ? 'text-white/60' : 'text-neutral-400'}`}>
+                              <div className={`flex items-center gap-1.5 text-sm ${isToday ? 'text-white/60' : 'text-muted'}`}>
                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                                   <line x1="12" y1="5" x2="12" y2="19"/>
                                   <line x1="5" y1="12" x2="19" y2="12"/>
@@ -374,7 +374,7 @@ export default function PlanningPage() {
           >
             <div
               className="w-[72px] h-[72px] rounded-2xl flex items-center justify-center text-[36px] shadow-2xl"
-              style={{ background: '#0018A8', opacity: 0.92, transform: 'scale(1.08)' }}
+              style={{ background: 'rgb(var(--c-terra))', opacity: 0.92, transform: 'scale(1.08)' }}
             >
               {touchGhost.meal.emoji || touchGhost.meal.name.slice(0, 1)}
             </div>

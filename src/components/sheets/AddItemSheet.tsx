@@ -319,7 +319,7 @@ export default function AddItemSheet() {
                     <div className="relative">
                       <div
                         className="w-[58px] h-[58px] rounded-2xl flex items-center justify-center select-none transition-all"
-                        style={sel ? { boxShadow: '0 0 0 2.5px #001DC1, 0 0 0 5px rgba(0,29,193,0.15)' } : undefined}
+                        style={sel ? { boxShadow: '0 0 0 2.5px rgb(var(--c-terra)), 0 0 0 5px rgb(var(--c-terra) / 0.15)' } : undefined}
                       >
                         <FoodSticker
                           name={item.name}
@@ -341,7 +341,7 @@ export default function AddItemSheet() {
                       )}
                     </div>
                     <span className="text-[10px] font-semibold text-center leading-tight w-full"
-                      style={{ color: sel ? '#001DC1' : '#374151' }}>
+                      style={{ color: sel ? 'rgb(var(--c-terra))' : 'rgb(var(--c-text2))' }}>
                       {item.name}
                     </span>
                   </button>
@@ -360,7 +360,7 @@ export default function AddItemSheet() {
           >
             <div
               className="w-10 h-10 rounded-full flex items-center justify-center text-lg shrink-0"
-              style={{ background: '#0018A8' }}
+              style={{ background: 'rgb(var(--c-terra))' }}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" className="w-5 h-5">
                 <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -386,7 +386,7 @@ export default function AddItemSheet() {
           <button
             onClick={handleAdd}
             className="w-full py-3.5 rounded-2xl text-sm font-extrabold transition-all active:scale-[0.97]"
-            style={{ background: '#0018A8', color: '#fff', boxShadow: '0 6px 20px rgba(0,24,168,0.3)' }}
+            style={{ background: 'rgb(var(--c-terra))', color: '#fff', boxShadow: '0 6px 20px rgba(0,24,168,0.3)' }}
           >
             Ajouter {selected.size} article{selected.size > 1 ? 's' : ''}
           </button>

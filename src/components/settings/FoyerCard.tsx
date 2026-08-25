@@ -39,7 +39,7 @@ export default function FoyerCard() {
         <p className="text-[11px] font-bold text-muted font-mono truncate mb-3">{foyerId}</p>
 
         {legacy && (
-          <p className="text-xs text-neutral-600 leading-snug mb-3">
+          <p className="text-xs text-text2 leading-snug mb-3">
             Ce foyer est celui par défaut : toute personne ouvrant l’app sans lien
             d’invitation y accède. Crée le tien pour que tes données restent privées.
           </p>
@@ -48,7 +48,7 @@ export default function FoyerCard() {
         <button
           onClick={handleCreate}
           className={`w-full px-3.5 py-2.5 text-xs font-extrabold rounded-xl active:scale-95 transition-transform ${
-            confirming ? 'bg-danger text-white' : 'bg-bg text-neutral-700 border border-border'
+            confirming ? 'bg-danger text-white' : 'bg-bg text-text2 border border-border'
           }`}
         >
           {confirming ? 'Confirmer : repartir de zéro' : 'Créer un foyer privé'}

@@ -44,13 +44,13 @@ export default function DayChip({ dayLabel, dayNum, isToday, isSelected, hasMidi
         <span className={cn(
           'w-[5px] h-[5px] rounded-full transition-colors',
           isToday
-            ? (hasMidi ? 'bg-white' : 'bg-white/25')
+            ? (hasMidi ? 'bg-white' : 'bg-fill/25')
             : (hasMidi ? 'bg-terra' : 'bg-border'),
         )} />
         <span className={cn(
           'w-[5px] h-[5px] rounded-full transition-colors',
           isToday
-            ? (hasSoir ? 'bg-white' : 'bg-white/25')
+            ? (hasSoir ? 'bg-white' : 'bg-fill/25')
             : (hasSoir ? 'bg-evening' : 'bg-border'),
         )} />
       </div>
