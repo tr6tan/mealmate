@@ -33,6 +33,9 @@ const IcoCart = () => (
 const IcoPen = () => (
   <svg className="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>
 )
+const IcoCopy = () => (
+  <svg className="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+)
 const IcoTrash = () => (
   <svg className="w-[15px] h-[15px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" /></svg>
 )
@@ -56,6 +59,7 @@ export default function RecipeDetailSheet() {
   const toggleFav = useAppStore((s) => s.toggleFav)
   const updateRecipe = useAppStore((s) => s.updateRecipe)
   const deleteRecipe = useAppStore((s) => s.deleteRecipe)
+  const duplicateRecipe = useAppStore((s) => s.duplicateRecipe)
   const addShoppingItem = useAppStore((s) => s.addShoppingItem)
   const openSheet = useAppStore((s) => s.openSheet)
   const closeSheet = useAppStore((s) => s.closeSheet)
@@ -65,11 +69,13 @@ export default function RecipeDetailSheet() {
   const [portions, setPortions] = useState(personnes)
   const [deleteConfirm, setDeleteConfirm] = useState(false)
   const [localNotes, setLocalNotes] = useState('')
+  // Cf. RecipeCard : une URL distante morte affichait une image cassée.
+  const [photoCassee, setPhotoCassee] = useState(false)
 
   const recipe = sheetState.recipeContext
   if (!recipe) return <BottomSheet name="recipe-detail"><div /></BottomSheet>
 
-  const photo = photos[recipe.id] ?? recipe.photo
+  const photo = photoCassee ? undefined : (photos[recipe.id] ?? recipe.photo)
   const ingredients = recipe.ingredients ?? []
   const steps = recipe.steps ?? []
 
@@ -103,7 +109,12 @@ export default function RecipeDetailSheet() {
       <header className="relative">
         <div className="relative h-[240px] overflow-hidden rounded-t-[28px]">
           {photo ? (
-            <img src={photo} alt="" className="w-full h-full object-cover" />
+            <img
+              src={photo}
+              alt=""
+              onError={() => setPhotoCassee(true)}
+              className="w-full h-full object-cover"
+            />
           ) : (
             <div
               className="w-full h-full flex items-center justify-center"
@@ -295,6 +306,22 @@ export default function RecipeDetailSheet() {
             className="w-12 h-12 rounded-2xl border border-border bg-fill/50 text-text2 flex items-center justify-center active:scale-95 transition-transform"
           >
             <IcoPen />
+          </button>
+          {/*
+            Partir d'une recette existante est le geste le plus fréquent après
+            la création. L'action vivait dans le store, testée, mais plus aucun
+            bouton n'y menait.
+          */}
+          <button
+            onClick={() => {
+              duplicateRecipe(recipe.id)
+              closeSheet()
+              showToast(`${recipe.name} dupliquée`)
+            }}
+            aria-label="Dupliquer la recette"
+            className="w-12 h-12 rounded-2xl border border-border bg-fill/50 text-text2 flex items-center justify-center active:scale-95 transition-transform"
+          >
+            <IcoCopy />
           </button>
           <button
             onClick={handleDelete}

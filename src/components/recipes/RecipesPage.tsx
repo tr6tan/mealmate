@@ -8,6 +8,22 @@ type FilterKey = 'all' | Period | 'fav' | 'rapide' | DietaryTag
 
 const DIETARY_TAGS: DietaryTag[] = ['vegetarien', 'vegan', 'sans-gluten', 'sans-lactose']
 
+type TriKey = 'defaut' | 'nom' | 'temps'
+
+const TRIS: { key: TriKey; label: string }[] = [
+  { key: 'defaut', label: 'Par défaut' },
+  { key: 'nom', label: 'A → Z' },
+  { key: 'temps', label: 'Le plus rapide' },
+]
+
+/** Minutes lues dans « 25 min », « 1h30 » : sert au tri par durée. */
+function enMinutes(temps: string): number {
+  const h = temps.match(/(\d+)\s*h(?:\s*(\d+))?/i)
+  if (h) return Number(h[1]) * 60 + Number(h[2] ?? 0)
+  const m = temps.match(/(\d+)/)
+  return m ? Number(m[1]) : Number.MAX_SAFE_INTEGER
+}
+
 const FILTERS: { key: FilterKey; label: string }[] = [
   { key: 'all',    label: 'Tout' },
   { key: 'pdej',  label: 'Petit-dej' },
@@ -30,6 +46,7 @@ export default function RecipesPage() {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<FilterKey>('all')
   const [favFirst, setFavFirst] = useState(false)
+  const [tri, setTri] = useState<TriKey>('defaut')
 
   // Compte de planification par recipe.id (toutes semaines confondues)
   const planCounts = useMemo(() => {
@@ -70,9 +87,14 @@ export default function RecipesPage() {
       const matchSearch = search ? fuzzyScore(search, r.name) >= 15 : true
       return matchFilter && matchSearch
     })
+    if (tri === 'nom') {
+      list = [...list].sort((a, b) => a.name.localeCompare(b.name, 'fr'))
+    } else if (tri === 'temps') {
+      list = [...list].sort((a, b) => enMinutes(a.time) - enMinutes(b.time))
+    }
     if (favFirst) list = [...list.filter((r) => r.fav), ...list.filter((r) => !r.fav)]
     return list
-  }, [inDiet, filter, search, favFirst])
+  }, [inDiet, filter, search, favFirst, tri])
 
   const counts = useMemo<Record<string, number>>(() => ({
     all: inDiet.length,
@@ -93,10 +115,28 @@ export default function RecipesPage() {
       <div className="px-5 pt-4 pb-nav-safe">
 
         {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-[13px] text-muted font-semibold">
+        <div className="flex items-center justify-between gap-2 mb-4">
+          <p className="text-[13px] text-muted font-semibold flex-shrink-0">
             {filtered.length} recette{filtered.length !== 1 ? 's' : ''}
           </p>
+          <div className="flex items-center gap-2 ml-auto">
+            <label className="sr-only" htmlFor="tri-recettes">Trier les recettes</label>
+            <select
+              id="tri-recettes"
+              value={tri}
+              onChange={(e) => setTri(e.target.value as TriKey)}
+              className="text-[12px] font-semibold text-text2 bg-fill/60 border border-border rounded-full pl-3 pr-7 min-h-[44px] outline-none appearance-none"
+              style={{
+                backgroundImage:
+                  "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23646C88' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")",
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 10px center',
+              }}
+            >
+              {TRIS.map((t) => (
+                <option key={t.key} value={t.key}>{t.label}</option>
+              ))}
+            </select>
           <button
             onClick={() => setFavFirst((v) => !v)}
             className={cn(
@@ -107,7 +147,8 @@ export default function RecipesPage() {
             aria-label="Favoris en premier"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-          </button>
+            </button>
+          </div>
         </div>
 
         {/* New recipe CTA */}
@@ -145,8 +186,18 @@ export default function RecipesPage() {
           )}
         </div>
 
-        {/* Filter pills */}
-        <div className="flex gap-2 pb-5 overflow-x-auto no-scrollbar">
+        {/*
+          Fondu à droite : la rangée défile horizontalement et le dernier
+          filtre était coupé net, sans rien qui indique qu'il y en a d'autres.
+          Le dégradé est décoratif et ne bloque pas le geste.
+        */}
+        <div className="relative -mr-5">
+          <div
+            className="absolute right-0 top-0 bottom-5 w-10 pointer-events-none z-10"
+            style={{ background: 'linear-gradient(to left, rgb(var(--c-bg)), transparent)' }}
+            aria-hidden
+          />
+          <div className="flex gap-2 pb-5 pr-5 overflow-x-auto no-scrollbar">
           {FILTERS.map((f) => (
             <button
               key={f.key}
@@ -165,8 +216,9 @@ export default function RecipesPage() {
                   {counts[f.key]}
                 </span>
               )}
-            </button>
-          ))}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Recipe list */}
@@ -198,7 +250,6 @@ export default function RecipesPage() {
               <RecipeCard
                 key={recipe.id}
                 recipe={recipe}
-                view="list"
                 planCount={planCounts[recipe.id] ?? 0}
                 onClick={() => openSheet({ sheet: 'recipe-detail', recipeContext: recipe })}
               />
