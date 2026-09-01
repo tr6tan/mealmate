@@ -5,6 +5,7 @@ import type { Recipe } from '@/types'
 import { DAY_LONG, haptic, fuzzyScore, getMondayByOffset, getWeekKey, ingredientEmoji } from '@/lib/utils'
 import FoodSticker from '@/components/ui/FoodSticker'
 import { showToast } from '@/lib/toast'
+import { estMaison } from '@/lib/recettesMaison'
 
 type TabMode = 'recette' | 'resto' | 'libre'
 
@@ -142,13 +143,38 @@ export default function AddMealSheet() {
       _fuzzy: fuzzyScore(debouncedSearch, r.name),
     })).filter(r => r._fuzzy >= (debouncedSearch ? 15 : 1))
 
+    /*
+     * Les recettes du foyer passent devant. Le tri par favori puis « rapide »
+     * envoyait une recette qu'on venait de créer au rang 41 sur 101, derrière
+     * les quarante recettes rapides livrées : il fallait la chercher par son
+     * nom pour la planifier.
+     */
     return base.sort((a, b) => {
+      const mA = estMaison(a) ? 1 : 0
+      const mB = estMaison(b) ? 1 : 0
+      if (mA !== mB) return mB - mA
       if (debouncedSearch) return b._fuzzy - a._fuzzy
       const sA = (a.fav ? 2 : 0) + (a.rapide ? 1 : 0)
       const sB = (b.fav ? 2 : 0) + (b.rapide ? 1 : 0)
       return sB - sA
     })
   }, [recipes, debouncedSearch])
+
+  // Frontière entre les recettes du foyer et le catalogue livré, pour poser un
+  // intertitre sans dupliquer les lignes dans deux sections.
+  const nbMaison = useMemo(() => filtered.filter(estMaison).length, [filtered])
+
+  /** Ouvre la création en gardant le créneau : la recette créée s'y posera. */
+  const creerRecette = () => {
+    if (!context) return
+    openSheet({
+      sheet: 'new-recipe',
+      newRecipeContext: {
+        nomInitial: search.trim() || undefined,
+        planifier: { dayIdx: context.dayIdx, slotKey: context.slotKey },
+      },
+    })
+  }
 
   const suggestions = useMemo(
     () => filtered.filter(r => !usedNames.has(r.name)).slice(0, 5),
@@ -241,20 +267,40 @@ export default function AddMealSheet() {
                 onDetail={() => openSheet({ sheet: 'recipe-detail', recipeContext: recipe })} />
             ))}
             <div className="mx-1 my-2 h-px bg-fill/60" />
-            <p className="text-[11px] text-muted font-semibold px-1 pb-2">Toutes les recettes</p>
           </>
         )}
         <div className="pb-6">
-          {filtered.map(recipe => (
-            <RecipeRow key={recipe.id} recipe={recipe} onSelect={handleSelect}
-              onDetail={() => openSheet({ sheet: 'recipe-detail', recipeContext: recipe })} />
+          {filtered.map((recipe, i) => (
+            <div key={recipe.id}>
+              {/* Intertitres posés à la frontière du tri, sans dupliquer de ligne. */}
+              {!debouncedSearch && i === 0 && nbMaison > 0 && (
+                <p className="text-[11px] text-muted font-semibold px-1 pb-2">Mes recettes</p>
+              )}
+              {!debouncedSearch && i === nbMaison && (
+                <p className={`text-[11px] text-muted font-semibold px-1 pb-2${nbMaison > 0 ? ' pt-3' : ''}`}>
+                  Toutes les recettes
+                </p>
+              )}
+              <RecipeRow recipe={recipe} onSelect={handleSelect}
+                onDetail={() => openSheet({ sheet: 'recipe-detail', recipeContext: recipe })} />
+            </div>
           ))}
+
           {filtered.length === 0 && (
-            <div className="text-center py-10 text-muted">
+            <div className="text-center py-10">
               <p className="text-3xl mb-2">🔍</p>
-              <p className="text-sm font-semibold">Aucune recette trouvée</p>
+              <p className="text-sm font-semibold text-muted">Aucune recette trouvée</p>
             </div>
           )}
+
+          {/* Créer sans quitter la planification. Le nom cherché en vain sert
+              d'amorce, et la recette créée se pose dans le créneau. */}
+          <button
+            onClick={creerRecette}
+            className="w-full mt-3 py-3.5 min-h-[52px] rounded-2xl border-2 border-dashed border-border text-text2 text-[13px] font-bold active:scale-[0.98] transition-transform"
+          >
+            {search.trim() ? `+ Créer « ${search.trim()} »` : '+ Créer une recette'}
+          </button>
         </div>
       </div>
 

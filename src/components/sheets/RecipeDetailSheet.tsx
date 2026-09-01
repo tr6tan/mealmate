@@ -95,7 +95,7 @@ export default function RecipeDetailSheet() {
     ingredients.forEach((ing) => {
       addShoppingItem({
         name: ing.name,
-        qty: scaleQty(ing.qty, portions),
+        qty: scaleQty(ing.qty, portions, recipe.portions),
         category: ing.category,
         checked: false,
       })
@@ -238,7 +238,7 @@ export default function RecipeDetailSheet() {
                   <FoodSticker name={ing.name} size={26} shadow={false} fallback={null} />
                   <span className="flex-1 text-[15px] text-text1 leading-snug">{ing.name}</span>
                   <span className="text-[14px] font-semibold text-muted tabular-nums flex-shrink-0">
-                    {scaleQty(ing.qty, portions)}
+                    {scaleQty(ing.qty, portions, recipe.portions)}
                   </span>
                 </li>
               ))}

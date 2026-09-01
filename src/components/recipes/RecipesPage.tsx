@@ -4,7 +4,9 @@ import type { Period, DietaryTag } from '@/types'
 import { cn, fuzzyScore } from '@/lib/utils'
 import RecipeCard from './RecipeCard'
 
-type FilterKey = 'all' | Period | 'fav' | 'rapide' | DietaryTag
+import { estMaison } from '@/lib/recettesMaison'
+
+type FilterKey = 'all' | 'maison' | Period | 'fav' | 'rapide' | DietaryTag
 
 const DIETARY_TAGS: DietaryTag[] = ['vegetarien', 'vegan', 'sans-gluten', 'sans-lactose']
 
@@ -26,6 +28,7 @@ function enMinutes(temps: string): number {
 
 const FILTERS: { key: FilterKey; label: string }[] = [
   { key: 'all',    label: 'Tout' },
+  { key: 'maison', label: 'Mes recettes' },
   { key: 'pdej',  label: 'Petit-dej' },
   { key: 'midi',  label: 'Midi' },
   { key: 'soir',  label: 'Soir' },
@@ -80,6 +83,7 @@ export default function RecipesPage() {
     let list = inDiet.filter((r) => {
       const matchFilter =
         filter === 'all' ||
+        (filter === 'maison' && estMaison(r)) ||
         filter === r.period ||
         (filter === 'fav' && r.fav) ||
         (filter === 'rapide' && r.rapide) ||
@@ -91,6 +95,14 @@ export default function RecipesPage() {
       list = [...list].sort((a, b) => a.name.localeCompare(b.name, 'fr'))
     } else if (tri === 'temps') {
       list = [...list].sort((a, b) => enMinutes(a.time) - enMinutes(b.time))
+    } else {
+      /*
+       * `addRecipe` place une nouvelle recette en tête, mais la synchro la
+       * renvoie en fin de carnet : `mergeRecipes` recompose « recettes livrées
+       * puis recettes du foyer ». Une seconde après l'avoir créée, la recette
+       * passait donc de la 1re à la 101e place, hors de portée sans défiler.
+       */
+      list = [...list.filter(estMaison), ...list.filter((r) => !estMaison(r))]
     }
     if (favFirst) list = [...list.filter((r) => r.fav), ...list.filter((r) => !r.fav)]
     return list
@@ -98,6 +110,7 @@ export default function RecipesPage() {
 
   const counts = useMemo<Record<string, number>>(() => ({
     all: inDiet.length,
+    maison: inDiet.filter(estMaison).length,
     pdej: inDiet.filter((r) => r.period === 'pdej').length,
     midi: inDiet.filter((r) => r.period === 'midi').length,
     soir: inDiet.filter((r) => r.period === 'soir').length,

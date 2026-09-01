@@ -36,4 +36,6 @@ export interface RecipeFormValues {
   ingredients: import('@/types').Ingredient[]
   steps: string[]
   tags: DietaryTag[]
+  /** Convives auxquels les quantités saisies se rapportent. */
+  portions: number
 }

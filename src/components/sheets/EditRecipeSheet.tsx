@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import { showToast } from '@/lib/toast'
+import { BASE_PORTIONS } from '@/lib/utils'
 import { deletePhoto } from '@/lib/photos'
 import RecipeFormFields from './RecipeFormFields'
 import { TIME_OPTIONS, type RecipeFormValues } from './recipeFormOptions'
@@ -25,6 +26,7 @@ const VIDE: RecipeFormValues = {
   ingredients: [],
   steps: [''],
   tags: [],
+  portions: BASE_PORTIONS,
 }
 
 export default function EditRecipeSheet() {
@@ -56,6 +58,7 @@ export default function EditRecipeSheet() {
       ingredients: recipe.ingredients ?? [],
       steps: recipe.steps?.length ? recipe.steps : [''],
       tags: recipe.tags ?? [],
+      portions: recipe.portions ?? BASE_PORTIONS,
     })
     setNotes(recipe.notes ?? '')
     setRating(recipe.rating)
@@ -84,6 +87,9 @@ export default function EditRecipeSheet() {
       steps: etapes.length ? etapes : undefined,
       ingredients: ingredients.length ? ingredients : undefined,
       tags: valeurs.tags.length ? valeurs.tags : undefined,
+      // Ne rien écrire quand la recette suit la base : les recettes livrées
+      // n'ont pas ce champ, autant ne pas le leur ajouter en les modifiant.
+      portions: valeurs.portions === BASE_PORTIONS ? undefined : valeurs.portions,
       notes: notes.trim() || undefined,
       rating,
     })

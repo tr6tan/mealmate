@@ -79,7 +79,7 @@ export default function MealActionsSheet() {
   const handleAddToCourses = () => {
     if (!recipe?.ingredients?.length) return
     recipe.ingredients.forEach((ing) => {
-      addShoppingItem({ name: ing.name, qty: scaleQty(ing.qty, portions), category: ing.category, checked: false })
+      addShoppingItem({ name: ing.name, qty: scaleQty(ing.qty, portions, recipe?.portions), category: ing.category, checked: false })
     })
     showToast(`${recipe.ingredients.length} ingrédients ajoutés aux courses !`)
   }
@@ -198,7 +198,7 @@ export default function MealActionsSheet() {
               return (
                 <div key={i} className="rounded-2xl p-2.5 text-center" style={{ background: cat.bg }}>
                   <p className="text-[12px] font-semibold leading-tight mb-0.5 text-text2">{ing.name}</p>
-                  <p className="text-[11px] font-bold" style={{ color: cat.color }}>{scaleQty(ing.qty, portions) || '—'}</p>
+                  <p className="text-[11px] font-bold" style={{ color: cat.color }}>{scaleQty(ing.qty, portions, recipe?.portions) || '—'}</p>
                 </div>
               )
             })}

@@ -315,13 +315,18 @@ export const BASE_PORTIONS = 2
  * "200g" pour 4 personnes → "400 g". Une quantité sans nombre (« un peu de
  * sel ») est renvoyée telle quelle.
  *
+ * `base` est le nombre de convives auquel la recette est écrite. Il valait
+ * toujours BASE_PORTIONS : une recette maison saisie pour 4 était donc doublée
+ * quand le foyer cuisinait pour 4. Les recettes qui le déclarent passent
+ * désormais leur propre valeur.
+ *
  * Cette fonction était dupliquée dans RecipeDetailSheet et MealActionsSheet,
  * avec deux conventions incompatibles (multiplicateur d'un côté, nombre de
  * personnes de l'autre) : la même recette affichait donc des quantités
  * différentes selon l'écran par lequel on l'ouvrait.
  */
-export function scaleQty(qty: string, people: number): string {
-  const factor = people / BASE_PORTIONS
+export function scaleQty(qty: string, people: number, base: number = BASE_PORTIONS): string {
+  const factor = people / (base > 0 ? base : BASE_PORTIONS)
   if (!qty || factor === 1) return qty
   const m = qty.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/)
   if (!m) return qty

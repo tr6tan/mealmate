@@ -53,6 +53,11 @@ export interface Recipe {
   tags?: DietaryTag[]
   notes?: string
   rating?: number // 1-5
+  /**
+   * Nombre de convives auquel les quantités se rapportent. Absent sur les
+   * recettes livrées, qui sont toutes écrites pour BASE_PORTIONS.
+   */
+  portions?: number
 }
 
 export interface Ingredient {
@@ -109,6 +114,13 @@ export interface SheetState {
   recipeContext?: Recipe
   pickDayContext?: { recipe: Recipe; moveFrom?: { dayIdx: number; slotKey: SlotKey } }
   addMealPeriod?: Period
+  /**
+   * Création de recette lancée depuis la planification : le nom déjà tapé dans
+   * la recherche sert d'amorce, et la recette créée est posée dans le créneau
+   * d'où l'on vient. Sans cela il fallait fermer, changer d'onglet, créer,
+   * revenir et rouvrir le jour et le créneau.
+   */
+  newRecipeContext?: { nomInitial?: string; planifier?: { dayIdx: number; slotKey: SlotKey } }
 }
 
 /** Données partagées dans Firestore (un doc par foyer) */

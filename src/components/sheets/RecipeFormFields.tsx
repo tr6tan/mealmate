@@ -35,7 +35,8 @@ interface Props {
 
 export default function RecipeFormFields({ valeurs, set }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { name, time, timeCustom, period, fav, rapide, photo, ingredients, steps, tags } = valeurs
+  const { name, time, timeCustom, period, fav, rapide, photo, ingredients, steps, tags, portions } =
+    valeurs
 
   const toggleTag = (tag: DietaryTag) =>
     set('tags', tags.includes(tag) ? tags.filter((t) => t !== tag) : [...tags, tag])
@@ -116,6 +117,33 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
           </button>
         </div>
       )}
+
+      {/* Portions.
+          Sans ce champ, l'app supposait toute recette écrite pour deux : une
+          recette saisie pour quatre voyait ses quantités doublées dès qu'on
+          cuisinait pour quatre. */}
+      <p className={LIBELLE}>Quantités écrites pour</p>
+      <div className="flex items-center gap-3 mb-4">
+        <button
+          onClick={() => set('portions', Math.max(1, portions - 1))}
+          aria-label="Un convive de moins"
+          disabled={portions <= 1}
+          className="w-11 h-11 rounded-2xl bg-card border-[1.5px] border-border text-text1 text-lg font-bold flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40"
+        >
+          −
+        </button>
+        <span className="text-[15px] font-bold text-text1 tabular-nums min-w-[92px] text-center">
+          {portions} {portions > 1 ? 'personnes' : 'personne'}
+        </span>
+        <button
+          onClick={() => set('portions', Math.min(24, portions + 1))}
+          aria-label="Un convive de plus"
+          disabled={portions >= 24}
+          className="w-11 h-11 rounded-2xl bg-card border-[1.5px] border-border text-text1 text-lg font-bold flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40"
+        >
+          +
+        </button>
+      </div>
 
       {/* Photo */}
       <p className={LIBELLE}>Photo</p>

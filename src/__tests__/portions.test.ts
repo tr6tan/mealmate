@@ -38,3 +38,28 @@ describe('scaleQty', () => {
     expect(depuisDetail).toBe('500 g')
   })
 })
+
+/**
+ * Régression : la base était figée à deux convives.
+ *
+ * `Recipe` n'avait pas de champ de portions, donc une recette maison saisie
+ * pour 4 était traitée comme écrite pour 2 : cuisiner pour 4 doublait les
+ * quantités, et la liste de courses annonçait de quoi nourrir huit personnes.
+ */
+describe('base de portions propre à la recette', () => {
+  it('ne touche à rien quand la recette est écrite pour le bon nombre', () => {
+    expect(scaleQty('800g', 4, 4)).toBe('800g')
+  })
+
+  it('divise une recette écrite pour 6 cuisinée pour 3', () => {
+    expect(scaleQty('600 g', 3, 6)).toBe('300 g')
+  })
+
+  it('garde BASE_PORTIONS quand la recette ne déclare rien', () => {
+    expect(scaleQty('200g', 4, undefined)).toBe(scaleQty('200g', 4))
+  })
+
+  it('ignore une base absurde plutôt que de diviser par zéro', () => {
+    expect(scaleQty('200g', 4, 0)).toBe('400 g')
+  })
+})

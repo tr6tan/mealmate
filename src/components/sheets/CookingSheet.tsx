@@ -252,7 +252,7 @@ export default function CookingSheet() {
                     >
                       <span className="text-[15px] text-white/90">{ing.name}</span>
                       <span className="text-[14px] font-semibold text-white/60 tabular-nums flex-shrink-0">
-                        {scaleQty(ing.qty, personnes)}
+                        {scaleQty(ing.qty, personnes, recipe.portions)}
                       </span>
                     </li>
                   ))}

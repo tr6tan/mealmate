@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
-import { cn } from '@/lib/utils'
+import { BASE_PORTIONS, cn } from '@/lib/utils'
 import { showToast } from '@/lib/toast'
 import RecipeFormFields from './RecipeFormFields'
 import { TIME_OPTIONS, type RecipeFormValues } from './recipeFormOptions'
@@ -18,6 +18,12 @@ import {
 export default function NewRecipeSheet() {
   const addRecipe  = useAppStore((s) => s.addRecipe)
   const closeSheet = useAppStore((s) => s.closeSheet)
+  const setMeal    = useAppStore((s) => s.setMeal)
+  const sheetState = useAppStore((s) => s.sheetState)
+
+  const isOpen  = sheetState.sheet === 'new-recipe'
+  // Création lancée depuis la planification : nom d'amorce et créneau de retour.
+  const venue   = sheetState.newRecipeContext
 
   // Mode
   // « Écrire » d'abord : sept sections à remplir avant le premier ingrédient
@@ -35,7 +41,7 @@ export default function NewRecipeSheet() {
   const [valeurs, setValeurs] = useState<RecipeFormValues>({
     name: '', time: '', timeCustom: false, period: 'midi',
     fav: false, rapide: false, photo: undefined,
-    ingredients: [], steps: [''], tags: [],
+    ingredients: [], steps: [''], tags: [], portions: BASE_PORTIONS,
   })
   const [photoUrl, setPhotoUrl] = useState<string | undefined>(undefined)
 
@@ -44,6 +50,25 @@ export default function NewRecipeSheet() {
 
   // Relu à chaque frappe : la personne voit ce qui est compris avant d'enregistrer.
   const draft = useMemo(() => parseRecipe(freeText), [freeText])
+
+  // Le nom cherché en vain dans le sélecteur devient la première ligne : on
+  // reprend la saisie là où elle s'est arrêtée plutôt que sur une page blanche.
+  useEffect(() => {
+    if (!isOpen) return
+    setMode('write')
+    if (venue?.nomInitial) setFreeText(`${venue.nomInitial}\n`)
+  }, [isOpen, venue?.nomInitial])
+
+  /**
+   * Pose la recette tout juste créée dans le créneau d'où l'on vient.
+   * `addRecipe` ne rend pas la recette créée, mais un repas planifié n'en
+   * retient que le nom, l'emoji, la durée et le favori.
+   */
+  const planifierSiDemande = (nom: string, time: string, fav: boolean) => {
+    if (!venue?.planifier) return false
+    setMeal(venue.planifier.dayIdx, venue.planifier.slotKey, { name: nom, emoji: '', time, fav })
+    return true
+  }
 
   /** Reporte le texte lu dans les champs détaillés. */
   const appliquerDraft = () => {
@@ -57,6 +82,7 @@ export default function NewRecipeSheet() {
       ingredients: draft.ingredients,
       steps: draft.steps.length ? draft.steps : [''],
       tags: draft.tags,
+      portions: draft.portions ?? BASE_PORTIONS,
     }))
   }
 
@@ -72,9 +98,11 @@ export default function NewRecipeSheet() {
       ingredients: draft.ingredients.length ? draft.ingredients : undefined,
       steps: draft.steps.length ? draft.steps : undefined,
       tags: draft.tags.length ? draft.tags : undefined,
+      portions: draft.portions,
       photo: valeurs.photo ?? photoUrl,
     })
-    showToast(`${draft.name.trim()} ajoutée !`)
+    const planifiee = planifierSiDemande(draft.name.trim(), draft.time, false)
+    showToast(planifiee ? `${draft.name.trim()} ajoutée et planifiée !` : `${draft.name.trim()} ajoutée !`)
     setFreeText('')
     set('photo', undefined)
     setPhotoUrl(undefined)
@@ -135,12 +163,18 @@ export default function NewRecipeSheet() {
       ingredients: ingredients.length ? ingredients : undefined,
       photo: valeurs.photo ?? photoUrl,
       tags: valeurs.tags.length ? valeurs.tags : undefined,
+      portions: valeurs.portions === BASE_PORTIONS ? undefined : valeurs.portions,
     })
-    showToast(`${valeurs.name.trim()} ajoutée !`)
+    const planifiee = planifierSiDemande(
+      valeurs.name.trim(),
+      valeurs.time.trim() || '? min',
+      valeurs.fav,
+    )
+    showToast(planifiee ? `${valeurs.name.trim()} ajoutée et planifiée !` : `${valeurs.name.trim()} ajoutée !`)
     setValeurs({
       name: '', time: '', timeCustom: false, period: 'midi',
       fav: false, rapide: false, photo: undefined,
-      ingredients: [], steps: [''], tags: [],
+      ingredients: [], steps: [''], tags: [], portions: BASE_PORTIONS,
     })
     setPhotoUrl(undefined)
     setFreeText('')
@@ -222,6 +256,7 @@ export default function NewRecipeSheet() {
                 {draft.rapide && ' · Rapide'}
                 {' · '}
                 {draft.period === 'pdej' ? 'Petit-déj' : draft.period === 'soir' ? 'Soir' : 'Midi'}
+                {draft.portions ? ` · pour ${draft.portions}` : ''}
               </p>
 
               {draft.ingredients.length > 0 && (
