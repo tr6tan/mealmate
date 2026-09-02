@@ -9,6 +9,14 @@ interface Props {
   className?: string
   /** Désactive le scroll interne du sheet — les enfants gèrent leur propre scroll */
   noScroll?: boolean
+  /**
+   * Fait flotter la poignée par-dessus le contenu au lieu de lui réserver une
+   * ligne. Sur une feuille qui s'ouvre sur une photo pleine largeur, les 4px
+   * de poignée et ses 16px de marge laissaient une bande blanche au-dessus de
+   * l'image. À réserver aux feuilles dont le haut est une image, où la
+   * poignée reste lisible en blanc translucide.
+   */
+  handleOverlay?: boolean
 }
 
 /**
@@ -37,7 +45,7 @@ function useKeyboardHeight() {
 /** Durée de l'animation de fermeture — le contenu reste monté le temps de glisser. */
 const CLOSE_ANIMATION_MS = 400
 
-export default function BottomSheet({ name, children, className, noScroll }: Props) {
+export default function BottomSheet({ name, children, className, noScroll, handleOverlay }: Props) {
   const sheetState = useAppStore((s) => s.sheetState)
   const closeSheet = useAppStore((s) => s.closeSheet)
   const isOpen = sheetState.sheet === name
@@ -224,7 +232,15 @@ export default function BottomSheet({ name, children, className, noScroll }: Pro
         }}
       >
         {/* Handle */}
-        <div className="w-10 h-1 bg-border rounded-full mx-auto mb-4 flex-shrink-0" />
+        {handleOverlay ? (
+          // Hauteur nulle : la poignée est dessinée par-dessus l'image sans
+          // pousser le contenu vers le bas.
+          <div className="h-0 relative z-20" aria-hidden>
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-white/70" />
+          </div>
+        ) : (
+          <div className="w-10 h-1 bg-border rounded-full mx-auto mb-4 flex-shrink-0" />
+        )}
         {mounted && children}
       </div>
     </>

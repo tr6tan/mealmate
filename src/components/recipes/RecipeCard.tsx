@@ -73,12 +73,12 @@ export default function RecipeCard({ recipe, onClick, planCount = 0, derniere }:
       </span>
 
       {/* Le filet part du texte, pas du bord : la vignette n'est pas coupée. */}
+      {/* Pas de chevron en fin de ligne : cent lignes, cent fois le même
+          signal, alors que la ligne entière est déjà un bouton. */}
       <span
-        className={`flex-1 min-w-0 flex items-center gap-3 py-3.5 ${
-          derniere ? '' : 'border-b border-sep'
-        }`}
+        className={`flex-1 min-w-0 py-3.5 ${derniere ? '' : 'border-b border-sep'}`}
       >
-        <span className="flex-1 min-w-0">
+        <span className="block min-w-0">
           <span className="flex items-center gap-1.5">
             <span className="text-[16px] font-semibold text-text1 tracking-[-0.01em] leading-snug line-clamp-2">
               {recipe.name}
@@ -97,10 +97,6 @@ export default function RecipeCard({ recipe, onClick, planCount = 0, derniere }:
             )}
           </span>
         </span>
-
-        <svg className="w-4 h-4 text-muted/45 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-          <path d="M9 18l6-6-6-6" />
-        </svg>
       </span>
     </button>
   )

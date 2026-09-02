@@ -108,7 +108,7 @@ export default function RecipeDetailSheet() {
   }
 
   return (
-    <BottomSheet name="recipe-detail" className="!px-0 !pt-0">
+    <BottomSheet name="recipe-detail" handleOverlay className="!px-0 !pt-0">
       {/* ── Photo pleine largeur, titre posé dessus ─────────────────────── */}
       <header className="relative">
         <div className="relative h-[232px] overflow-hidden rounded-t-[28px]">
