@@ -4,16 +4,19 @@ import { useAppStore } from '@/store/useAppStore'
 import { showToast } from '@/lib/toast'
 import FoodSticker from '@/components/ui/FoodSticker'
 import { PERIOD_LABEL, scaleQty } from '@/lib/utils'
-import Fleuron from '@/components/ui/Fleuron'
 
 /**
  * Fiche de recette.
  *
- * Mise en page empruntée aux livres de cuisine plutôt qu'aux formulaires :
- * photo pleine largeur, titre posé dessus, ingrédients en colonnes alignées
- * séparées par des filets, étapes numérotées en gros chiffres clairs. Les
- * cartes blanches empilées d'une version à l'autre écrasaient la hiérarchie :
- * un ingrédient, une étape et un bouton avaient tous le même poids visuel.
+ * Trois choses seulement : la photo, ce qu'il faut acheter, ce qu'il faut
+ * faire. Les cartes blanches empilées écrasaient la hiérarchie — un
+ * ingrédient, une étape et un bouton avaient tous le même poids visuel — et la
+ * mise en page de livre imprimé qui les a remplacées un temps mettait la
+ * typographie devant le contenu.
+ *
+ * Ici la hiérarchie est portée par la taille et l'espace, pas par des cadres :
+ * un intertitre par section, un filet fin entre deux ingrédients, rien
+ * d'autre.
  */
 
 const IcoBack = () => (
@@ -105,16 +108,10 @@ export default function RecipeDetailSheet() {
   }
 
   return (
-    <BottomSheet name="recipe-detail" className="!px-0 !pt-0 !bg-transparent">
-      <div className="papier min-h-full rounded-t-[28px]">
-
-      {/* ── La planche ────────────────────────────────────────────────────
-          Dans un livre ancien, l'image est une planche gravée : encadrée d'un
-          filet, elle précède le titre au lieu de le porter. Le titre posé sur
-          la photo était la convention de l'app ; ici il revient sur le papier,
-          où une page de livre le place. */}
+    <BottomSheet name="recipe-detail" className="!px-0 !pt-0">
+      {/* ── Photo pleine largeur, titre posé dessus ─────────────────────── */}
       <header className="relative">
-        <div className="relative h-[214px] overflow-hidden rounded-t-[28px]">
+        <div className="relative h-[232px] overflow-hidden rounded-t-[28px]">
           {photo ? (
             <img
               src={photo}
@@ -129,16 +126,26 @@ export default function RecipeDetailSheet() {
             >
               <FoodSticker
                 name={recipe.name}
-                size={130}
-                fallback={<span className="text-[90px] leading-none">{recipe.emoji}</span>}
+                size={124}
+                fallback={<span className="text-[86px] leading-none">{recipe.emoji}</span>}
               />
             </div>
           )}
-          {/* Filet intérieur : le cadre de la planche. */}
+
+          {/* Voile sombre : le titre doit rester lisible sur n'importe quelle photo */}
           <div
-            className="absolute inset-2.5 pointer-events-none rounded-[20px] border border-white/45"
-            aria-hidden
+            className="absolute inset-x-0 bottom-0 h-3/4 pointer-events-none"
+            style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.86) 6%, rgba(0,0,0,0.5) 42%, transparent)' }}
           />
+
+          <div className="absolute inset-x-0 bottom-0 p-5">
+            <p className="text-white/75 text-[11px] font-bold tracking-[0.1em] uppercase mb-1.5">
+              {PERIOD_LABEL[recipe.period]}
+            </p>
+            <h2 className="text-white text-[29px] font-extrabold tracking-[-0.03em] leading-[1.08]">
+              {recipe.name}
+            </h2>
+          </div>
         </div>
 
         {/* Commandes en surimpression, sur pastille sombre pour rester visibles */}
@@ -162,71 +169,67 @@ export default function RecipeDetailSheet() {
         </div>
       </header>
 
-      <div className="px-6">
-        {/* ── Le titre ──────────────────────────────────────────────────────
-            Surtitre en capitales espacées, titre en Garamond centré, filet
-            double : les trois gestes qui font lire une page comme un livre. */}
-        <div className="pt-7 text-center">
-          <p className="font-book capitales text-[10.5px] text-text2/85">
-            {PERIOD_LABEL[recipe.period]}
-            {recipe.time && <> &middot; {recipe.time}</>}
-          </p>
-          <h2 className="font-book text-[33px] font-semibold text-text1 leading-[1.1] mt-2.5 mb-0 px-2">
-            {recipe.name}
-          </h2>
-          <div className="filet-double w-[62%] mx-auto mt-4" aria-hidden />
-
-          {/* Les régimes en italique, comme une mention d'éditeur. Les pastilles
-              colorées appartenaient à la fiche produit, pas à la page. */}
-          {(recipe.tags ?? []).length > 0 && (
-            <p className="font-book italic text-[14.5px] text-text2 mt-4">
-              {(recipe.tags ?? []).map((t) => TAGS[t] ?? t).join(' · ')}
-            </p>
+      <div className="px-5">
+        {/* ── Une seule ligne de repères ───────────────────────────────────
+            Durée, nombre d'ingrédients, régimes : trois faits sur une ligne,
+            là où trois rangées de pastilles se disputaient l'attention. */}
+        <div className="flex items-center flex-wrap gap-x-2 gap-y-1 py-4 text-[13px] text-muted">
+          <span className="font-semibold text-text2 tabular-nums">{recipe.time}</span>
+          {ingredients.length > 0 && (
+            <>
+              <span aria-hidden>·</span>
+              <span>{ingredients.length} ingrédients</span>
+            </>
           )}
-
-          <div className="flex justify-center gap-0.5 mt-3" role="group" aria-label="Note">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                onClick={() => updateRecipe(recipe.id, { rating: recipe.rating === star ? undefined : star })}
-                aria-label={`${star} sur 5`}
-                aria-pressed={(recipe.rating ?? 0) >= star}
-                className="p-1 active:scale-110 transition-transform"
-              >
-                <svg
-                  className="w-[17px] h-[17px]"
-                  viewBox="0 0 24 24"
-                  fill={(recipe.rating ?? 0) >= star ? 'rgb(var(--c-morning))' : 'none'}
-                  stroke={(recipe.rating ?? 0) >= star ? 'rgb(var(--c-morning))' : 'rgb(var(--c-border))'}
-                  strokeWidth="1.8"
-                  strokeLinejoin="round"
-                >
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-              </button>
-            ))}
-          </div>
+          {(recipe.tags ?? []).map((t) => (
+            <span key={t} className="flex items-center gap-2">
+              <span aria-hidden>·</span>
+              <span>{TAGS[t] ?? t}</span>
+            </span>
+          ))}
         </div>
 
-        {/* ── Ingrédients ──────────────────────────────────────────────
-            Points de conduite du nom vers la quantité, comme dans un sommaire
-            ou sur une carte : l'œil suit la ligne sans avoir besoin d'un filet
-            plein sous chaque entrée. La vignette reste, en petit — les livres
-            anciens illustrent leurs marges. */}
-        {ingredients.length > 0 && (
-          <section>
-            <Fleuron label="Ingrédients" />
+        {/* ── Appréciation ────────────────────────────────────────────────── */}
+        <div className="flex gap-0.5 -ml-1 pb-1" role="group" aria-label="Note">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              onClick={() => updateRecipe(recipe.id, { rating: recipe.rating === star ? undefined : star })}
+              aria-label={`${star} sur 5`}
+              aria-pressed={(recipe.rating ?? 0) >= star}
+              className="w-8 h-8 flex items-center justify-center active:scale-110 transition-transform"
+            >
+              <svg
+                className="w-[17px] h-[17px]"
+                viewBox="0 0 24 24"
+                fill={(recipe.rating ?? 0) >= star ? 'rgb(var(--c-morning))' : 'none'}
+                stroke={(recipe.rating ?? 0) >= star ? 'rgb(var(--c-morning))' : 'rgb(var(--c-border))'}
+                strokeWidth="1.9"
+                strokeLinejoin="round"
+              >
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+              </svg>
+            </button>
+          ))}
+        </div>
 
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <span className="font-book italic text-[14.5px] text-text2">pour</span>
-              <div className="flex items-center gap-0.5 border border-border rounded-full p-0.5">
+        {/* ── Ingrédients ──────────────────────────────────────────────── */}
+        {ingredients.length > 0 && (
+          <section className="pt-4">
+            <div className="flex items-center justify-between gap-3 mb-1">
+              <h3 className="text-[11px] font-extrabold tracking-[0.1em] uppercase text-muted">
+                Ingrédients
+              </h3>
+              {/* Le nombre de convives se règle ici, où l'on lit les
+                  quantités, et non dans les réglages. */}
+              <div className="flex items-center gap-0.5 rounded-full bg-black/[0.045] p-0.5">
                 {([2, 4, 6] as const).map((p) => (
                   <button
                     key={p}
                     onClick={() => setPortions(p)}
                     aria-label={`${p} personnes`}
                     aria-pressed={portions === p}
-                    className={`w-8 h-8 rounded-full font-book text-[15px] font-semibold transition-colors ${
+                    className={`w-8 h-8 rounded-full text-[13px] font-bold tabular-nums transition-colors ${
                       portions === p ? 'bg-terra text-white' : 'text-text2'
                     }`}
                   >
@@ -234,19 +237,18 @@ export default function RecipeDetailSheet() {
                   </button>
                 ))}
               </div>
-              <span className="font-book italic text-[14.5px] text-text2">personnes</span>
             </div>
 
-            <ul className="mb-6">
+            <ul className="mb-4">
               {ingredients.map((ing, i) => (
-                <li key={`${ing.name}-${i}`} className="flex items-baseline gap-2.5 py-[7px]">
-                  <span className="self-center flex-shrink-0">
-                    <FoodSticker name={ing.name} size={22} shadow={false} fallback={null} />
-                  </span>
-                  <span className="font-book text-[17px] text-text1 leading-snug">{ing.name}</span>
-                  <span className="conduite" aria-hidden />
-                  <span className="font-book elzevir text-[16px] text-text2 flex-shrink-0">
-                    {scaleQty(ing.qty, portions, recipe.portions) || '—'}
+                <li
+                  key={`${ing.name}-${i}`}
+                  className="flex items-center gap-3 py-2.5 border-b border-sep last:border-0"
+                >
+                  <FoodSticker name={ing.name} size={24} shadow={false} fallback={null} />
+                  <span className="flex-1 text-[15px] text-text1 leading-snug">{ing.name}</span>
+                  <span className="text-[14px] font-semibold text-muted tabular-nums flex-shrink-0">
+                    {scaleQty(ing.qty, portions, recipe.portions)}
                   </span>
                 </li>
               ))}
@@ -254,54 +256,44 @@ export default function RecipeDetailSheet() {
 
             <button
               onClick={handleAddToCourses}
-              className="w-full flex items-center justify-center gap-2 py-3 min-h-[44px] rounded-2xl border border-border bg-card/60 text-[14px] font-semibold text-text1 active:scale-[0.98] transition-transform"
+              className="w-full flex items-center justify-center gap-2 h-12 rounded-2xl bg-black/[0.045] text-[14px] font-semibold text-text1 active:scale-[0.98] transition-transform"
             >
               <IcoCart />
-              Ajouter à la liste de courses
+              Ajouter aux courses
             </button>
           </section>
         )}
 
         {/* ── Préparation ──────────────────────────────────────────────────
-            Le numéro pend dans la marge en chiffre elzévirien, et la première
-            instruction s'ouvre sur une lettrine : c'est ainsi qu'un livre
-            entame un paragraphe, là où l'app posait un gros chiffre bleu au
-            sommet d'une carte. */}
+            Le numéro en gris clair et grand format sert de repère sans
+            pastille colorée : on retrouve son étape d'un coup d'œil. */}
         {steps.length > 0 && (
-          <section>
-            <Fleuron label="Préparation" />
-            <ol>
+          <section className="pt-7">
+            <h3 className="text-[11px] font-extrabold tracking-[0.1em] uppercase text-muted mb-3">
+              Préparation
+            </h3>
+            <ol className="flex flex-col gap-4">
               {steps.map((step, i) => (
-                <li key={i} className="relative pl-8 mb-4 last:mb-0">
+                <li key={i} className="flex gap-3.5">
                   <span
-                    className="absolute left-0 top-[0.28em] font-book elzevir text-[16px] text-evening/70 w-6 text-right"
+                    className="text-[22px] font-extrabold leading-none tabular-nums flex-shrink-0 w-6 text-right pt-0.5"
+                    style={{ color: 'rgb(var(--c-terra) / 0.3)' }}
                     aria-hidden
                   >
-                    {i + 1}.
+                    {i + 1}
                   </span>
-                  <p
-                    className={`font-book text-[17.5px] text-text1 leading-[1.62] ${
-                      /*
-                       * Une lettrine a besoin de deux ou trois lignes pour que
-                       * le texte l'entoure. Sur « Cuire 20 min. » elle laisse
-                       * un trou blanc : mieux vaut alors ne pas en mettre.
-                       */
-                      i === 0 && step.length >= 62 ? 'lettrine' : ''
-                    }`}
-                  >
-                    {step}
-                  </p>
+                  <p className="flex-1 text-[15px] text-text1 leading-[1.55]">{step}</p>
                 </li>
               ))}
             </ol>
           </section>
         )}
 
-        {/* ── Notes ────────────────────────────────────────────────────────
-            En italique, sur un filet de marge : la note ajoutée à la main dans
-            un livre de famille, distincte du texte imprimé. */}
-        <section>
-          <Fleuron label="Notes" />
+        {/* ── Notes ───────────────────────────────────────────────────────── */}
+        <section className="pt-7">
+          <h3 className="text-[11px] font-extrabold tracking-[0.1em] uppercase text-muted mb-2">
+            Notes
+          </h3>
           <textarea
             value={localNotes || recipe.notes || ''}
             onChange={(e) => {
@@ -309,8 +301,8 @@ export default function RecipeDetailSheet() {
               updateRecipe(recipe.id, { notes: e.target.value || undefined })
             }}
             placeholder="Une astuce, une variante, ce qui a marché…"
-            rows={3}
-            className="w-full bg-transparent border-l-2 border-evening/30 focus:border-evening/70 outline-none resize-none font-book italic text-[16.5px] text-text1 placeholder:text-muted placeholder:not-italic placeholder:font-sans placeholder:text-[14px] leading-[1.6] pl-3.5 transition-colors"
+            rows={2}
+            className="w-full bg-transparent border-b border-sep focus:border-terra outline-none resize-none text-[15px] text-text1 placeholder:text-muted leading-relaxed pb-2 transition-colors"
           />
         </section>
 
@@ -326,7 +318,7 @@ export default function RecipeDetailSheet() {
           <button
             onClick={() => openSheet({ sheet: 'edit-recipe', recipeContext: recipe })}
             aria-label="Modifier la recette"
-            className="w-12 h-12 rounded-2xl border border-border bg-fill/50 text-text2 flex items-center justify-center active:scale-95 transition-transform"
+            className="w-12 h-12 rounded-2xl bg-black/[0.045] text-text2 flex items-center justify-center active:scale-95 transition-transform"
           >
             <IcoPen />
           </button>
@@ -342,18 +334,18 @@ export default function RecipeDetailSheet() {
               showToast(`${recipe.name} dupliquée`)
             }}
             aria-label="Dupliquer la recette"
-            className="w-12 h-12 rounded-2xl border border-border bg-fill/50 text-text2 flex items-center justify-center active:scale-95 transition-transform"
+            className="w-12 h-12 rounded-2xl bg-black/[0.045] text-text2 flex items-center justify-center active:scale-95 transition-transform"
           >
             <IcoCopy />
           </button>
           <button
             onClick={handleDelete}
             aria-label={deleteConfirm ? 'Confirmer la suppression' : 'Supprimer la recette'}
-            className="w-12 h-12 rounded-2xl border flex items-center justify-center active:scale-95 transition-all"
+            className="w-12 h-12 rounded-2xl flex items-center justify-center active:scale-95 transition-all"
             style={
               deleteConfirm
-                ? { background: 'rgb(var(--c-danger))', borderColor: 'rgb(var(--c-danger))', color: '#fff' }
-                : { borderColor: 'rgb(var(--c-border))', color: 'rgb(var(--c-muted))' }
+                ? { background: 'rgb(var(--c-danger))', color: '#fff' }
+                : { background: 'rgb(0 0 0 / 0.045)', color: 'rgb(var(--c-muted))' }
             }
           >
             <IcoTrash />
@@ -364,13 +356,6 @@ export default function RecipeDetailSheet() {
             Appuyez à nouveau pour supprimer
           </p>
         )}
-
-        {/* Cul-de-lampe : l'ornement qui clôt un chapitre. Sans lui, la page
-            s'arrête sur un bouton et le livre redevient une fiche. */}
-        <div className="pb-3 pt-1">
-          <Fleuron />
-        </div>
-      </div>
       </div>
     </BottomSheet>
   )

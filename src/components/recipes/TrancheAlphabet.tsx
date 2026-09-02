@@ -2,23 +2,22 @@ import { useCallback, useRef, useState } from 'react'
 import { LETTRES } from '@/lib/initiale'
 
 /**
- * La tranche d'un livret : les lettres imprimées sur le bord de la page.
+ * Index alphabétique, en bord d'écran.
  *
- * Chercher une recette dans une liste de cent demandait de défiler ou de
- * connaître son nom pour le taper. Sur un carnet de cuisine, on attrape la
- * tranche au pouce et on ouvre à la lettre. C'est ce geste-là :
+ * Chercher une recette dans une liste de cent demandait de défiler longtemps
+ * ou de connaître son nom d'avance :
  *
  *  — un appui ouvre à la lettre ;
  *  — un glissement du pouce fait défiler l'index en continu, avec la lettre
  *    survolée affichée en grand au centre, comme le répertoire d'un
  *    téléphone ;
- *  — les lettres sans recette restent visibles mais pâles, et ne répondent
- *    pas : leur absence est une information, les retirer ferait sauter
- *    l'alignement de la tranche à chaque filtre.
+ *  — les lettres sans recette restent visibles mais pâles : leur absence est
+ *    une information, et les retirer ferait sauter l'alignement de l'index à
+ *    chaque changement de filtre.
  *
- * Les lettres sont posées dans un `pointermove` unique sur le conteneur
- * plutôt qu'en 27 gestionnaires : au pouce on glisse entre deux lettres bien
- * plus souvent qu'on ne reste sur une seule.
+ * Le suivi passe par un `pointermove` unique plutôt que par 27 gestionnaires :
+ * au pouce on glisse entre deux lettres bien plus souvent qu'on ne reste sur
+ * une seule.
  */
 
 interface Props {
@@ -118,20 +117,14 @@ export default function TrancheAlphabet({ presentes, courante, onChoisir }: Prop
 
   return (
     <>
-      {/* La lettre survolée, en grand : au pouce, la tranche est masquée par
-          la main. */}
+      {/* La lettre visée, en pastille : au pouce, l'index est masqué par la
+          main. Assez petite pour ne pas couvrir la liste qu'on parcourt. */}
       {glissee && (
         <div
           className="fixed inset-0 z-30 flex items-center justify-center pointer-events-none"
           aria-hidden
         >
-          {/* Opacité en style et non par utilitaire : `text-text1/12` entrait en
-              conflit avec `text-[120px]` et la lettre sortait presque noire,
-              masquant la liste au lieu de l'ombrer. */}
-          <span
-            className="font-book text-[124px] leading-none font-semibold"
-            style={{ color: 'rgb(var(--c-evening) / 0.16)' }}
-          >
+          <span className="w-[76px] h-[76px] rounded-3xl bg-terra text-white text-[34px] font-bold tracking-[-0.02em] flex items-center justify-center shadow-lg">
             {glissee}
           </span>
         </div>
@@ -159,12 +152,12 @@ export default function TrancheAlphabet({ presentes, courante, onChoisir }: Prop
               aria-current={marquee ? 'true' : undefined}
               tabIndex={active ? 0 : -1}
               className={
-                'w-6 h-[19px] flex items-center justify-center font-book text-[11.5px] leading-none transition-colors ' +
+                'w-6 h-[18px] flex items-center justify-center text-[10.5px] font-bold leading-none tabular-nums transition-colors ' +
                 (marquee
-                  ? 'text-accent font-semibold'
+                  ? 'text-accent'
                   : active
-                    ? 'text-text2'
-                    : 'text-text2/25')
+                    ? 'text-muted'
+                    : 'text-muted/30')
               }
             >
               {lettre}

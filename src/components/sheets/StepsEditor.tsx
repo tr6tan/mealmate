@@ -70,9 +70,9 @@ export default function StepsEditor({ steps, onChange }: Props) {
       <button
         type="button"
         onClick={() => onChange([...steps, ''])}
-        className="w-full mt-2 py-3 min-h-[48px] rounded-xl border border-dashed border-text2/35 font-book italic text-[15.5px] text-text2 active:scale-[0.99] transition-transform"
+        className="w-full mt-2 h-12 rounded-2xl bg-black/[0.045] text-[14px] font-semibold text-text2 active:scale-[0.98] transition-transform"
       >
-        Ajouter une étape
+        + Ajouter une étape
       </button>
     </div>
   )
@@ -113,11 +113,14 @@ function Etape({
 
   return (
     <li className="relative pl-8 pb-3">
+      {/* Même repère que sur la fiche : un grand chiffre pâle, pas de
+          pastille colorée. */}
       <span
-        className="absolute left-0 top-[0.55em] font-book elzevir text-[16px] text-evening/70 w-6 text-right"
+        className="absolute left-0 top-[0.1em] text-[19px] font-extrabold tabular-nums w-6 text-right"
+        style={{ color: 'rgb(var(--c-terra) / 0.3)' }}
         aria-hidden
       >
-        {numero}.
+        {numero}
       </span>
 
       <textarea
@@ -127,15 +130,15 @@ function Etape({
         placeholder={premiere ? 'Préchauffer le four à 180°C…' : 'Et ensuite…'}
         rows={1}
         aria-label={`Étape ${numero}`}
-        className="w-full bg-transparent border-b border-text2/25 focus:border-evening/60 outline-none resize-none overflow-hidden font-book text-[17px] text-text1 placeholder:text-muted placeholder:font-sans placeholder:text-[14px] placeholder:italic leading-[1.55] pb-1.5 transition-colors"
+        className="w-full bg-transparent border-b border-sep focus:border-terra outline-none resize-none overflow-hidden text-[15px] text-text1 placeholder:text-muted leading-[1.55] pb-1.5 transition-colors"
       />
 
       <div className="flex items-center gap-1 mt-1">
         {/* La durée reconnue, montrée pendant la saisie : c'est celle que le
             mode cuisine proposera en minuteur. */}
         {duree && (
-          <span className="font-book italic text-[13.5px] text-sage mr-auto whitespace-nowrap">
-            minuteur {duree.libelle}
+          <span className="text-[12px] font-semibold text-sage mr-auto whitespace-nowrap">
+            Minuteur {duree.libelle}
           </span>
         )}
         {!duree && <span className="mr-auto" />}

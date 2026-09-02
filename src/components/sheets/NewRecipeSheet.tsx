@@ -105,31 +105,24 @@ export default function NewRecipeSheet() {
   const prete = valeurs.name.trim().length > 0
 
   return (
-    <BottomSheet name="new-recipe" className="!px-0 !pt-0 !bg-transparent max-h-[94dvh]">
-      <div className="papier min-h-full rounded-t-[28px] px-6 pt-5">
-
-        {/* ── Titre de partie ─────────────────────────────────────────────── */}
-        <div className="flex items-start justify-between mb-1">
-          <span className="w-11" aria-hidden />
-          <div className="text-center flex-1">
-            <h2 className="font-book capitales text-[12px] text-text2">Nouvelle recette</h2>
-            <div className="filet-double w-[64%] mx-auto mt-2" aria-hidden />
-          </div>
+    <BottomSheet name="new-recipe" className="max-h-[94dvh]">
+      <div>
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-[20px] font-extrabold text-text1 tracking-[-0.02em]">
+            Nouvelle recette
+          </h2>
           <button
             onClick={closeSheet}
             aria-label="Fermer"
-            className="w-11 h-11 flex items-center justify-center text-muted -mt-2.5"
+            className="w-11 h-11 -mr-2.5 flex items-center justify-center text-muted"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
           </button>
         </div>
 
-        {venue?.planifier && (
-          <p className="font-book italic text-[14.5px] text-sage text-center mb-4">
-            Elle sera aussitôt mise au menu.
-          </p>
-        )}
-        <div className={venue?.planifier ? '' : 'mb-5'} />
+        <p className="text-[13px] text-muted mb-5">
+          {venue?.planifier ? 'Elle sera aussitôt mise au menu.' : 'Le nom suffit pour commencer.'}
+        </p>
 
         <RecipeFormFields valeurs={valeurs} set={set} />
 
@@ -141,14 +134,11 @@ export default function NewRecipeSheet() {
           Ajouter la recette
         </button>
         {!prete && (
-          <p className="font-book italic text-[14px] text-muted text-center mt-2.5">
+          <p className="text-[13px] text-muted text-center mt-2.5">
             Il manque le nom du plat.
           </p>
         )}
-
-        <div className="pb-2 pt-1">
-          <span className="block h-px bg-text2/20 w-1/3 mx-auto" />
-        </div>
+        <div className="pb-2" />
       </div>
     </BottomSheet>
   )

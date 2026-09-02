@@ -12,27 +12,27 @@ import {
 import { PERIOD_LABEL, cn, resizeToBase64 } from '@/lib/utils'
 import { devinerCategorie } from '@/lib/categorieIngredient'
 import { showToast } from '@/lib/toast'
-import Fleuron from '@/components/ui/Fleuron'
 import StepsEditor from './StepsEditor'
 
 /**
  * Champs communs aux formulaires de création et de modification d'une recette.
  *
- * Composé comme une fiche de livre de cuisine : intertitres à fleurons, champs
- * réglés d'un simple filet plutôt qu'encadrés, ingrédients à points de
- * conduite. Les libellés et les boutons restent en sans — on les vise au
- * pouce, ils ne se lisent pas.
+ * Champs réglés d'un filet plutôt qu'encadrés : dix champs encadrés empilés
+ * font dix rectangles, et on ne voit plus lequel est actif. Le filet ne se
+ * remarque qu'au moment où il prend la couleur d'accent.
  *
  * Ce composant ne détient aucun état : les écrans gardent le leur et passent
  * les valeurs avec leur setter, ce qui laisse à chacun ses champs propres
  * (notes et appréciation à la modification).
  */
 
-const LIBELLE = 'font-sans text-[10px] font-extrabold tracking-[0.1em] uppercase text-muted mb-2'
-/** Champ réglé : un filet sous le texte, comme une ligne à remplir. */
+const LIBELLE = 'text-[11px] font-extrabold tracking-[0.1em] uppercase text-muted mb-2'
+/** Champ réglé : un filet sous le texte, qui s'accentue au focus. */
 const REGLE =
-  'w-full bg-transparent border-b border-text2/25 focus:border-evening/60 outline-none font-book text-text1 placeholder:text-muted placeholder:font-sans placeholder:text-[14px] placeholder:italic transition-colors'
-const PUCE = 'px-3 py-2 min-h-[40px] rounded-xl text-xs font-bold border transition-all'
+  'w-full bg-transparent border-b border-sep focus:border-terra outline-none text-text1 placeholder:text-muted transition-colors'
+/** Puce de choix : pleine si retenue, fond très léger sinon. */
+const PUCE = 'h-9 px-3.5 rounded-full text-[13px] font-semibold whitespace-nowrap transition-colors'
+const PUCE_OFF = 'bg-black/[0.045] text-text2'
 
 interface Props {
   valeurs: RecipeFormValues
@@ -87,7 +87,7 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
         autoCapitalize="sentences"
         spellCheck={false}
         enterKeyHint="next"
-        className={cn(REGLE, 'text-[24px] font-semibold text-center pb-2.5 mb-5')}
+        className={cn(REGLE, 'text-[22px] font-bold tracking-[-0.02em] pb-2.5 mb-6')}
       />
 
       {/* ── Temps ───────────────────────────────────────────────────────── */}
@@ -100,7 +100,7 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
               type="button"
               onClick={() => set('time', t)}
               aria-pressed={time === t}
-              className={cn(PUCE, time === t ? 'bg-terra border-terra text-white' : 'bg-card border-border text-text2')}
+              className={cn(PUCE, time === t ? 'bg-terra text-white' : PUCE_OFF)}
             >
               {t}
             </button>
@@ -111,7 +111,7 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
               set('timeCustom', true)
               set('time', '')
             }}
-            className={cn(PUCE, 'border-dashed border-border text-text2')}
+            className={cn(PUCE, PUCE_OFF)}
           >
             Autre…
           </button>
@@ -126,12 +126,12 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
             autoComplete="off"
             spellCheck={false}
             enterKeyHint="done"
-            className={cn(REGLE, 'flex-1 text-[17px] pb-2')}
+            className={cn(REGLE, 'flex-1 text-[15px] pb-2')}
           />
           <button
             type="button"
             onClick={() => set('timeCustom', false)}
-            className="px-3 min-h-[44px] rounded-xl border border-border text-text2 text-xs font-bold"
+            className="px-3.5 h-11 rounded-full bg-black/[0.045] text-text2 text-[13px] font-semibold"
           >
             Retour
           </button>
@@ -149,20 +149,19 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
           onClick={() => set('portions', (p) => Math.max(1, p - 1))}
           aria-label="Un convive de moins"
           disabled={portions <= 1}
-          className="w-11 h-11 rounded-xl border border-border text-text1 text-lg font-bold flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40"
+          className="w-11 h-11 rounded-full bg-black/[0.045] text-text1 text-lg font-bold flex items-center justify-center active:scale-95 transition-transform disabled:opacity-30"
         >
           −
         </button>
-        <span className="font-book text-[17px] text-text1 min-w-[112px] text-center">
-          <span className="elzevir font-semibold">{portions}</span>{' '}
-          <span className="italic">{portions > 1 ? 'personnes' : 'personne'}</span>
+        <span className="text-[15px] font-semibold text-text1 min-w-[112px] text-center tabular-nums">
+          {portions} {portions > 1 ? 'personnes' : 'personne'}
         </span>
         <button
           type="button"
           onClick={() => set('portions', (p) => Math.min(24, p + 1))}
           aria-label="Un convive de plus"
           disabled={portions >= 24}
-          className="w-11 h-11 rounded-xl border border-border text-text1 text-lg font-bold flex items-center justify-center active:scale-95 transition-transform disabled:opacity-40"
+          className="w-11 h-11 rounded-full bg-black/[0.045] text-text1 text-lg font-bold flex items-center justify-center active:scale-95 transition-transform disabled:opacity-30"
         >
           +
         </button>
@@ -175,14 +174,14 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="w-full h-[104px] rounded-xl border border-dashed border-text2/35 flex flex-col items-center justify-center gap-1.5 active:scale-[0.99] transition-transform overflow-hidden"
+          className="w-full h-[104px] rounded-2xl bg-black/[0.045] flex flex-col items-center justify-center gap-1.5 active:scale-[0.99] transition-transform overflow-hidden"
         >
           {photo ? (
             <img src={photo} alt="Aperçu" className="w-full h-full object-cover" />
           ) : (
             <>
               <svg className="w-6 h-6 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
-              <span className="font-book italic text-[15px] text-text2">Ajouter une photo</span>
+              <span className="text-[13px] font-semibold text-text2">Ajouter une photo</span>
             </>
           )}
         </button>
@@ -190,7 +189,7 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
           <button
             type="button"
             onClick={() => set('photo', undefined)}
-            className="mt-1 font-book italic text-[14px] text-muted underline min-h-[44px]"
+            className="mt-1 text-[13px] font-semibold text-muted min-h-[44px]"
           >
             Retirer la photo
           </button>
@@ -214,7 +213,7 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
             type="button"
             onClick={() => set('period', p)}
             aria-pressed={period === p}
-            className={cn(PUCE, 'flex-1', period === p ? 'bg-terra border-terra text-white' : 'bg-card border-border text-text2')}
+            className={cn(PUCE, 'flex-1', period === p ? 'bg-terra text-white' : PUCE_OFF)}
           >
             {PERIOD_LABEL[p]}
           </button>
@@ -240,7 +239,7 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
             type="button"
             onClick={() => toggleTag(t.id)}
             aria-pressed={tags.includes(t.id)}
-            className={cn(PUCE, tags.includes(t.id) ? 'bg-sage border-sage text-white' : 'bg-card border-border text-text2')}
+            className={cn(PUCE, tags.includes(t.id) ? 'bg-sage text-white' : PUCE_OFF)}
           >
             {t.label}
           </button>
@@ -248,10 +247,10 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
       </div>
 
       {/* ── Ingrédients ─────────────────────────────────────────────────────
-          Nom à gauche, quantité à droite, points de conduite entre les deux :
-          la ligne se lit déjà comme celle de la fiche pendant qu'on la tape.
-          Le rayon est deviné d'après le nom et se replie tant qu'il convient. */}
-      <Fleuron label="Ingrédients" />
+          Nom à gauche, quantité à droite, comme sur la fiche : la ligne se lit
+          déjà telle qu'elle s'affichera pendant qu'on la tape. Le rayon est
+          deviné d'après le nom et reste modifiable. */}
+      <p className={cn(LIBELLE, 'mt-7')}>Ingrédients</p>
       <ul>
         {ingredients.map((ing, idx) => (
           <li key={idx} className="pb-2.5">
@@ -262,7 +261,7 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
                 value={ing.name}
                 onChange={(e) => majNomIngredient(idx, e.target.value)}
                 aria-label={`Ingrédient ${idx + 1}`}
-                className={cn(REGLE, 'flex-1 min-w-0 text-[17px] pb-1.5')}
+                className={cn(REGLE, 'flex-1 min-w-0 text-[15px] font-medium pb-1.5')}
               />
               <input
                 type="text"
@@ -270,7 +269,7 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
                 value={ing.qty}
                 onChange={(e) => majIngredient(idx, { qty: e.target.value })}
                 aria-label={`Quantité de l'ingrédient ${idx + 1}`}
-                className={cn(REGLE, 'w-[76px] flex-shrink-0 text-[16px] text-right pb-1.5 elzevir')}
+                className={cn(REGLE, 'w-[76px] flex-shrink-0 text-[15px] font-medium text-right pb-1.5 tabular-nums')}
               />
               <button
                 type="button"
@@ -290,10 +289,8 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
                   onClick={() => majIngredient(idx, { category: c.id, categorieChoisie: true })}
                   aria-pressed={ing.category === c.id}
                   className={cn(
-                    'flex-1 py-1 rounded-md text-[10px] font-bold border transition-all',
-                    ing.category === c.id
-                      ? 'bg-sage/15 border-sage/50 text-sage'
-                      : 'bg-transparent border-transparent text-muted',
+                    'flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-colors',
+                    ing.category === c.id ? 'bg-sage/15 text-sage' : 'text-muted/70',
                   )}
                 >
                   {c.label}
@@ -306,13 +303,13 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
       <button
         type="button"
         onClick={() => set('ingredients', [...ingredients, { name: '', qty: '', category: 'epicerie' }])}
-        className="w-full mt-1 mb-2 py-3 min-h-[48px] rounded-xl border border-dashed border-text2/35 font-book italic text-[15.5px] text-text2 active:scale-[0.99] transition-transform"
+        className="w-full mt-2 h-12 rounded-2xl bg-black/[0.045] text-[14px] font-semibold text-text2 active:scale-[0.98] transition-transform"
       >
-        Ajouter un ingrédient
+        + Ajouter un ingrédient
       </button>
 
       {/* ── Préparation ─────────────────────────────────────────────────── */}
-      <Fleuron label="Préparation" />
+      <p className={cn(LIBELLE, 'mt-7')}>Préparation</p>
       <StepsEditor steps={steps} onChange={(s) => set('steps', s)} />
     </>
   )
