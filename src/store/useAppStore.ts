@@ -54,7 +54,7 @@ function parseWeekKey(key: string): Date {
 /**
  * Retire le champ `photo` des repas planifiés.
  * Il recopiait la photo de la recette dans chaque créneau du planning sans
- * jamais être affiché — du poids mort dans le document Firestore.
+ * jamais être affiché, du poids mort dans le document Firestore.
  */
 function stripMealPhotos(weekPlans: WeekPlans): WeekPlans {
   const out: WeekPlans = {}
@@ -86,7 +86,7 @@ function buildInitialWeek(): WeekPlan {
 // Référence stable pour une semaine vide (évite les re-renders infinis)
 const EMPTY_WEEK: WeekPlan = buildInitialWeek()
 
-// Ids des recettes livrées avec l'app — sert à distinguer une suppression de
+// Ids des recettes livrées avec l'app, sert à distinguer une suppression de
 // recette par défaut (à mémoriser) d'une suppression de recette perso.
 const DEFAULT_IDS = new Set(DEFAULT_RECIPES.map((r) => r.id))
 
@@ -110,7 +110,7 @@ interface AppState {
   shoppingItems: ShoppingItem[]
   settings: AppSettings
 
-  // Actions — UI
+  // Actions, UI
   setActiveTab: (tab: ActiveTab) => void
   setCurrentDayIdx: (idx: number) => void
   setWeekOffset: (offset: number) => void
@@ -118,14 +118,14 @@ interface AppState {
   closeSheet: () => void
   setSyncStatus: (status: 'connecting' | 'synced' | 'saving' | 'updated' | 'error') => void
 
-  // Actions — Planning
+  // Actions, Planning
   setMeal: (dayIdx: number, slotKey: SlotKey, meal: Meal | null) => void
   clearWeek: () => void
   copyWeekFromOffset: (fromOffset: number) => void
   copyDay: (fromDayIdx: number, toDayIdx: number) => void
   generateShoppingFromPlan: () => void
 
-  // Actions — Recipes
+  // Actions, Recipes
   addRecipe: (recipe: Omit<Recipe, 'id'>) => void
   deleteRecipe: (id: string) => void
   duplicateRecipe: (id: string) => void
@@ -133,7 +133,7 @@ interface AppState {
   toggleFav: (id: string) => void
   resetRecipes: () => void
 
-  // Actions — Shopping
+  // Actions, Shopping
   addShoppingItem: (item: Omit<ShoppingItem, 'id'>) => void
   toggleShoppingItem: (id: string) => void
   removeShoppingItem: (id: string) => void
@@ -142,10 +142,10 @@ interface AppState {
   clearAllItems: () => void
   setAllChecked: (checked: boolean) => void
 
-  // Actions — Settings
+  // Actions, Settings
   updateSettings: (patch: Partial<AppSettings>) => void
 
-  // Actions internes — hydratation depuis Firestore
+  // Actions internes, hydratation depuis Firestore
   _hydrate: (data: FoyerData) => void
   _setPhotos: (photos: Record<string, string>) => void
 }

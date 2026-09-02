@@ -7,7 +7,7 @@ interface Props {
   name: SheetName
   children: ReactNode
   className?: string
-  /** Désactive le scroll interne du sheet — les enfants gèrent leur propre scroll */
+  /** Désactive le scroll interne du sheet, les enfants gèrent leur propre scroll */
   noScroll?: boolean
   /**
    * Fait flotter la poignée par-dessus le contenu au lieu de lui réserver une
@@ -42,7 +42,7 @@ function useKeyboardHeight() {
   return height
 }
 
-/** Durée de l'animation de fermeture — le contenu reste monté le temps de glisser. */
+/** Durée de l'animation de fermeture, le contenu reste monté le temps de glisser. */
 const CLOSE_ANIMATION_MS = 400
 
 export default function BottomSheet({ name, children, className, noScroll, handleOverlay }: Props) {
@@ -122,7 +122,7 @@ export default function BottomSheet({ name, children, className, noScroll, handl
     }
   }, [isOpen, closeSheet, focusables])
 
-  // Swipe to close — ne ferme que si :
+  // Swipe to close, ne ferme que si :
   //  • le touch démarre depuis le handle/header (hors zone scrollable)
   //  • OU depuis la zone scrollable qui est scroll-top=0 et swipe lent + long
   useEffect(() => {

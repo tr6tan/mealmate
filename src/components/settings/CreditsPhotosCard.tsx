@@ -37,7 +37,7 @@ export default function CreditsPhotosCard() {
           {CREDITS_PHOTOS.map((c) => (
             <li key={c.recette} className="text-[10px] text-muted leading-snug">
               <span className="text-text2 font-semibold">{c.recette}</span>
-              {' — '}
+              {', '}
               <a
                 href={urlCommons(c.fichier)}
                 target="_blank"

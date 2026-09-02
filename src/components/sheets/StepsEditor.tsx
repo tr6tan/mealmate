@@ -8,12 +8,12 @@ import { lireDuree } from '@/lib/dureeEtape'
  * étape et une croix pour l'effacer. Quatre manques se payaient à chaque
  * recette un peu longue :
  *
- *  — le texte au-delà de deux lignes défilait dans un champ de 40px, donc on
+ *, le texte au-delà de deux lignes défilait dans un champ de 40px, donc on
  *    ne relisait jamais l'étape en entier ;
- *  — aucun moyen de réordonner : une étape oubliée au milieu obligeait à
+ *, aucun moyen de réordonner : une étape oubliée au milieu obligeait à
  *    retaper tout ce qui suivait ;
- *  — aucun moyen d'insérer, pour la même raison ;
- *  — la durée écrite dans l'étape n'était pas relevée, alors que le mode
+ *, aucun moyen d'insérer, pour la même raison ;
+ *, la durée écrite dans l'étape n'était pas relevée, alors que le mode
  *    cuisine sait la lire et proposer un minuteur. On la montre donc pendant
  *    la saisie : ce qui est reconnu ici sera proposé là-bas.
  */

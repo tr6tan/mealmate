@@ -1,18 +1,17 @@
 import { useRef } from 'react'
 import type { DietaryTag } from '@/types'
 import {
-  CAT_OPTIONS,
   PERIODS,
   TAG_OPTIONS,
-  TIME_OPTIONS,
-  type IngredientForm,
   type RecipeFormValues,
   type SetChamp,
 } from './recipeFormOptions'
 import { PERIOD_LABEL, cn, resizeToBase64 } from '@/lib/utils'
-import { devinerCategorie } from '@/lib/categorieIngredient'
+import { DUREE_MAX, DUREE_MIN, dureePrecedente, dureeSuivante, enMinutes, formaterDuree } from '@/lib/duree'
+import { devinerPeriode, devinerRegimes } from '@/lib/classerRecette'
 import { showToast } from '@/lib/toast'
 import StepsEditor from './StepsEditor'
+import IngredientsEditor from './IngredientsEditor'
 
 /**
  * Champs communs aux formulaires de création et de modification d'une recette.
@@ -42,11 +41,24 @@ interface Props {
 
 export default function RecipeFormFields({ valeurs, set }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { name, time, timeCustom, period, fav, rapide, photo, ingredients, steps, tags, portions } =
-    valeurs
+  const { name, time, period, fav, rapide, photo, ingredients, steps, tags, portions } = valeurs
+  const minutes = enMinutes(time) || 30
 
-  const toggleTag = (tag: DietaryTag) =>
-    set('tags', tags.includes(tag) ? tags.filter((t) => t !== tag) : [...tags, tag])
+  /*
+   * Moment du repas et régimes se devinent tant que la personne n'y a pas
+   * touché. Le drapeau retient ce choix : sans lui, taper un ingrédient de
+   * plus effaçait la correction qu'on venait de faire.
+   */
+  const periodeProposee = devinerPeriode(name)
+  const regimesProposes = devinerRegimes(ingredients, name)
+  const periodeAffichee = valeurs.periodChoisie ? period : periodeProposee
+  const tagsAffiches = valeurs.tagsChoisis ? tags : regimesProposes
+
+  const toggleTag = (tag: DietaryTag) => {
+    const base = tagsAffiches
+    set('tags', base.includes(tag) ? base.filter((t) => t !== tag) : [...base, tag])
+    set('tagsChoisis', true)
+  }
 
   const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -57,22 +69,6 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
       showToast('Erreur lors du chargement de la photo')
     }
   }
-
-  const majIngredient = (idx: number, patch: Partial<IngredientForm>) =>
-    set('ingredients', ingredients.map((ing, i) => (i === idx ? { ...ing, ...patch } : ing)))
-
-  /**
-   * Le nom donne le rayon : on le propose au fur et à mesure de la frappe,
-   * tant que la personne n'a pas choisi elle-même. Viser cinq boutons sous
-   * chaque ingrédient pour dire qu'une tomate est un légume était du travail
-   * que le nom faisait déjà.
-   */
-  const majNomIngredient = (idx: number, nom: string) =>
-    set('ingredients', ingredients.map((ing, i) => (
-      i === idx
-        ? { ...ing, name: nom, category: ing.categorieChoisie ? ing.category : devinerCategorie(nom) }
-        : ing
-    )))
 
   return (
     <>
@@ -90,53 +86,36 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
         className={cn(REGLE, 'text-[22px] font-bold tracking-[-0.02em] pb-2.5 mb-6')}
       />
 
-      {/* ── Temps ───────────────────────────────────────────────────────── */}
-      <p className={LIBELLE}>Temps</p>
-      {!timeCustom ? (
-        <div className="flex flex-wrap gap-2 mb-5">
-          {TIME_OPTIONS.map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => set('time', t)}
-              aria-pressed={time === t}
-              className={cn(PUCE, time === t ? 'bg-terra text-white' : PUCE_OFF)}
-            >
-              {t}
-            </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => {
-              set('timeCustom', true)
-              set('time', '')
-            }}
-            className={cn(PUCE, PUCE_OFF)}
-          >
-            Autre…
-          </button>
-        </div>
-      ) : (
-        <div className="flex gap-2 mb-5 items-end">
-          <input
-            type="text"
-            placeholder="Ex : 25 min"
-            value={time}
-            onChange={(e) => set('time', e.target.value)}
-            autoComplete="off"
-            spellCheck={false}
-            enterKeyHint="done"
-            className={cn(REGLE, 'flex-1 text-[15px] pb-2')}
-          />
-          <button
-            type="button"
-            onClick={() => set('timeCustom', false)}
-            className="px-3.5 h-11 rounded-full bg-black/[0.045] text-text2 text-[13px] font-semibold"
-          >
-            Retour
-          </button>
-        </div>
-      )}
+      {/* ── Temps ─────────────────────────────────────────────────────────
+          Un incrément plutôt qu'une grille de huit puces suivie d'un mode
+          texte libre : trois rangées de boutons pour une valeur qui tient sur
+          une ligne, et un onglet « Autre… » à trouver pour saisir 25 min. Les
+          pas suivent l'usage, de 5 en 5 sous la demi-heure puis de 15 en 15,
+          parce que personne n'annonce une recette en 1h05. */}
+      <p className={LIBELLE}>Temps de préparation</p>
+      <div className="flex items-center gap-3 mb-6">
+        <button
+          type="button"
+          onClick={() => set('time', formaterDuree(dureePrecedente(minutes)))}
+          aria-label="Moins de temps"
+          disabled={minutes <= DUREE_MIN}
+          className="w-11 h-11 rounded-full bg-black/[0.045] text-text1 text-lg font-bold flex items-center justify-center active:scale-95 transition-transform disabled:opacity-30"
+        >
+          −
+        </button>
+        <span className="flex-1 text-center text-[17px] font-bold text-text1 tabular-nums" aria-live="polite">
+          {formaterDuree(minutes)}
+        </span>
+        <button
+          type="button"
+          onClick={() => set('time', formaterDuree(dureeSuivante(minutes)))}
+          aria-label="Plus de temps"
+          disabled={minutes >= DUREE_MAX}
+          className="w-11 h-11 rounded-full bg-black/[0.045] text-text1 text-lg font-bold flex items-center justify-center active:scale-95 transition-transform disabled:opacity-30"
+        >
+          +
+        </button>
+      </div>
 
       {/* ── Portions ────────────────────────────────────────────────────────
           Sans ce champ, l'app supposait toute recette écrite pour deux : une
@@ -205,15 +184,20 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
       </div>
 
       {/* ── Moment et options ───────────────────────────────────────────── */}
-      <p className={LIBELLE}>Moment du repas</p>
+      <p className={LIBELLE}>
+        Moment du repas
+        {!valeurs.periodChoisie && name.trim() && (
+          <span className="ml-1.5 normal-case tracking-normal font-semibold text-sage">proposé</span>
+        )}
+      </p>
       <div className="flex gap-2 mb-5">
         {PERIODS.map((p) => (
           <button
             key={p}
             type="button"
-            onClick={() => set('period', p)}
-            aria-pressed={period === p}
-            className={cn(PUCE, 'flex-1', period === p ? 'bg-terra text-white' : PUCE_OFF)}
+            onClick={() => { set('period', p); set('periodChoisie', true) }}
+            aria-pressed={periodeAffichee === p}
+            className={cn(PUCE, 'flex-1', periodeAffichee === p ? 'bg-terra text-white' : PUCE_OFF)}
           >
             {PERIOD_LABEL[p]}
           </button>
@@ -231,82 +215,32 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
         </label>
       </div>
 
-      <p className={LIBELLE}>Régime</p>
+      <p className={LIBELLE}>
+        Régime
+        {!valeurs.tagsChoisis && regimesProposes.length > 0 && (
+          <span className="ml-1.5 normal-case tracking-normal font-semibold text-sage">proposé</span>
+        )}
+      </p>
       <div className="flex flex-wrap gap-2 mb-2">
         {TAG_OPTIONS.map((t) => (
           <button
             key={t.id}
             type="button"
             onClick={() => toggleTag(t.id)}
-            aria-pressed={tags.includes(t.id)}
-            className={cn(PUCE, tags.includes(t.id) ? 'bg-sage text-white' : PUCE_OFF)}
+            aria-pressed={tagsAffiches.includes(t.id)}
+            className={cn(PUCE, tagsAffiches.includes(t.id) ? 'bg-sage text-white' : PUCE_OFF)}
           >
             {t.label}
           </button>
         ))}
       </div>
 
-      {/* ── Ingrédients ─────────────────────────────────────────────────────
-          Nom à gauche, quantité à droite, comme sur la fiche : la ligne se lit
-          déjà telle qu'elle s'affichera pendant qu'on la tape. Le rayon est
-          deviné d'après le nom et reste modifiable. */}
+      {/* ── Ingrédients ─────────────────────────────────────────────────── */}
       <p className={cn(LIBELLE, 'mt-7')}>Ingrédients</p>
-      <ul>
-        {ingredients.map((ing, idx) => (
-          <li key={idx} className="pb-2.5">
-            <div className="flex items-end gap-2">
-              <input
-                type="text"
-                placeholder="Ingrédient"
-                value={ing.name}
-                onChange={(e) => majNomIngredient(idx, e.target.value)}
-                aria-label={`Ingrédient ${idx + 1}`}
-                className={cn(REGLE, 'flex-1 min-w-0 text-[15px] font-medium pb-1.5')}
-              />
-              <input
-                type="text"
-                placeholder="Qté"
-                value={ing.qty}
-                onChange={(e) => majIngredient(idx, { qty: e.target.value })}
-                aria-label={`Quantité de l'ingrédient ${idx + 1}`}
-                className={cn(REGLE, 'w-[76px] flex-shrink-0 text-[15px] font-medium text-right pb-1.5 tabular-nums')}
-              />
-              <button
-                type="button"
-                onClick={() => set('ingredients', ingredients.filter((_, i) => i !== idx))}
-                aria-label={`Retirer ${ing.name || 'cet ingrédient'}`}
-                className="w-9 h-11 flex items-center justify-center text-text2 flex-shrink-0 active:scale-90 transition-transform"
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
-              </button>
-            </div>
-
-            <div className="flex gap-1 mt-1 pr-9">
-              {CAT_OPTIONS.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => majIngredient(idx, { category: c.id, categorieChoisie: true })}
-                  aria-pressed={ing.category === c.id}
-                  className={cn(
-                    'flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-colors',
-                    ing.category === c.id ? 'bg-sage/15 text-sage' : 'text-muted/70',
-                  )}
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          </li>
-        ))}
-      </ul>
-      <button
-        type="button"
-        onClick={() => set('ingredients', [...ingredients, { name: '', qty: '', category: 'epicerie' }])}
-        className="w-full mt-2 h-12 rounded-2xl bg-black/[0.045] text-[14px] font-semibold text-text2 active:scale-[0.98] transition-transform"
-      >
-        + Ajouter un ingrédient
-      </button>
+      <IngredientsEditor
+        ingredients={ingredients}
+        onChange={(liste) => set('ingredients', liste)}
+      />
 
       {/* ── Préparation ─────────────────────────────────────────────────── */}
       <p className={cn(LIBELLE, 'mt-7')}>Préparation</p>

@@ -89,7 +89,7 @@ export default function MealActionsSheet() {
 
       {/* ── Hero ── */}
       {(meal.isRestaurant === true || meal.name === 'Restaurant') ? (
-        /* Hero restaurant — version carte bleue immersive */
+        /* Hero restaurant, version carte bleue immersive */
         <div
           className="relative -mx-5 -mt-5 mb-5 px-5 pt-8 pb-6 rounded-t-[28px] overflow-hidden"
           style={{
@@ -198,7 +198,7 @@ export default function MealActionsSheet() {
               return (
                 <div key={i} className="rounded-2xl p-2.5 text-center" style={{ background: cat.bg }}>
                   <p className="text-[12px] font-semibold leading-tight mb-0.5 text-text2">{ing.name}</p>
-                  <p className="text-[11px] font-bold" style={{ color: cat.color }}>{scaleQty(ing.qty, portions, recipe?.portions) || '—'}</p>
+                  <p className="text-[11px] font-bold" style={{ color: cat.color }}>{scaleQty(ing.qty, portions, recipe?.portions) || ', '}</p>
                 </div>
               )
             })}

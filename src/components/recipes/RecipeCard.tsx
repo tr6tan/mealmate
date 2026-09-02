@@ -9,7 +9,7 @@ import FoodSticker from '@/components/ui/FoodSticker'
  * Sans carte ni verre : sur cent lignes, cent cadres et cent ombres portées
  * font plus de bruit que d'information. Un filet fin posé sous le texte suffit
  * à séparer deux entrées, et il s'arrête au bord de la vignette pour que l'œil
- * suive la colonne de texte — la convention des listes iOS.
+ * suive la colonne de texte, la convention des listes iOS.
  */
 
 interface Props {

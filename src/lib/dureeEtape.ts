@@ -17,7 +17,7 @@ export interface DureeTrouvee {
 }
 
 const RE_DUREE =
-  /(\d+)\s*(?:à|-|–)?\s*(\d+)?\s*(secondes?|sec\b|s\b|minutes?|min\b|mn\b|heures?|h\b)/gi
+  /(\d+)\s*(?:à|-|, )?\s*(\d+)?\s*(secondes?|sec\b|s\b|minutes?|min\b|mn\b|heures?|h\b)/gi
 
 function enSecondes(valeur: number, unite: string): number {
   const u = unite.toLowerCase()

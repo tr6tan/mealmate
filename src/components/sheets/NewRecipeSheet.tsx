@@ -11,8 +11,8 @@ import { creerSetChamp,
 /**
  * Création d'une recette.
  *
- * L'écran offrait trois chemins concurrents — texte libre, formulaire
- * détaillé, import par URL — présentés en onglets. Trois façons de faire la
+ * L'écran offrait trois chemins concurrents, texte libre, formulaire
+ * détaillé, import par URL, présentés en onglets. Trois façons de faire la
  * même chose, dont il fallait deviner laquelle convenait, et trois fois plus
  * de code à maintenir. Il n'en reste qu'un : on remplit la fiche.
  *
@@ -23,12 +23,13 @@ import { creerSetChamp,
 const VIDE: RecipeFormValues = {
   name: '',
   time: '30 min',
-  timeCustom: false,
   period: 'midi',
   fav: false,
   rapide: false,
   photo: undefined,
-  ingredients: [{ name: '', qty: '', category: 'epicerie' }],
+  // Pas de ligne vide au départ : la barre d'ajout tient ce rôle, et une
+  // ligne sans nom n'invitait qu'à se demander quoi en faire.
+  ingredients: [],
   steps: [''],
   tags: [],
   portions: BASE_PORTIONS,

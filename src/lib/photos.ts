@@ -1,5 +1,5 @@
 /**
- * Photos de recettes — stockées hors du document foyer.
+ * Photos de recettes, stockées hors du document foyer.
  *
  * Un document Firestore plafonne à 1 Mio. Une photo compressée pèse ~40 Ko en
  * base64 : quelques recettes illustrées suffisaient à faire dépasser le doc

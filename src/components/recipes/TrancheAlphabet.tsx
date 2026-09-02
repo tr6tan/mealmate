@@ -7,11 +7,11 @@ import { LETTRES } from '@/lib/initiale'
  * Chercher une recette dans une liste de cent demandait de défiler longtemps
  * ou de connaître son nom d'avance :
  *
- *  — un appui ouvre à la lettre ;
- *  — un glissement du pouce fait défiler l'index en continu, avec la lettre
+ *, un appui ouvre à la lettre ;
+ *, un glissement du pouce fait défiler l'index en continu, avec la lettre
  *    survolée affichée en grand au centre, comme le répertoire d'un
  *    téléphone ;
- *  — les lettres sans recette restent visibles mais pâles : leur absence est
+ *, les lettres sans recette restent visibles mais pâles : leur absence est
  *    une information, et les retirer ferait sauter l'alignement de l'index à
  *    chaque changement de filtre.
  *
@@ -91,7 +91,7 @@ export default function TrancheAlphabet({ presentes, courante, onChoisir }: Prop
    * plateformes, et `hasPointerCapture` renvoyait alors faux : le glissement
    * ne faisait rien du tout, seuls les appuis répondaient. Des écouteurs
    * posés sur la fenêtre pendant le geste fonctionnent partout, et laissent
-   * le doigt dériver hors de la tranche — ce qui arrive constamment sur une
+   * le doigt dériver hors de la tranche, ce qui arrive constamment sur une
    * bande de 24px de large.
    */
   const commencer = (clientY: number) => {

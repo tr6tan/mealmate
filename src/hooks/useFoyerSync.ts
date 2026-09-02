@@ -17,7 +17,7 @@ import {
 } from '@/lib/syncDiff'
 import type { FoyerData, Recipe } from '@/types'
 
-// Timers par champ — une file séparée par slice de données
+// Timers par champ, une file séparée par slice de données
 const _timers: Record<string, ReturnType<typeof setTimeout>> = {}
 // Dernières écritures en attente (pour le flush quand l'app passe en fond)
 const _pendingWrites: Record<string, FieldWrites> = {}

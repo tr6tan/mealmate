@@ -9,8 +9,8 @@ import { PERIOD_LABEL, scaleQty } from '@/lib/utils'
  * Fiche de recette.
  *
  * Trois choses seulement : la photo, ce qu'il faut acheter, ce qu'il faut
- * faire. Les cartes blanches empilées écrasaient la hiérarchie — un
- * ingrédient, une étape et un bouton avaient tous le même poids visuel — et la
+ * faire. Les cartes blanches empilées écrasaient la hiérarchie, un
+ * ingrédient, une étape et un bouton avaient tous le même poids visuel, et la
  * mise en page de livre imprimé qui les a remplacées un temps mettait la
  * typographie devant le contenu.
  *

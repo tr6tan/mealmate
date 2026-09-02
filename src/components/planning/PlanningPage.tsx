@@ -62,7 +62,7 @@ export default function PlanningPage() {
 
   const weekLabel = useMemo(() => {
     const end = getDayFromMonday(monday, 6)
-    return `${monday.getDate()} ${MONTHS[monday.getMonth()]} – ${end.getDate()} ${MONTHS[end.getMonth()]}`
+    return `${monday.getDate()} ${MONTHS[monday.getMonth()]}, ${end.getDate()} ${MONTHS[end.getMonth()]}`
   }, [monday])
 
   const weekTitle = useMemo(() => {
@@ -158,7 +158,7 @@ export default function PlanningPage() {
                 className={cardClass}
                 style={isToday ? { background: 'rgb(var(--c-terra))', boxShadow: '0 12px 32px rgba(0,24,168,0.35)' } : undefined}
               >
-                {/* Day header – tap to collapse */}
+                {/* Day header, tap to collapse */}
                 <div
                   className="flex items-center gap-3 mb-3 cursor-pointer select-none active:opacity-70 transition-opacity"
                   onClick={toggleDay}
@@ -193,7 +193,7 @@ export default function PlanningPage() {
                   </svg>
                 </div>
 
-                {/* Meal slots – 2-col grid */}
+                {/* Meal slots, 2-col grid */}
                 <div className="grid grid-cols-2 gap-2">
                   {([
                     { slotKey: 'midi' as const, label: 'Déjeuner', meal: midiMeal },

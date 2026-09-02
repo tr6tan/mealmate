@@ -5,19 +5,19 @@ import type { Recipe } from '@/types'
  *
  * Les 100 recettes portaient toutes une URL Unsplash, mais l'ensemble ne
  * tenait pas : 11 URL rendaient 404 (18 recettes sans image), 22 photos
- * étaient partagées par plusieurs plats — une seule servait pour cinq
+ * étaient partagées par plusieurs plats, une seule servait pour cinq
  * poulets, une autre pour le hachis Parmentier, le gratin dauphinois, le
- * parmentier de canard et le rösti — et une bonne vingtaine montraient autre
+ * parmentier de canard et le rösti, et une bonne vingtaine montraient autre
  * chose que leur recette : des balances de justice pour les cannelloni, deux
  * truites crues pour la tartiflette, des spaghettis pour le gratin de
  * courgettes.
  *
  * Les 63 entrées ci-dessous ont été regardées une par une :
  *
- *  — 33 photos Unsplash conservées, celles qui montrent bien leur plat ;
- *  — 30 photos de Wikimedia Commons pour les classiques que Commons documente
+ *, 33 photos Unsplash conservées, celles qui montrent bien leur plat ;
+ *, 30 photos de Wikimedia Commons pour les classiques que Commons documente
  *    bien et qu'Unsplash rendait mal. Moins léchées qu'une photo de studio,
- *    mais justes, et stables — Commons est une archive, pas un flux.
+ *    mais justes, et stables, Commons est une archive, pas un flux.
  *
  * Les 37 recettes absentes de cette table n'ont pas de photo : `photo` vaut
  * alors `undefined` et l'app retombe sur le sticker illustré, qui existe pour
@@ -131,7 +131,7 @@ export const DEFAULT_RECIPES: Recipe[] = [
       { name: 'Beurre', qty: '50g', category: 'cremerie' },
       { name: 'Sucre', qty: '2 c.à.s', category: 'epicerie' },
     ],
-    steps: ['Mélanger farine, sucre et sel.', 'Ajouter les œufs battus et le lait progressivement.', 'Incorporer le beurre fondu.', 'Cuire dans le gaufrier 4–5 min.'],
+    steps: ['Mélanger farine, sucre et sel.', 'Ajouter les œufs battus et le lait progressivement.', 'Incorporer le beurre fondu.', 'Cuire dans le gaufrier 4, 5 min.'],
   },
   {
     id: 'crepes',
@@ -579,7 +579,7 @@ export const DEFAULT_RECIPES: Recipe[] = [
       'Préchauffer le four à 220°C.',
       'Étaler la pâte, napper de sauce tomate.',
       'Répartir mozzarella, jambon et champignons.',
-      'Enfourner 12–15 min jusqu\'à dorure.',
+      'Enfourner 12, 15 min jusqu\'à dorure.',
     ],
   },
   {
@@ -1193,7 +1193,7 @@ export const DEFAULT_RECIPES: Recipe[] = [
       'Mélanger crème fraîche et fromage blanc, saler et muscade.',
       'Étaler sur la pâte fine.',
       'Répartir lardons et oignons émincés finement.',
-      'Cuire 10–12 min jusqu\'à ce que les bords soient dorés.',
+      'Cuire 10, 12 min jusqu\'à ce que les bords soient dorés.',
     ],
   },
   {
@@ -2336,7 +2336,7 @@ export const DEFAULT_RECIPES: Recipe[] = [
       'Faire revenir l\'oignon et l\'ail, ajouter le bœuf haché.',
       'Incorporer la chair des courgettes et la sauce tomate, cuire 10 min.',
       'Remplir les courgettes, parsemer de gruyère.',
-      'Enfourner 25–30 min.',
+      'Enfourner 25, 30 min.',
     ],
   },
   {

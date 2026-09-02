@@ -238,7 +238,7 @@ export default function AddMealSheet() {
           ))}
         </div>
 
-        {/* Barre de recherche — visible uniquement onglet Recette */}
+        {/* Barre de recherche, visible uniquement onglet Recette */}
         <div className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-2xl mb-1${tab !== 'recette' ? ' hidden' : ''}`} style={{ background: 'rgba(0,0,0,0.05)' }}>
             <svg className="w-4 h-4 text-muted flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input
@@ -255,7 +255,7 @@ export default function AddMealSheet() {
           </div>
       </div>
 
-      {/* ── Panels — tous rendus, visibilité par hidden ── */}
+      {/* ── Panels, tous rendus, visibilité par hidden ── */}
 
       {/* Recette */}
       <div className={`flex-1 overflow-y-auto overscroll-contain no-scrollbar${tab !== 'recette' ? ' hidden' : ''}`} style={{ touchAction: 'pan-y' }}>

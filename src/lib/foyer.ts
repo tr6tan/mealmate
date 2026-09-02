@@ -12,7 +12,7 @@
  */
 import { nanoid } from '@/lib/nanoid'
 
-/** Foyer historique — défaut pour les installations antérieures au multi-foyer. */
+/** Foyer historique, défaut pour les installations antérieures au multi-foyer. */
 const LEGACY_FOYER_ID = 'c1cfad8f-ddba-4518-a320-7776f3c0f5f7'
 
 const STORAGE_KEY = 'mealmate-foyer-id'
@@ -20,7 +20,7 @@ const QUERY_PARAM = 'foyer'
 
 /**
  * Un id de foyer plausible : évite qu'une URL bricolée pointe n'importe où.
- * La borne basse (16) est la même que dans firestore.rules — un id court
+ * La borne basse (16) est la même que dans firestore.rules, un id court
  * serait devinable par énumération.
  */
 function isValidFoyerId(id: string | null | undefined): id is string {
@@ -47,7 +47,7 @@ let _cached: string | null = null
 
 /**
  * Id du foyer courant, par ordre de priorité :
- *   1. `?foyer=…` dans l'URL (lien d'invitation) — mémorisé au passage
+ *   1. `?foyer=…` dans l'URL (lien d'invitation), mémorisé au passage
  *   2. le dernier foyer utilisé sur cet appareil
  *   3. le foyer historique
  */

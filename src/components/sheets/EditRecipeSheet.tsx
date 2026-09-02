@@ -6,7 +6,6 @@ import { BASE_PORTIONS } from '@/lib/utils'
 import { deletePhoto } from '@/lib/photos'
 import RecipeFormFields from './RecipeFormFields'
 import {
-  TIME_OPTIONS,
   creerSetChamp,
   nettoyerIngredients,
   type RecipeFormValues,
@@ -23,7 +22,6 @@ import {
 const VIDE: RecipeFormValues = {
   name: '',
   time: '',
-  timeCustom: false,
   period: 'midi',
   fav: false,
   rapide: false,
@@ -54,7 +52,6 @@ export default function EditRecipeSheet() {
     setValeurs({
       name: recipe.name,
       time: recipe.time,
-      timeCustom: !TIME_OPTIONS.includes(recipe.time),
       period: recipe.period,
       fav: recipe.fav,
       rapide: recipe.rapide,

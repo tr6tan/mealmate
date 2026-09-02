@@ -12,7 +12,7 @@ import { CATALOG, type CatalogItem } from '@/data/shoppingCatalog'
 
 /**
  * Dictionnaire de mots-clés par catégorie.
- * Le stemming + score gèrent pluriels, accents et fautes de frappe —
+ * Le stemming + score gèrent pluriels, accents et fautes de frappe -
  * pas besoin de lister toutes les variantes.
  */
 const KEYWORDS: Record<ShoppingCategory, string[]> = {

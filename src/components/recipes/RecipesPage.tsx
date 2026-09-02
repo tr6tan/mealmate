@@ -10,21 +10,21 @@ import TrancheAlphabet from './TrancheAlphabet'
 /**
  * La liste des recettes.
  *
- * L'écran a porté jusqu'à quatre rangs de commandes — titre, bouton pleine
- * largeur, recherche, trois onglets de classement, six filtres — soit 308px
+ * L'écran a porté jusqu'à quatre rangs de commandes, titre, bouton pleine
+ * largeur, recherche, trois onglets de classement, six filtres, soit 308px
  * avant la première recette, la moitié d'un écran de téléphone. Il en reste
  * deux : la recherche, et une rangée de filtres.
  *
  * Ce qui a disparu et pourquoi :
  *
- *  — les onglets de classement. L'ordre alphabétique est le seul qui se
+ *, les onglets de classement. L'ordre alphabétique est le seul qui se
  *    combine avec l'index de lettres, et c'est l'index qui remplace le tri.
  *    « Par moment » et « Les miennes » n'étaient pas des ordres mais des
  *    filtres : ils ont rejoint la rangée de filtres, où ils étaient chez eux ;
- *  — le bouton bleu pleine largeur. Créer une recette se fait une fois par
+ *, le bouton bleu pleine largeur. Créer une recette se fait une fois par
  *    semaine, chercher une recette dix fois par jour : l'action passe en tête
  *    de titre, où elle reste atteignable au pouce sans occuper un rang ;
- *  — les cartes de verre autour de chaque ligne, remplacées par un filet.
+ *, les cartes de verre autour de chaque ligne, remplacées par un filet.
  */
 
 type FiltreKey = 'maison' | 'fav' | 'rapide' | Period | DietaryTag
@@ -152,7 +152,7 @@ export default function RecipesPage() {
    *
    * Mesurée sur les rectangles et non sur `offsetTop` : celui-ci se compte
    * depuis le premier ancêtre positionné, qui n'est pas le conteneur, si bien
-   * que la lettre marquée dérivait de deux sections — on touchait S, l'index
+   * que la lettre marquée dérivait de deux sections, on touchait S, l'index
    * marquait Q.
    */
   const ecartDansLaBoite = (el: HTMLElement, boite: HTMLElement) =>
@@ -165,7 +165,7 @@ export default function RecipesPage() {
    * `content-visibility: auto`, donc celles qui sont hors écran ne sont pas
    * disposées et leur hauteur n'est qu'estimée : viser S atterrissait deux
    * sections plus haut, sur Q, et l'écart grandissait avec la distance. Une
-   * fois le contenu réellement disposé, on corrige — jusqu'à six fois, pour
+   * fois le contenu réellement disposé, on corrige, jusqu'à six fois, pour
    * ne jamais boucler.
    *
    * Le défilement est instantané et non animé : c'est un index, on veut la

@@ -30,7 +30,7 @@ export default function AppShell({ nav, children }: Props) {
         paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
-      {/* Contenu — chaque page gère son propre scroll */}
+      {/* Contenu, chaque page gère son propre scroll */}
       <main className="flex-1 overflow-hidden flex flex-col h-full">
         {nav}
       </main>

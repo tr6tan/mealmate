@@ -16,8 +16,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig)
 
 // Persistance offline native Firestore (IndexedDB)
-// — Les écritures hors ligne sont mises en file et envoyées dès le retour de connexion
-// — Les lectures fonctionnent depuis le cache même sans réseau
+//, Les écritures hors ligne sont mises en file et envoyées dès le retour de connexion
+//, Les lectures fonctionnent depuis le cache même sans réseau
 export const db = initializeFirestore(app, {
   localCache: persistentLocalCache({
     tabManager: persistentMultipleTabManager(),

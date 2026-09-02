@@ -1,4 +1,4 @@
-/** Tiny nanoid-like function — no external dependency */
+/** Tiny nanoid-like function, no external dependency */
 export function nanoid(size = 21): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   let id = ''

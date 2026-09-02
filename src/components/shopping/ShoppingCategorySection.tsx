@@ -90,7 +90,7 @@ function ShoppingCard({ item }: { item: ShoppingItem }) {
         style={{ opacity: item.checked ? 1 : 0 }}
       />
 
-      {/* Sticker – animation stamp au cochage, scale-down + grisé quand coché */}
+      {/* Sticker, animation stamp au cochage, scale-down + grisé quand coché */}
       <div
         className={stamping ? 'animate-sticker-stamp' : 'transition-all duration-300'}
         style={!stamping ? {
@@ -112,7 +112,7 @@ function ShoppingCard({ item }: { item: ShoppingItem }) {
         {item.name}
       </span>
 
-      {/* Quantité — tap pour éditer */}
+      {/* Quantité, tap pour éditer */}
       {editingQty ? (
         <input
           ref={inputRef}
@@ -142,7 +142,7 @@ function ShoppingCard({ item }: { item: ShoppingItem }) {
         </button>
       )}
 
-      {/* Badge coché — pop animé */}
+      {/* Badge coché, pop animé */}
       {item.checked && (
         <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-success flex items-center justify-center shadow-sm ring-2 ring-card animate-check-pop">
           <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">

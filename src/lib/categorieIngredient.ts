@@ -6,7 +6,7 @@ import type { ShoppingCategory } from '@/types'
  * Le formulaire demandait de choisir la catégorie à la main pour chaque
  * ingrédient : cinq boutons à viser sous chaque ligne, alors que le nom la
  * donne presque toujours. Elle est désormais proposée dès la saisie du nom, et
- * reste modifiable — c'est une proposition, pas une décision.
+ * reste modifiable, c'est une proposition, pas une décision.
  *
  * Extrait de `parseRecipe`, supprimé avec le mode « coller un texte ».
  */

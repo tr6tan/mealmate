@@ -30,7 +30,7 @@ export default function ShoppingPage() {
   const prevPctRef = useRef(0)
   useEffect(() => {
     if (pct === 100 && total > 0 && prevPctRef.current < 100) {
-      // Salve 1 — deux canons latéraux simultanés
+      // Salve 1, deux canons latéraux simultanés
       const fire = (originX: number, angle: number) =>
         confetti({
           particleCount: 60,
@@ -47,7 +47,7 @@ export default function ShoppingPage() {
       fire(0.15, 65)
       fire(0.85, 115)
 
-      // Salve 2 — rafale centrale 200ms après
+      // Salve 2, rafale centrale 200ms après
       setTimeout(() => {
         confetti({
           particleCount: 90,
@@ -61,7 +61,7 @@ export default function ShoppingPage() {
         })
       }, 200)
 
-      // Salve 3 — étoiles dorées 400ms après
+      // Salve 3, étoiles dorées 400ms après
       setTimeout(() => {
         confetti({
           particleCount: 30,

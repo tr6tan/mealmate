@@ -3,15 +3,15 @@
  *
  * Sert à l'index alphabétique du livret. Trois pièges de la langue :
  *
- *  — les accents doivent se ranger sous la lettre nue, sinon « Œufs mimosa »
+ *, les accents doivent se ranger sous la lettre nue, sinon « Œufs mimosa »
  *    et « Épinards » se retrouvent après Z, où personne ne les cherche ;
- *  — les ligatures ne se décomposent pas par NFD : « Œ » exige sa propre
+ *, les ligatures ne se décomposent pas par NFD : « Œ » exige sa propre
  *    règle, comme pour les rayons et les stickers ;
- *  — un nom qui commence par un chiffre ou un symbole n'a pas de lettre : il
+ *, un nom qui commence par un chiffre ou un symbole n'a pas de lettre : il
  *    va sous « # », en fin d'index.
  */
 
-/** Lettre sous laquelle une recette est classée : A–Z, ou « # ». */
+/** Lettre sous laquelle une recette est classée : A, Z, ou « # ». */
 export function initiale(nom: string): string {
   const nu = (nom ?? '')
     .trim()

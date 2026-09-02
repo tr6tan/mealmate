@@ -2,32 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Design tokens — Light ── */
+/* ── Design tokens, Light ── */
 /* Palette : ios blue #0018A8 · warm beige #F4F1EA · retro green #31603D · saffron #F5C065 */
 :root {
-  --c-bg:          244 241 234; /* #F4F1EA — beige chaud */
+  --c-bg:          244 241 234; /* #F4F1EA, beige chaud */
   --c-card:        255 255 255; /* #FFFFFF */
-  --c-sep:         224 228 240; /* #E0E4F0 — bleu-gris doux */
-  --c-border:      200 205 223; /* #C8CDDF — bleu-gris medium */
-  --c-text1:        13  17  23; /* #0D1117 — quasi-noir cool */
-  --c-text2:        61  74 110; /* #3D4A6E — bleu slate */
-  --c-muted:       100 108 136; /* #646C88 — bleu muted (4.6:1 sur le beige, WCAG AA) */
-  --c-terra:         0  24 168; /* #0018A8 — ios blue */
-  --c-terra-light: 220 224 255; /* #DCE0FF — bleu très clair */
-  --c-terra-dark:    0  18 140; /* #00128C — bleu foncé */
-  --c-sage:         49  96  61; /* #31603D — retro green */
-  --c-sage-light:  185 215 190; /* #B9D7BE — vert sauge clair */
-  --c-morning:     245 192 101; /* #F5C065 — saffron (petit-déj) */
-  --c-evening:     110  67  61; /* #6E433D — russet (dîner) */
-  --c-danger:      192  48  74; /* #C0304A — rouge erreur/suppression */
-  --c-danger-light:253 232 240; /* #FDE8F0 — fond danger clair */
-  --c-success:      46 125  50; /* #2E7D32 — vert succès */
-  --c-success-light:232 245 233; /* #E8F5E9 — fond succès clair */
+  --c-sep:         224 228 240; /* #E0E4F0, bleu-gris doux */
+  --c-border:      200 205 223; /* #C8CDDF, bleu-gris medium */
+  --c-text1:        13  17  23; /* #0D1117, quasi-noir cool */
+  --c-text2:        61  74 110; /* #3D4A6E, bleu slate */
+  --c-muted:       100 108 136; /* #646C88, bleu muted (4.6:1 sur le beige, WCAG AA) */
+  --c-terra:         0  24 168; /* #0018A8, ios blue */
+  --c-terra-light: 220 224 255; /* #DCE0FF, bleu très clair */
+  --c-terra-dark:    0  18 140; /* #00128C, bleu foncé */
+  --c-sage:         49  96  61; /* #31603D, retro green */
+  --c-sage-light:  185 215 190; /* #B9D7BE, vert sauge clair */
+  --c-morning:     245 192 101; /* #F5C065, saffron (petit-déj) */
+  --c-evening:     110  67  61; /* #6E433D, russet (dîner) */
+  --c-danger:      192  48  74; /* #C0304A, rouge erreur/suppression */
+  --c-danger-light:253 232 240; /* #FDE8F0, fond danger clair */
+  --c-success:      46 125  50; /* #2E7D32, vert succès */
+  --c-success-light:232 245 233; /* #E8F5E9, fond succès clair */
   --c-accent:        0  24 168; /* texte accentué : ici identique à terra (11:1) */
   --c-fill:        255 255 255; /* surface de contrôle sur une carte */
 }
 
-/* ── Design tokens — Dark ── */
+/* ── Design tokens, Dark ── */
 .dark {
   --c-bg:     28  28  30; /* #1C1C1E */
   --c-card:   44  44  46; /* #2C2C2E */
@@ -36,11 +36,11 @@
   --c-text1:  242 242 247; /* #F2F2F7 */
   --c-text2:  199 199 204; /* #C7C7CC */
   --c-muted:  142 142 147; /* #8E8E93 */
-  --c-danger:      255  69  58; /* #FF453A — danger iOS dark */
+  --c-danger:      255  69  58; /* #FF453A, danger iOS dark */
   --c-danger-light: 50  20  25; /* dark bg danger */
-  --c-success:      48 209  88; /* #30D158 — success iOS dark */
+  --c-success:      48 209  88; /* #30D158, success iOS dark */
   --c-success-light: 20  50  30; /* dark bg success */
-  --c-accent:      138 152 255; /* #8A98FF — 6.5:1 sur le fond sombre */
+  --c-accent:      138 152 255; /* #8A98FF, 6.5:1 sur le fond sombre */
   --c-fill:         96 112 170; /* surface de contrôle : sombre mais détachée du fond */
   /* terra sert de fond de bouton : on l'éclaircit un peu pour qu'il se
      détache du noir sans casser le blanc posé dessus. */
@@ -53,37 +53,37 @@
   --c-evening:     193 138 128;
 }
 
-/* ── Design tokens — Ocean (thème alternatif) ── */
+/* ── Design tokens, Ocean (thème alternatif) ── */
 /* Palette : ocean blue #2563EB · soft gray #F1F5F9 · teal #0D9488 · coral #F97316 · slate #475569 */
 .theme-ocean {
-  --c-bg:          241 245 249; /* #F1F5F9 — soft gray */
-  --c-card:        255 255 255; /* #FFFFFF — blanc pur */
-  --c-sep:         226 232 240; /* #E2E8F0 — séparateur gris clair */
-  --c-border:      203 213 225; /* #CBD5E1 — bordure slate */
-  --c-text1:        15  23  42; /* #0F172A — slate 900 */
-  --c-text2:        71  85 105; /* #475569 — slate 600 */
-  --c-muted:        94 109 131; /* #5E6D83 — slate assombri (4.8:1 sur le fond, WCAG AA) */
-  --c-terra:        37  99 235; /* #2563EB — ocean blue */
-  --c-terra-light: 219 234 254; /* #DBEAFE — blue 100 */
-  --c-terra-dark:   29  78 216; /* #1D4ED8 — blue 700 */
-  --c-sage:         13 148 136; /* #0D9488 — teal */
-  --c-sage-light:  204 251 241; /* #CCFBF1 — teal 100 */
-  --c-morning:     251 191  36; /* #FBBF24 — amber */
-  --c-evening:      71  85 105; /* #475569 — slate 600 */
-  --c-accent:       29  78 216; /* #1D4ED8 — blue 700 */
+  --c-bg:          241 245 249; /* #F1F5F9, soft gray */
+  --c-card:        255 255 255; /* #FFFFFF, blanc pur */
+  --c-sep:         226 232 240; /* #E2E8F0, séparateur gris clair */
+  --c-border:      203 213 225; /* #CBD5E1, bordure slate */
+  --c-text1:        15  23  42; /* #0F172A, slate 900 */
+  --c-text2:        71  85 105; /* #475569, slate 600 */
+  --c-muted:        94 109 131; /* #5E6D83, slate assombri (4.8:1 sur le fond, WCAG AA) */
+  --c-terra:        37  99 235; /* #2563EB, ocean blue */
+  --c-terra-light: 219 234 254; /* #DBEAFE, blue 100 */
+  --c-terra-dark:   29  78 216; /* #1D4ED8, blue 700 */
+  --c-sage:         13 148 136; /* #0D9488, teal */
+  --c-sage-light:  204 251 241; /* #CCFBF1, teal 100 */
+  --c-morning:     251 191  36; /* #FBBF24, amber */
+  --c-evening:      71  85 105; /* #475569, slate 600 */
+  --c-accent:       29  78 216; /* #1D4ED8, blue 700 */
   --c-fill:        255 255 255;
 }
 .theme-ocean.dark {
-  --c-bg:          15  23  42;  /* #0F172A — slate 900 */
-  --c-card:        30  41  59;  /* #1E293B — slate 800 */
-  --c-sep:         51  65  85;  /* #334155 — slate 700 */
-  --c-border:      71  85 105;  /* #475569 — slate 600 */
-  --c-text1:       248 250 252; /* #F8FAFC — slate 50 */
-  --c-text2:       203 213 225; /* #CBD5E1 — slate 300 */
-  --c-muted:       148 163 184; /* #94A3B8 — slate 400 */
-  --c-accent:      125 185 255; /* #7DB9FF — 8.7:1 sur le fond slate 900 */
+  --c-bg:          15  23  42;  /* #0F172A, slate 900 */
+  --c-card:        30  41  59;  /* #1E293B, slate 800 */
+  --c-sep:         51  65  85;  /* #334155, slate 700 */
+  --c-border:      71  85 105;  /* #475569, slate 600 */
+  --c-text1:       248 250 252; /* #F8FAFC, slate 50 */
+  --c-text2:       203 213 225; /* #CBD5E1, slate 300 */
+  --c-muted:       148 163 184; /* #94A3B8, slate 400 */
+  --c-accent:      125 185 255; /* #7DB9FF, 8.7:1 sur le fond slate 900 */
   --c-fill:         94 116 150; /* slate éclairci, visible sur le fond slate 900 */
-  --c-terra:        37  99 235; /* #2563EB — ocean blue */
+  --c-terra:        37  99 235; /* #2563EB, ocean blue */
   --c-terra-light:  30  58 110;
   --c-sage:         45 212 191; /* teal 300 */
   --c-sage-light:   19  78  74;
@@ -129,8 +129,8 @@
     /*
      * ── MealMate type stack ─────────────────────────────────
      * Display : Plus Jakarta Sans variable (Google Fonts)
-     *   — variable wght 200–800, alternate cv01/cv04 actifs
-     *   — tracking négatif sur les gros titres (signature iOS SF Pro)
+     *, variable wght 200, 800, alternate cv01/cv04 actifs
+     *, tracking négatif sur les gros titres (signature iOS SF Pro)
      * Fallback : -apple-system → SF Pro sur iOS/macOS
      *            BlinkMacSystemFont → SF Pro sur Chrome macOS
      * ────────────────────────────────────────────────────────
@@ -149,7 +149,7 @@
     /* Pas de `background-color` ici : cette seconde règle `body` écrasait le
        fond déclaré plus haut et laissait le body transparent, donc le fond
        par défaut du navigateur (blanc ou gris) visible partout où le shell
-       ne peint pas — notamment sous la zone de gestes. */
+       ne peint pas, notamment sous la zone de gestes. */
     color: rgb(var(--c-text1));
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -223,7 +223,7 @@
    optical sizing, single-story 'a' et 'g' via cv01/cv04.
    ─────────────────────────────────────────────────── */
 
-/* Display — chiffres héroïques, splash, logo */
+/* Display, chiffres héroïques, splash, logo */
 .type-display {
   font-size: clamp(2rem, 7vw, 3.5rem);
   font-weight: 800;
@@ -232,7 +232,7 @@
   font-feature-settings: 'cv01' 1, 'cv04' 1, 'ss01' 1, 'tnum' 0;
 }
 
-/* Title 1 — H1 de page */
+/* Title 1, H1 de page */
 .type-title1 {
   font-size: 1.625rem;   /* 26px */
   font-weight: 700;
@@ -240,7 +240,7 @@
   letter-spacing: -0.032em;
 }
 
-/* Title 2 — section header, carte principale */
+/* Title 2, section header, carte principale */
 .type-title2 {
   font-size: 1.25rem;    /* 20px */
   font-weight: 700;
@@ -248,7 +248,7 @@
   letter-spacing: -0.026em;
 }
 
-/* Headline — titre de card, sheet */
+/* Headline, titre de card, sheet */
 .type-headline {
   font-size: 1.0625rem;  /* 17px */
   font-weight: 600;
@@ -256,7 +256,7 @@
   letter-spacing: -0.018em;
 }
 
-/* Body — texte courant */
+/* Body, texte courant */
 .type-body {
   font-size: 1rem;       /* 16px */
   font-weight: 400;
@@ -264,7 +264,7 @@
   letter-spacing: -0.01em;
 }
 
-/* Callout — info secondaire importante */
+/* Callout, info secondaire importante */
 .type-callout {
   font-size: 0.9375rem;  /* 15px */
   font-weight: 500;
@@ -272,7 +272,7 @@
   letter-spacing: -0.012em;
 }
 
-/* Subhead — sous-titre, label de section */
+/* Subhead, sous-titre, label de section */
 .type-subhead {
   font-size: 0.875rem;   /* 14px */
   font-weight: 600;
@@ -280,7 +280,7 @@
   letter-spacing: -0.008em;
 }
 
-/* Footnote — compteurs, méta, secondary info */
+/* Footnote, compteurs, méta, secondary info */
 .type-footnote {
   font-size: 0.8125rem;  /* 13px */
   font-weight: 500;
@@ -288,7 +288,7 @@
   letter-spacing: 0;
 }
 
-/* Caption — labels très petits, badges */
+/* Caption, labels très petits, badges */
 .type-caption {
   font-size: 0.6875rem;  /* 11px */
   font-weight: 600;
@@ -297,7 +297,7 @@
   text-transform: uppercase;
 }
 
-/* Numeric — chiffres tabulaires (stats, timers) */
+/* Numeric, chiffres tabulaires (stats, timers) */
 .type-numeric {
   font-variant-numeric: tabular-nums;
   font-feature-settings: 'tnum' 1, 'cv01' 1;
@@ -432,7 +432,7 @@
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
-/* Shopping – badge coché */
+/* Shopping, badge coché */
 @keyframes check-pop {
   0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
   60%  { transform: scale(1.35) rotate(6deg); opacity: 1; }
@@ -443,7 +443,7 @@
   animation: check-pop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
-/* Shopping – sticker "tampon" au moment du cochage */
+/* Shopping, sticker "tampon" au moment du cochage */
 @keyframes sticker-stamp {
   0%   { transform: scale(1)    rotate(0deg); }
   20%  { transform: scale(1.22) rotate(-7deg); }

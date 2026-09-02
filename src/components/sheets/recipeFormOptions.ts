@@ -8,8 +8,6 @@ import type { DietaryTag, Ingredient, Period, ShoppingCategory } from '@/types'
 
 export const PERIODS: Period[] = ['pdej', 'midi', 'soir']
 
-export const TIME_OPTIONS = ['5 min', '10 min', '15 min', '20 min', '30 min', '45 min', '1h', '1h30']
-
 export const CAT_OPTIONS: { id: ShoppingCategory; label: string }[] = [
   { id: 'legumes', label: 'Lég.' },
   { id: 'viandes', label: 'Vde.' },
@@ -47,7 +45,6 @@ export function nettoyerIngredients(liste: IngredientForm[]): Ingredient[] {
 export interface RecipeFormValues {
   name: string
   time: string
-  timeCustom: boolean
   period: Period
   fav: boolean
   rapide: boolean
@@ -57,6 +54,13 @@ export interface RecipeFormValues {
   tags: DietaryTag[]
   /** Convives auxquels les quantités saisies se rapportent. */
   portions: number
+  /**
+   * Vrai dès que la personne a désigné elle-même le moment du repas ou les
+   * régimes. Sans ces drapeaux, la devinette repartait à chaque frappe et
+   * effaçait la correction qu'on venait de faire.
+   */
+  periodChoisie?: boolean
+  tagsChoisis?: boolean
 }
 
 /**
@@ -64,7 +68,7 @@ export interface RecipeFormValues {
  *
  * Accepte une fonction en plus d'une valeur : `set('portions', p => p + 1)`.
  * Sans cela, deux appuis rapprochés sur « + » lisaient tous deux la même
- * valeur capturée au rendu et n'en comptaient qu'un — les portions passaient
+ * valeur capturée au rendu et n'en comptaient qu'un, les portions passaient
  * de 2 à 3 au lieu de 4.
  */
 export type SetChamp = <K extends keyof RecipeFormValues>(
