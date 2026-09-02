@@ -276,7 +276,13 @@ export function fuzzyScore(query: string, target: string): number {
       if (qw.length >= 3 && tw.startsWith(qw)) { bestWord = Math.max(bestWord, 55); continue }
       const d = levenshtein(qw, tw)
       if (d <= 1 && qw.length >= 3) bestWord = Math.max(bestWord, 40)
-      else if (d <= 2 && qw.length >= 5) bestWord = Math.max(bestWord, 20)
+      /*
+       * Deux fautes ne sont tolérées qu'à partir de sept lettres. Le seuil
+       * était à cinq, où deux substitutions laissent passer 40 % du mot :
+       * chercher « tarte » remontait « Chili con carne » (carne, distance 2)
+       * juste à côté de « Tarte flambée ».
+       */
+      else if (d <= 2 && qw.length >= 7) bestWord = Math.max(bestWord, 20)
     }
     // Aussi tester contre le target entier (ex: "bolo" dans "bolognaise")
     if (bestWord < 60 && t.includes(qw)) bestWord = Math.max(bestWord, 50)
