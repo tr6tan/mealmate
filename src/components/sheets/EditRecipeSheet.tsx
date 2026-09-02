@@ -5,7 +5,12 @@ import { showToast } from '@/lib/toast'
 import { BASE_PORTIONS } from '@/lib/utils'
 import { deletePhoto } from '@/lib/photos'
 import RecipeFormFields from './RecipeFormFields'
-import { TIME_OPTIONS, type RecipeFormValues } from './recipeFormOptions'
+import {
+  TIME_OPTIONS,
+  creerSetChamp,
+  nettoyerIngredients,
+  type RecipeFormValues,
+} from './recipeFormOptions'
 
 /**
  * Modification d'une recette.
@@ -41,8 +46,7 @@ export default function EditRecipeSheet() {
   const [notes, setNotes] = useState('')
   const [rating, setRating] = useState<number | undefined>(undefined)
 
-  const set = <K extends keyof RecipeFormValues>(clef: K, valeur: RecipeFormValues[K]) =>
-    setValeurs((v) => ({ ...v, [clef]: valeur }))
+  const set = creerSetChamp(setValeurs)
 
   // Pré-remplissage à chaque ouverture
   useEffect(() => {
@@ -74,7 +78,7 @@ export default function EditRecipeSheet() {
     if (!valeurs.photo && photos[recipe.id]) void deletePhoto(recipe.id)
 
     const etapes = valeurs.steps.map((s) => s.trim()).filter(Boolean)
-    const ingredients = valeurs.ingredients.filter((i) => i.name.trim())
+    const ingredients = nettoyerIngredients(valeurs.ingredients)
 
     updateRecipe(recipe.id, {
       name: valeurs.name.trim(),
@@ -100,10 +104,15 @@ export default function EditRecipeSheet() {
   if (!recipe) return <BottomSheet name="edit-recipe"><div /></BottomSheet>
 
   return (
-    <BottomSheet name="edit-recipe" className="max-h-[92dvh]">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-[17px] font-extrabold text-text1">Modifier la recette</h2>
-        <button onClick={closeSheet} aria-label="Fermer" className="w-11 h-11 flex items-center justify-center text-muted">
+    <BottomSheet name="edit-recipe" className="!px-0 !pt-0 !bg-transparent max-h-[92dvh]">
+      <div className="papier min-h-full rounded-t-[28px] px-6 pt-5">
+      <div className="flex items-start justify-between mb-6">
+        <span className="w-11" aria-hidden />
+        <div className="text-center flex-1">
+          <h2 className="font-book capitales text-[12px] text-text2">Modifier la recette</h2>
+          <div className="filet-double w-[64%] mx-auto mt-2" aria-hidden />
+        </div>
+        <button onClick={closeSheet} aria-label="Fermer" className="w-11 h-11 flex items-center justify-center text-muted -mt-2.5">
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
         </button>
       </div>
@@ -111,7 +120,7 @@ export default function EditRecipeSheet() {
       <RecipeFormFields valeurs={valeurs} set={set} />
 
       {/* Notes */}
-      <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-2">
+      <p className="font-sans text-[10px] font-extrabold tracking-[0.1em] uppercase text-muted mb-2 mt-7">
         Notes personnelles
       </p>
       <textarea
@@ -119,11 +128,11 @@ export default function EditRecipeSheet() {
         onChange={(e) => setNotes(e.target.value)}
         placeholder="Une astuce, une variante…"
         rows={3}
-        className="w-full px-3.5 py-3 mb-4 bg-card border-[1.5px] border-border rounded-2xl text-sm text-text1 outline-none placeholder:text-muted focus:border-terra resize-none leading-relaxed transition-colors"
+        className="w-full mb-5 bg-transparent border-l-2 border-evening/30 focus:border-evening/70 outline-none resize-none font-book italic text-[16.5px] text-text1 placeholder:text-muted placeholder:not-italic placeholder:font-sans placeholder:text-[14px] leading-[1.6] pl-3.5 transition-colors"
       />
 
       {/* Appréciation */}
-      <p className="text-[10px] font-extrabold tracking-[0.08em] uppercase text-muted mb-2">Note</p>
+      <p className="font-sans text-[10px] font-extrabold tracking-[0.1em] uppercase text-muted mb-2">Appréciation</p>
       <div className="flex gap-1 mb-5" role="group" aria-label="Note">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
@@ -154,6 +163,10 @@ export default function EditRecipeSheet() {
       >
         Enregistrer
       </button>
+      <div className="pb-2 pt-3">
+        <span className="block h-px bg-text2/20 w-1/3 mx-auto" />
+      </div>
+      </div>
     </BottomSheet>
   )
 }

@@ -7,6 +7,7 @@ import {
   readShoppingItems,
   stableStringify,
   toShoppingMap,
+  retirerIndefinis,
 } from '@/lib/syncDiff'
 import type { DayPlan, Meal, Recipe, ShoppingItem, WeekPlans } from '@/types'
 
@@ -236,5 +237,55 @@ describe('readShoppingItems', () => {
   it('tolère une liste absente ou des entrées abîmées', () => {
     expect(readShoppingItems(undefined)).toEqual([])
     expect(readShoppingItems({ a: null as unknown as ShoppingItem })).toEqual([])
+  })
+})
+
+describe('retirerIndefinis', () => {
+  /**
+   * Régression : une recette créée disparaissait quelques secondes après.
+   *
+   * Firestore refuse `undefined`. Une recette du formulaire porte des champs
+   * optionnels vides (`photo`, `tags`, `steps`, `portions`), partait donc dans
+   * `recipesCustom` avec des `undefined`, l'écriture échouait sur ses trois
+   * essais, puis le snapshot suivant réécrivait l'état distant par-dessus le
+   * local. Le carnet revenait à 100 recettes, sans message.
+   */
+  it('retire la clef, ne remplace pas la valeur', () => {
+    expect(retirerIndefinis({ a: 1, b: undefined })).toEqual({ a: 1 })
+    expect('b' in retirerIndefinis({ a: 1, b: undefined })).toBe(false)
+  })
+
+  it('descend dans les objets imbriqués', () => {
+    expect(retirerIndefinis({ r: { name: 'Tarte', photo: undefined } }))
+      .toEqual({ r: { name: 'Tarte' } })
+  })
+
+  it('descend dans les tableaux, comme recipesCustom', () => {
+    const recettes = [
+      { id: '1', name: 'Tarte', photo: undefined, tags: undefined },
+      { id: '2', name: 'Soupe', portions: 4 },
+    ]
+    expect(retirerIndefinis({ recipesCustom: recettes })).toEqual({
+      recipesCustom: [{ id: '1', name: 'Tarte' }, { id: '2', name: 'Soupe', portions: 4 }],
+    })
+  })
+
+  it('garde null, qui signifie « champ vidé » dans les overrides', () => {
+    expect(retirerIndefinis({ a: null })).toEqual({ a: null })
+  })
+
+  it('laisse intactes les sentinelles Firestore', () => {
+    // `deleteField()` est une instance de classe : la parcourir comme un objet
+    // simple la réduirait à {} et l'effacement ne partirait jamais.
+    class FieldValue { _methodName = 'deleteField' }
+    const sentinelle = new FieldValue()
+    const sortie = retirerIndefinis({ 'weekPlans.2026-08-24': sentinelle })
+    expect(sortie['weekPlans.2026-08-24']).toBe(sentinelle)
+  })
+
+  it('ne touche pas aux valeurs simples', () => {
+    expect(retirerIndefinis('texte')).toBe('texte')
+    expect(retirerIndefinis(0)).toBe(0)
+    expect(retirerIndefinis(false)).toBe(false)
   })
 })

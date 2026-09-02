@@ -5,6 +5,7 @@ import { cn, fuzzyScore } from '@/lib/utils'
 import RecipeCard from './RecipeCard'
 
 import { estMaison } from '@/lib/recettesMaison'
+import Fleuron from '@/components/ui/Fleuron'
 
 type FilterKey = 'all' | 'maison' | Period | 'fav' | 'rapide' | DietaryTag
 
@@ -108,6 +109,29 @@ export default function RecipesPage() {
     return list
   }, [inDiet, filter, search, favFirst, tri])
 
+  /*
+   * Sections du sommaire.
+   *
+   * Un sommaire de livre annonce ses parties. Dans l'ordre par défaut on
+   * groupe donc « Mes recettes » puis les trois moments du repas ; dès qu'un
+   * autre tri est demandé (A → Z, le plus rapide) le regroupement disparaîtrait
+   * de son sens, et la liste redevient plate.
+   */
+  const sections = useMemo<{ titre: string | null; recettes: typeof filtered }[]>(() => {
+    if (tri !== 'defaut') return [{ titre: null, recettes: filtered }]
+
+    const maison = filtered.filter(estMaison)
+    const livrees = filtered.filter((r) => !estMaison(r))
+    const parPeriode = (p: Period) => livrees.filter((r) => r.period === p)
+
+    return [
+      { titre: 'Mes recettes', recettes: maison },
+      { titre: 'Petits-déjeuners', recettes: parPeriode('pdej') },
+      { titre: 'Déjeuners', recettes: parPeriode('midi') },
+      { titre: 'Dîners', recettes: parPeriode('soir') },
+    ].filter((sec) => sec.recettes.length > 0)
+  }, [filtered, tri])
+
   const counts = useMemo<Record<string, number>>(() => ({
     all: inDiet.length,
     maison: inDiet.filter(estMaison).length,
@@ -123,15 +147,21 @@ export default function RecipesPage() {
   }), [inDiet])
 
   return (
-    <div className="flex-1 min-h-0 overflow-y-auto no-scrollbar">
+    <div className="papier flex-1 min-h-0 overflow-y-auto no-scrollbar">
       <div className="flex-shrink-0 pt-safe" />
       <div className="px-5 pt-4 pb-nav-safe">
 
-        {/* Header */}
-        <div className="flex items-center justify-between gap-2 mb-4">
-          <p className="text-[13px] text-muted font-semibold flex-shrink-0">
+        {/* Titre de partie : la page de sommaire d'un livre s'annonce. */}
+        <div className="text-center mb-5">
+          <h1 className="font-book capitales text-[13px] text-text2">Sommaire</h1>
+          <div className="filet-double w-[38%] mx-auto mt-2.5" aria-hidden />
+          <p className="font-book italic text-[14px] text-muted mt-3.5">
             {filtered.length} recette{filtered.length !== 1 ? 's' : ''}
           </p>
+        </div>
+
+        {/* Header */}
+        <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2 ml-auto">
             <label className="sr-only" htmlFor="tri-recettes">Trier les recettes</label>
             <select
@@ -258,15 +288,27 @@ export default function RecipesPage() {
             </button>
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
-            {filtered.map((recipe) => (
-              <RecipeCard
-                key={recipe.id}
-                recipe={recipe}
-                planCount={planCounts[recipe.id] ?? 0}
-                onClick={() => openSheet({ sheet: 'recipe-detail', recipeContext: recipe })}
-              />
+          <div>
+            {sections.map((sec, i) => (
+              <section key={sec.titre ?? 'tout'}>
+                {sec.titre ? (
+                  <Fleuron label={sec.titre} />
+                ) : (
+                  i > 0 && <Fleuron />
+                )}
+                {sec.recettes.map((recipe) => (
+                  <RecipeCard
+                    key={recipe.id}
+                    recipe={recipe}
+                    planCount={planCounts[recipe.id] ?? 0}
+                    onClick={() => openSheet({ sheet: 'recipe-detail', recipeContext: recipe })}
+                  />
+                ))}
+              </section>
             ))}
+            {/* Cul-de-lampe : le sommaire se termine sur un ornement, pas sur
+                une ligne coupée par le bord de l'écran. */}
+            <Fleuron />
           </div>
         )}
       </div>

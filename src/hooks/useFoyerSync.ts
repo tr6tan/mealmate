@@ -12,6 +12,7 @@ import {
   mergeRecipes,
   readShoppingItems,
   toShoppingMap,
+  retirerIndefinis,
   type FieldWrites,
 } from '@/lib/syncDiff'
 import type { FoyerData, Recipe } from '@/types'
@@ -46,9 +47,11 @@ function scheduleWrite(
   _pendingWrites[cle] = { ...(_pendingWrites[cle] ?? {}), ...writes }
 
   _timers[cle] = setTimeout(async () => {
-    const aEnvoyer = _pendingWrites[cle]
+    // Un seul point de passage pour toutes les écritures : la garde contre
+    // `undefined` se pose donc ici, et protège tous les appelants.
+    const aEnvoyer = retirerIndefinis(_pendingWrites[cle])
     delete _pendingWrites[cle]
-    if (!aEnvoyer) return
+    if (!aEnvoyer || Object.keys(aEnvoyer).length === 0) return
     onSaving()
 
     const ref = doc(db, COLLECTION, foyerId)

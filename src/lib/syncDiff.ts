@@ -184,6 +184,39 @@ export function mergeRecipes(
   return [...base, ...delta.custom.filter((r) => !idsBase.has(r.id))]
 }
 
+/**
+ * Retire récursivement les clefs de valeur `undefined`.
+ *
+ * Firestore refuse `undefined` : « Unsupported field value: undefined ». Une
+ * recette créée par le formulaire porte pourtant des champs optionnels vides
+ * (`photo`, `tags`, `steps`, `portions`…), et partait donc dans
+ * `recipesCustom` avec des `undefined`. L'écriture échouait, les trois essais
+ * échouaient, puis le snapshot suivant réécrivait l'état distant par-dessus le
+ * local : la recette disparaissait quelques secondes après sa création, sans
+ * message. Le compte revenait à 100.
+ *
+ * Une clef absente et une clef à `undefined` disent la même chose côté
+ * TypeScript ; c'est donc la clef qu'on retire, pas la valeur qu'on remplace.
+ * Effacer un champ existant se demande avec `deleteField()`, dont la sentinelle
+ * doit survivre : on ne descend que dans les objets simples et les tableaux.
+ */
+export function retirerIndefinis<T>(valeur: T): T {
+  if (Array.isArray(valeur)) {
+    return valeur.map((v) => retirerIndefinis(v)) as unknown as T
+  }
+  // Les sentinelles Firestore (`deleteField()`, `serverTimestamp()`) sont des
+  // instances de classe : leur prototype n'est pas `Object.prototype`.
+  if (valeur !== null && typeof valeur === 'object' && Object.getPrototypeOf(valeur) === Object.prototype) {
+    const sortie: Record<string, unknown> = {}
+    for (const [clef, v] of Object.entries(valeur as Record<string, unknown>)) {
+      if (v === undefined) continue
+      sortie[clef] = retirerIndefinis(v)
+    }
+    return sortie as T
+  }
+  return valeur
+}
+
 // ── Liste de courses ────────────────────────────────────────────────────────
 
 /**
