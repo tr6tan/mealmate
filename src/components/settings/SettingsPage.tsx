@@ -1,6 +1,7 @@
 import { useAppStore, selectCurrentWeekPlan } from '@/store/useAppStore'
 import FoyerCard from './FoyerCard'
 import PreferencesCard from './PreferencesCard'
+import CreditsPhotosCard from './CreditsPhotosCard'
 import type { DietFilter } from '@/types'
 
 export default function SettingsPage() {
@@ -101,6 +102,7 @@ export default function SettingsPage() {
         <p className="text-[10px] text-muted text-center px-4 leading-relaxed">
           Icônes par <a href="https://icons8.com" target="_blank" rel="noopener noreferrer" className="underline">Icons8</a>
         </p>
+        <CreditsPhotosCard />
 
         {/* Version : ici plutôt qu'en surimpression de l'écran principal, où
             elle n'apportait rien à l'usage. */}

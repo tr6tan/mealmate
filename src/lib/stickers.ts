@@ -83,6 +83,20 @@ const RULES: Array<[RegExp, string]> = [
   [/roti de boeuf|rosbif/, 'steak-rare'],
   [/\bbacon\b/, 'bacon'],
   [/chorizo|lardons/, 'salami'],
+  // ── Le plat prime sur sa protéine ─────────────────────────────────────
+  // « Salade César poulet » est une salade avant d'être un poulet, et
+  // « Bowl quinoa poulet provençal » est un bol. Ces règles vivaient après
+  // celles des viandes : le mot « poulet » gagnait, et l'app montrait un
+  // seau de poulet frit pour une salade.
+  [/salade de fruits|salade d'agrumes/, 'apple'],
+  [/salade composee|salade grecque/, 'greek-salad'],
+  [/salade verte|laitue|scarole/, 'lettuce'],
+  [/\bsalade\b|\bsalad\b|tabou?le|nicoise|cesar/, 'salad'],
+  [/bowl (de )?quinoa|quinoa.*bowl/, 'rice-bowl'],
+  // Un wok de légumes est un plat de légumes ; la boîte de nouilles à
+  // emporter ne s'applique qu'aux woks de nouilles.
+  [/wok.*(legume|vegetable)/, 'broccoli'],
+
   [/roti de porc|porc\b/, 'steak-rare'],
   [/canard|duck|magret/, 'duck'],
   [/escalope|schnitzel|milanaise/, 'steak-rare'],
@@ -98,8 +112,6 @@ const RULES: Array<[RegExp, string]> = [
   [/poisson|fish/, 'whole-fish'],
   [/potage|gazpacho|gaspacho|vichyssoise/, 'soup-plate'],
   [/soupe|soup|veloute|miso|bouillon/, 'soup-plate'],
-  [/salade composee|salade grecque/, 'greek-salad'],
-  [/salade|salad|tabou?le|nicoise|cesar/, 'salad'],
   [/yop|actimel|danette|yaourt a boire/, 'yogurt'],
   [/fromage blanc|faisselle/, 'yogurt'],
   [/reblochon|chevre|bleu\b|roquefort|raclette (fromage)?|tomme|munster|maroilles/, 'cheese'],
@@ -134,7 +146,7 @@ const RULES: Array<[RegExp, string]> = [
   [/poireau/, 'leek'],
   [/\bnavet\b|panais/, 'radish'],
   [/chou rouge|chou vert|chou blanc|choucroute|chou/, 'cabbage'],
-  [/laitue|salade verte|endive|scarole/, 'lettuce'],
+  [/endive/, 'lettuce'],
   [/carotte/, 'carrot'],
   [/legume|vegetable/, 'vegetables-bag'],
   // Herbes & épices
@@ -153,7 +165,9 @@ const RULES: Array<[RegExp, string]> = [
   [/granola|cereale|cereal/, 'rolled-oats'],
   [/yaourt|yogurt|skyr|kefir/, 'yogurt'],
   [/smoothie bowl/, 'rice-bowl'],
-  [/smoothie|jus|juice/, 'energy-drink'],
+  // La canette d'energy-drink ne ressemble en rien à un smoothie : un
+  // verre à paille est le seul récipient disponible qui s'en approche.
+  [/smoothie|jus|juice|nectar/, 'orange-soda'],
   [/cafe|café|espresso|cappuccino|latte|americano/, 'coffee'],
   [/chocolat chaud/, 'hot-chocolate-with-marshmallows'],
   [/the vert|thé vert/, 'green-tea'],
@@ -177,7 +191,7 @@ const RULES: Array<[RegExp, string]> = [
   [/avocat|avocado/, 'avocado'],
   [/fraise/, 'berry-7'],
   [/fruits? rouges?|fruits? des bois/, 'raspberry'],
-  [/fruits? (frais|de saison)|salade de fruits/, 'apple'],
+  [/fruits? (frais|de saison)/, 'apple'],
   [/myrtille|bleuet/, 'blueberry'],
   [/framboise/, 'raspberry'],
   [/tomates? cerises?/, 'tomato'],
