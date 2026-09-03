@@ -51,6 +51,7 @@ export default function NewRecipeSheet() {
   const [valeurs, setValeurs] = useState<RecipeFormValues>(VIDE)
   const [lecture, setLecture] = useState<'repos' | 'encours'>('repos')
   const [venuDePhoto, setVenuDePhoto] = useState(false)
+  const [echecLecture, setEchecLecture] = useState<string | null>(null)
   const champPhoto = useRef<HTMLInputElement>(null)
 
   const set = creerSetChamp(setValeurs)
@@ -64,6 +65,7 @@ export default function NewRecipeSheet() {
     if (!isOpen) return
     setValeurs({ ...VIDE, name: venue?.nomInitial ?? '' })
     setVenuDePhoto(false)
+    setEchecLecture(null)
   }, [isOpen, venue?.nomInitial])
 
   /**
@@ -81,11 +83,17 @@ export default function NewRecipeSheet() {
     if (!fichier) return
 
     setLecture('encours')
+    setEchecLecture(null)
     try {
       setValeurs(versFormulaire(await lirePhoto(fichier)))
       setVenuDePhoto(true)
     } catch (err) {
-      showToast(err instanceof ErreurImport ? err.message : messageDErreur('fournisseur'))
+      /*
+       * L'échec s'affiche dans la feuille et non dans un toast : il porte
+       * parfois le message du fournisseur, qu'il faut pouvoir lire en entier
+       * et recopier. Un toast de trois secondes ne s'y prête pas.
+       */
+      setEchecLecture(err instanceof ErreurImport ? err.message : messageDErreur('fournisseur'))
     } finally {
       setLecture('repos')
     }
@@ -193,6 +201,14 @@ export default function NewRecipeSheet() {
           className="hidden"
           onChange={importerPhoto}
         />
+
+        {echecLecture && (
+          <div className="-mt-3 mb-5 p-3 rounded-2xl bg-danger-light" role="alert">
+            <p className="text-[13px] font-semibold text-danger whitespace-pre-line leading-snug">
+              {echecLecture}
+            </p>
+          </div>
+        )}
 
         {venuDePhoto && (
           <p className="-mt-3 mb-5 text-[13px] text-sage font-semibold">

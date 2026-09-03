@@ -42,6 +42,10 @@ const MESSAGES: Record<string, string> = {
   fournisseur: 'La lecture a échoué. Réessaie dans un moment.',
   reseau: 'Pas de connexion. La lecture d’une photo demande le réseau.',
   illisible: 'Je ne reconnais pas une recette sur cette photo.',
+  // Cette panne-la s'était déguisée en « la lecture a échoué » : la requête
+  // n'atteignait pas la fonction, l'app recevait la page d'accueil avec un
+  // code 200, et la lecture du JSON échouait sans rien dire d'utile.
+  'route-absente': "La fonction d'import n'est pas déployée (l'app a répondu à sa place).",
 }
 
 export function messageDErreur(code: string): string {
@@ -73,13 +77,30 @@ export async function lirePhoto(fichier: File): Promise<RecetteLue> {
     throw new ErreurImport('reseau', messageDErreur('reseau'))
   }
 
-  if (!reponse.ok) {
-    const corps = await reponse.json().catch(() => ({}))
-    const code = (corps as { erreur?: string }).erreur ?? 'fournisseur'
-    throw new ErreurImport(code, messageDErreur(code))
+  /*
+   * Une réponse qui n'est pas du JSON vient de la page d'accueil renvoyée à
+   * la place de la fonction : on le dit plutôt que de laisser `.json()`
+   * échouer sur du HTML et remonter une panne anonyme.
+   */
+  const typeContenu = reponse.headers.get('content-type') ?? ''
+  if (!typeContenu.includes('json')) {
+    throw new ErreurImport('route-absente', messageDErreur('route-absente'))
   }
 
-  const lue = (await reponse.json()) as RecetteLue
+  const corps = await reponse.json().catch(() => null)
+  if (corps === null) {
+    throw new ErreurImport('route-absente', messageDErreur('route-absente'))
+  }
+
+  if (!reponse.ok) {
+    const code = (corps as { erreur?: string }).erreur ?? 'fournisseur'
+    const detail = (corps as { message?: string }).message
+    // Le message du fournisseur est conservé : sans lui, une erreur de champ
+    // dans la requête ressemble à une panne réseau et ne se corrige pas.
+    throw new ErreurImport(code, detail ? `${messageDErreur(code)}\n${detail}` : messageDErreur(code))
+  }
+
+  const lue = corps as RecetteLue
   if (!lue?.lisible || !lue.nom?.trim()) {
     throw new ErreurImport('illisible', messageDErreur('illisible'))
   }
