@@ -91,8 +91,19 @@ describe('versFormulaire', () => {
 describe('messageDErreur', () => {
   it('nomme les pannes que la personne peut corriger', () => {
     expect(messageDErreur('illisible')).toMatch(/photo/i)
-    expect(messageDErreur('trop-de-demandes')).toMatch(/minute/i)
+    expect(messageDErreur('trop-de-demandes')).toMatch(/quota/i)
     expect(messageDErreur('reseau')).toMatch(/connexion/i)
+  })
+
+  it('dit que le quota est épuisé, pas que Gemini est en panne', () => {
+    /*
+     * Régression : un quota épuisé était annoncé comme une surcharge du
+     * fournisseur, donc comme une panne chez Google. Deux causes qui
+     * n'appellent pas la même conduite : la surcharge se réessaie, le quota
+     * se change de modèle ou s'attend.
+     */
+    expect(messageDErreur('quota')).toMatch(/quota/i)
+    expect(messageDErreur('quota')).not.toBe(messageDErreur('surcharge'))
   })
 
   it('distingue un délai dépassé d’une absence de réseau', () => {

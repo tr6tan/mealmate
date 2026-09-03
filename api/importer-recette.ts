@@ -63,6 +63,23 @@ Rends ce que la page dit, et rien d'autre :
 
 Réponds en français, dans la langue de la page si elle est française.`
 
+/**
+ * Modèles essayés dans l'ordre.
+ *
+ * Chaque modèle a son propre quota gratuit, et ils ne se ressemblent pas :
+ * `gemini-3.8-flash`, le plus récent, n'en accorde que vingt, épuisés en une
+ * séance d'essais et non rechargés à la minute. Un seul modèle rendait donc
+ * la fonction inutilisable dès qu'on s'en servait un peu.
+ *
+ * Les quatre ci-dessous ont été essayés sur une vraie carte de recette :
+ * tous rendent le même résultat juste, en dix à quinze secondes. Passer au
+ * suivant quand l'un est à sec coûte une requête perdue et rien de plus.
+ *
+ * `GEMINI_MODEL` permet d'en imposer un seul, pour un essai ou un
+ * dépannage.
+ */
+const MODELES = ['gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-flash-lite-latest']
+
 /** Un corps trop gros vient d'une photo non redimensionnée : on le dit. */
 const TAILLE_MAX = 4 * 1024 * 1024
 
@@ -115,19 +132,18 @@ export default async function handler(req: Requete, res: Reponse) {
    * serait tué en cours de route.
    */
   const debut = Date.now()
-  const RESTE_ASSEZ = () => Date.now() - debut < 25_000
+  const impose = process.env.GEMINI_MODEL
+  const aEssayer = impose ? [impose] : MODELES
 
   /*
    * Surcharge et quota se ressemblent mais ne se soignent pas pareil.
    *
-   * Une surcharge se dissipe en quelques secondes et mérite un réessai. Un
-   * quota dépassé, non : Google indique lui-même combien de temps attendre,
-   * et réessayer 2,5 s plus tard ne fait que consommer une requête de plus
-   * sur celles qui restent. Les confondre revenait à aggraver la panne tout
-   * en annonçant la mauvaise cause.
+   * Une surcharge se dissipe en quelques secondes et mérite un réessai sur
+   * le même modèle. Un quota dépassé, non : il faut changer de modèle, ou
+   * rendre la main. Réessayer sur place ne ferait que consommer une requête
+   * de plus sur celles qui restent.
    */
-  const EST_QUOTA = (texte: string) =>
-    /quota|rate.?limit|too_many_requests/i.test(texte)
+  const EST_QUOTA = (texte: string) => /quota|rate.?limit|too_many_requests/i.test(texte)
   const EST_SURCHARGE = (code: number, texte: string) =>
     code === 503 || /high demand|overload|unavailable/i.test(texte)
 
@@ -138,12 +154,12 @@ export default async function handler(req: Requete, res: Reponse) {
     return Number.isFinite(n) ? n : null
   }
 
-  const appeler = () =>
+  const appeler = (modele: string) =>
     fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
       method: 'POST',
       headers: { 'x-goog-api-key': cle, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'gemini-3.8-flash',
+        model: modele,
         input: [
           { type: 'text', text: CONSIGNE },
           { type: 'image', data: image, mime_type: corps?.mimeType ?? 'image/jpeg' },
@@ -153,42 +169,47 @@ export default async function handler(req: Requete, res: Reponse) {
     })
 
   try {
-    let reponse = await appeler()
+    let reponse: Response | null = null
+    let modeleRetenu = ''
+    let dernierDetail = ''
 
-    if (!reponse.ok) {
-      const detail = await reponse.text()
-      // Le quota ne se répare pas en insistant : on rend la main tout de suite.
-      if (EST_QUOTA(detail)) {
-        res.status(429).json({
-          erreur: 'quota',
-          secondes: ATTENTE(detail),
-          message: detail.slice(0, 300),
-        })
-        return
+    for (const modele of aEssayer) {
+      // La fonction est coupée à 60 s : ne pas lancer un appel qui serait tué
+      // en cours de route, mieux vaut rendre l'erreur du précédent.
+      if (Date.now() - debut > 35_000) break
+
+      let r = await appeler(modele)
+
+      if (!r.ok) {
+        const detail = await r.text()
+        dernierDetail = detail
+
+        // Une surcharge se dissipe : un réessai sur le même modèle.
+        if (EST_SURCHARGE(r.status, detail) && Date.now() - debut < 25_000) {
+          await new Promise((res2) => setTimeout(res2, 2500))
+          r = await appeler(modele)
+          if (!r.ok) {
+            dernierDetail = await r.text()
+            continue
+          }
+        } else {
+          // Quota épuisé ou autre refus : au modèle suivant.
+          continue
+        }
       }
-      if (EST_SURCHARGE(reponse.status, detail) && RESTE_ASSEZ()) {
-        await new Promise((r) => setTimeout(r, 2500))
-        reponse = await appeler()
-      } else {
-        res.status(502).json({ erreur: 'fournisseur', message: detail.slice(0, 300) })
-        return
-      }
+
+      reponse = r
+      modeleRetenu = modele
+      break
     }
 
-    if (!reponse.ok) {
-      const detail = await reponse.text()
-      if (EST_QUOTA(detail)) {
-        res.status(429).json({
-          erreur: 'quota',
-          secondes: ATTENTE(detail),
-          message: detail.slice(0, 300),
-        })
-        return
-      }
-      const surcharge = EST_SURCHARGE(reponse.status, detail)
-      res.status(surcharge ? 503 : 502).json({
-        erreur: surcharge ? 'surcharge' : 'fournisseur',
-        message: detail.slice(0, 300),
+    if (!reponse) {
+      const quota = EST_QUOTA(dernierDetail)
+      res.status(quota ? 429 : 502).json({
+        erreur: quota ? 'quota' : 'fournisseur',
+        secondes: quota ? ATTENTE(dernierDetail) : undefined,
+        modelesEssayes: aEssayer.length,
+        message: dernierDetail.slice(0, 300),
       })
       return
     }
@@ -206,7 +227,7 @@ export default async function handler(req: Requete, res: Reponse) {
       return
     }
 
-    res.status(200).json(JSON.parse(texte))
+    res.status(200).json({ ...JSON.parse(texte), modele: modeleRetenu })
   } catch (e) {
     res.status(502).json({
       erreur: 'fournisseur',
