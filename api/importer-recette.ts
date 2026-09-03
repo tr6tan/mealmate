@@ -116,8 +116,27 @@ export default async function handler(req: Requete, res: Reponse) {
    */
   const debut = Date.now()
   const RESTE_ASSEZ = () => Date.now() - debut < 25_000
-  const EST_PASSAGERE = (code: number, texte: string) =>
-    code === 503 || code === 429 || /high demand|overload|unavailable/i.test(texte)
+
+  /*
+   * Surcharge et quota se ressemblent mais ne se soignent pas pareil.
+   *
+   * Une surcharge se dissipe en quelques secondes et mérite un réessai. Un
+   * quota dépassé, non : Google indique lui-même combien de temps attendre,
+   * et réessayer 2,5 s plus tard ne fait que consommer une requête de plus
+   * sur celles qui restent. Les confondre revenait à aggraver la panne tout
+   * en annonçant la mauvaise cause.
+   */
+  const EST_QUOTA = (texte: string) =>
+    /quota|rate.?limit|too_many_requests/i.test(texte)
+  const EST_SURCHARGE = (code: number, texte: string) =>
+    code === 503 || /high demand|overload|unavailable/i.test(texte)
+
+  /** Délai d'attente que Google donne dans son message, en secondes. */
+  const ATTENTE = (texte: string): number | null => {
+    const m = texte.match(/retry in ([\d.]+)s/i)
+    const n = m ? Math.ceil(Number(m[1])) : NaN
+    return Number.isFinite(n) ? n : null
+  }
 
   const appeler = () =>
     fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
@@ -138,23 +157,37 @@ export default async function handler(req: Requete, res: Reponse) {
 
     if (!reponse.ok) {
       const detail = await reponse.text()
-      if (EST_PASSAGERE(reponse.status, detail) && RESTE_ASSEZ()) {
+      // Le quota ne se répare pas en insistant : on rend la main tout de suite.
+      if (EST_QUOTA(detail)) {
+        res.status(429).json({
+          erreur: 'quota',
+          secondes: ATTENTE(detail),
+          message: detail.slice(0, 300),
+        })
+        return
+      }
+      if (EST_SURCHARGE(reponse.status, detail) && RESTE_ASSEZ()) {
         await new Promise((r) => setTimeout(r, 2500))
         reponse = await appeler()
       } else {
-        res.status(reponse.status === 429 ? 429 : 502).json({
-          erreur: reponse.status === 429 ? 'trop-de-demandes' : 'fournisseur',
-          message: detail.slice(0, 300),
-        })
+        res.status(502).json({ erreur: 'fournisseur', message: detail.slice(0, 300) })
         return
       }
     }
 
     if (!reponse.ok) {
       const detail = await reponse.text()
-      const passagere = EST_PASSAGERE(reponse.status, detail)
-      res.status(passagere ? 503 : 502).json({
-        erreur: passagere ? 'surcharge' : 'fournisseur',
+      if (EST_QUOTA(detail)) {
+        res.status(429).json({
+          erreur: 'quota',
+          secondes: ATTENTE(detail),
+          message: detail.slice(0, 300),
+        })
+        return
+      }
+      const surcharge = EST_SURCHARGE(reponse.status, detail)
+      res.status(surcharge ? 503 : 502).json({
+        erreur: surcharge ? 'surcharge' : 'fournisseur',
         message: detail.slice(0, 300),
       })
       return

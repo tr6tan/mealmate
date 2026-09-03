@@ -35,7 +35,7 @@ export class ErreurImport extends Error {
 /** Messages destinés à la personne, pas au journal. */
 const MESSAGES: Record<string, string> = {
   'cle-absente': "L'import par photo n'est pas encore configuré sur le serveur.",
-  'trop-de-demandes': 'Trop de photos d’un coup. Réessaie dans une minute.',
+  'trop-de-demandes': 'Trop de lectures en peu de temps (20 par minute au maximum).',
   'image-trop-grosse': 'Photo trop lourde, réessaie avec un cadrage plus serré.',
   'image-absente': 'Aucune photo reçue.',
   'reponse-vide': 'La lecture n’a rien rendu. Réessaie avec une photo plus nette.',
@@ -45,6 +45,10 @@ const MESSAGES: Record<string, string> = {
   // Le palier gratuit sature aux heures pleines. Le serveur a déja réessayé
   // une fois : dire que c'est passager évite de chercher une faute ailleurs.
   surcharge: 'Gemini est saturé en ce moment. Réessaie dans une minute.',
+  // Le palier gratuit tient 20 lectures par minute. Google indique le délai
+  // exact dans sa réponse : autant le reprendre plutôt qu'inventer un ordre
+  // de grandeur.
+  quota: 'Trop de lectures en peu de temps (20 par minute au maximum).',
   illisible: 'Je ne reconnais pas une recette sur cette photo.',
   // Cette panne-la s'était déguisée en « la lecture a échoué » : la requête
   // n'atteignait pas la fonction, l'app recevait la page d'accueil avec un
@@ -113,6 +117,19 @@ export async function lirePhoto(fichier: File): Promise<RecetteLue> {
 
   if (!reponse.ok) {
     const code = (corps as { erreur?: string }).erreur ?? 'fournisseur'
+
+    // Google donne le délai d'attente : le reprendre évite de faire réessayer
+    // au hasard, et de consommer une requête de plus pour rien.
+    if (code === 'quota') {
+      const secondes = (corps as { secondes?: number | null }).secondes
+      throw new ErreurImport(
+        code,
+        secondes
+          ? `${messageDErreur(code)} Réessaie dans ${secondes} secondes.`
+          : messageDErreur(code),
+      )
+    }
+
     const detail = (corps as { message?: string }).message
     // Le message du fournisseur est conservé : sans lui, une erreur de champ
     // dans la requête ressemble à une panne réseau et ne se corrige pas.
