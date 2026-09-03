@@ -104,8 +104,23 @@ export default async function handler(req: Requete, res: Reponse) {
     return
   }
 
-  try {
-    const reponse = await fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
+  /*
+   * Le palier gratuit répond parfois « high demand » : une panne passagère,
+   * qui se résout d'elle-même en quelques secondes. Deux essais sur trois
+   * échouaient ainsi pendant la mise au point, et demander à la personne de
+   * recommencer aurait été lui faire faire le travail de la machine.
+   *
+   * Un seul réessai, et seulement s'il reste du temps : la fonction est
+   * coupée à 60 s, une lecture en prend 25, et un réessai lancé trop tard
+   * serait tué en cours de route.
+   */
+  const debut = Date.now()
+  const RESTE_ASSEZ = () => Date.now() - debut < 25_000
+  const EST_PASSAGERE = (code: number, texte: string) =>
+    code === 503 || code === 429 || /high demand|overload|unavailable/i.test(texte)
+
+  const appeler = () =>
+    fetch('https://generativelanguage.googleapis.com/v1beta/interactions', {
       method: 'POST',
       headers: { 'x-goog-api-key': cle, 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -118,12 +133,28 @@ export default async function handler(req: Requete, res: Reponse) {
       }),
     })
 
+  try {
+    let reponse = await appeler()
+
     if (!reponse.ok) {
       const detail = await reponse.text()
-      // 429 remonte tel quel : le client sait dire « réessaie dans un moment »
-      // plutôt que « erreur inconnue ».
-      res.status(reponse.status === 429 ? 429 : 502).json({
-        erreur: reponse.status === 429 ? 'trop-de-demandes' : 'fournisseur',
+      if (EST_PASSAGERE(reponse.status, detail) && RESTE_ASSEZ()) {
+        await new Promise((r) => setTimeout(r, 2500))
+        reponse = await appeler()
+      } else {
+        res.status(reponse.status === 429 ? 429 : 502).json({
+          erreur: reponse.status === 429 ? 'trop-de-demandes' : 'fournisseur',
+          message: detail.slice(0, 300),
+        })
+        return
+      }
+    }
+
+    if (!reponse.ok) {
+      const detail = await reponse.text()
+      const passagere = EST_PASSAGERE(reponse.status, detail)
+      res.status(passagere ? 503 : 502).json({
+        erreur: passagere ? 'surcharge' : 'fournisseur',
         message: detail.slice(0, 300),
       })
       return

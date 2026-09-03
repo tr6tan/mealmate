@@ -42,6 +42,9 @@ const MESSAGES: Record<string, string> = {
   fournisseur: 'La lecture a échoué. Réessaie dans un moment.',
   reseau: 'Impossible de joindre le serveur. Vérifie ta connexion.',
   'trop-long': 'La lecture a pris trop de temps. Réessaie, ou cadre la photo sur la seule recette.',
+  // Le palier gratuit sature aux heures pleines. Le serveur a déja réessayé
+  // une fois : dire que c'est passager évite de chercher une faute ailleurs.
+  surcharge: 'Gemini est saturé en ce moment. Réessaie dans une minute.',
   illisible: 'Je ne reconnais pas une recette sur cette photo.',
   // Cette panne-la s'était déguisée en « la lecture a échoué » : la requête
   // n'atteignait pas la fonction, l'app recevait la page d'accueil avec un
