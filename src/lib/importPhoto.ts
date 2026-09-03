@@ -26,7 +26,12 @@ export interface RecetteLue {
 }
 
 export class ErreurImport extends Error {
-  constructor(readonly code: string, message: string) {
+  constructor(
+    readonly code: string,
+    message: string,
+    /** Secondes à attendre avant de réessayer, quand le fournisseur les donne. */
+    readonly attendre?: number,
+  ) {
     super(message)
     this.name = 'ErreurImport'
   }
@@ -121,13 +126,8 @@ export async function lirePhoto(fichier: File): Promise<RecetteLue> {
     // Google donne le délai d'attente : le reprendre évite de faire réessayer
     // au hasard, et de consommer une requête de plus pour rien.
     if (code === 'quota') {
-      const secondes = (corps as { secondes?: number | null }).secondes
-      throw new ErreurImport(
-        code,
-        secondes
-          ? `${messageDErreur(code)} Réessaie dans ${secondes} secondes.`
-          : messageDErreur(code),
-      )
+      const secondes = (corps as { secondes?: number | null }).secondes ?? undefined
+      throw new ErreurImport(code, messageDErreur(code), secondes)
     }
 
     const detail = (corps as { message?: string }).message

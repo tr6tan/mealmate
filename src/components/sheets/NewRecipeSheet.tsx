@@ -52,6 +52,17 @@ export default function NewRecipeSheet() {
   const [lecture, setLecture] = useState<'repos' | 'encours'>('repos')
   const [venuDePhoto, setVenuDePhoto] = useState(false)
   const [echecLecture, setEchecLecture] = useState<string | null>(null)
+  /*
+   * Secondes restantes avant de pouvoir réessayer.
+   *
+   * Le palier gratuit tient vingt lectures par minute, et une requête
+   * refusée compte quand même : réessayer trop tôt repousse donc la fenêtre.
+   * Afficher un décompte et bloquer le bouton évite de faire deviner, et
+   * évite surtout de brûler des requêtes pour rien. C'est exactement le
+   * piège dans lequel je suis tombé en mettant la fonction au point.
+   */
+  const [finAttente, setFinAttente] = useState(0)
+  const [maintenant, setMaintenant] = useState(() => Date.now())
   const champPhoto = useRef<HTMLInputElement>(null)
 
   const set = creerSetChamp(setValeurs)
@@ -66,6 +77,7 @@ export default function NewRecipeSheet() {
     setValeurs({ ...VIDE, name: venue?.nomInitial ?? '' })
     setVenuDePhoto(false)
     setEchecLecture(null)
+    setFinAttente(0)
   }, [isOpen, venue?.nomInitial])
 
   /**
@@ -75,6 +87,22 @@ export default function NewRecipeSheet() {
    * mal lue se corrige alors en un geste, au lieu de partir dans la liste de
    * courses sans que personne l'ait vue.
    */
+  /*
+   * Le décompte se lit sur l'horloge, pas en retirant une seconde par tick.
+   *
+   * Compter à la main perdait des secondes : l'intervalle était recréé à
+   * chaque changement, et un onglet en arrière-plan voit ses minuteries
+   * ralenties. Une échéance fixe et un rafraîchissement régulier donnent la
+   * même valeur quoi qu'il arrive au fil d'exécution.
+   */
+  const attente = Math.max(0, Math.ceil((finAttente - maintenant) / 1000))
+
+  useEffect(() => {
+    if (finAttente <= Date.now()) return
+    const t = setInterval(() => setMaintenant(Date.now()), 500)
+    return () => clearInterval(t)
+  }, [finAttente])
+
   const importerPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const fichier = e.target.files?.[0]
     // Le champ est vidé tout de suite : sans cela, reprendre la même photo
@@ -94,6 +122,10 @@ export default function NewRecipeSheet() {
        * et recopier. Un toast de trois secondes ne s'y prête pas.
        */
       setEchecLecture(err instanceof ErreurImport ? err.message : messageDErreur('fournisseur'))
+      if (err instanceof ErreurImport && err.attendre) {
+        setFinAttente(Date.now() + err.attendre * 1000)
+        setMaintenant(Date.now())
+      }
     } finally {
       setLecture('repos')
     }
@@ -172,10 +204,17 @@ export default function NewRecipeSheet() {
         <button
           type="button"
           onClick={() => champPhoto.current?.click()}
-          disabled={lecture === 'encours'}
+          disabled={lecture === 'encours' || attente > 0}
           className="w-full h-12 mb-5 rounded-2xl bg-black/[0.045] flex items-center justify-center gap-2 text-[14px] font-semibold text-text1 active:scale-[0.98] transition-transform disabled:opacity-60"
         >
-          {lecture === 'encours' ? (
+          {attente > 0 ? (
+            <>
+              <svg className="w-[17px] h-[17px] text-text2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden>
+                <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" />
+              </svg>
+              Réessayer dans {attente} s
+            </>
+          ) : lecture === 'encours' ? (
             <>
               <span
                 className="w-4 h-4 rounded-full border-2 border-text2/30 border-t-terra animate-spin"
@@ -212,6 +251,12 @@ export default function NewRecipeSheet() {
             <p className="text-[13px] font-semibold text-danger whitespace-pre-line leading-snug">
               {echecLecture}
             </p>
+            {attente > 0 && (
+              <p className="mt-1 text-[12px] text-danger/80">
+                Le bouton se réactive tout seul. Réessayer avant consomme une
+                lecture et repousse l’attente.
+              </p>
+            )}
           </div>
         )}
 
