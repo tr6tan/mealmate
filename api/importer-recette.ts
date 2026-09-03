@@ -47,8 +47,26 @@ const SCHEMA = {
       items: { type: 'string' },
       description: 'Une entrée par étape, sans le numéro',
     },
+    photo: {
+      type: 'object',
+      description: "Emplacement de la photographie du plat terminé, s'il y en a une",
+      properties: {
+        presente: {
+          type: 'boolean',
+          description:
+            "true seulement s'il y a une vraie photographie du plat terminé. false pour un dessin, une illustration d'ingrédient, un logo ou une photo d'ustensile.",
+        },
+        boite: {
+          type: 'array',
+          items: { type: 'integer' },
+          description:
+            'Cadre de cette photographie, [ymin, xmin, ymax, xmax] rapporté à 0-1000. Tableau vide si presente vaut false.',
+        },
+      },
+      required: ['presente', 'boite'],
+    },
   },
-  required: ['lisible', 'nom', 'minutes', 'portions', 'ingredients', 'etapes'],
+  required: ['lisible', 'nom', 'minutes', 'portions', 'ingredients', 'etapes', 'photo'],
 } as const
 
 const CONSIGNE = `Tu lis la photo d'une recette de cuisine : page de livre, fiche, carnet manuscrit ou capture d'écran.
@@ -59,26 +77,41 @@ Rends ce que la page dit, et rien d'autre :
 - sépare la quantité du nom : « 200 g de farine » donne nom « Farine », quantité « 200 g » ;
 - une étape par instruction, sans son numéro ;
 - si la page annonce préparation et cuisson séparément, additionne-les, mais laisse le repos de côté ;
-- si l'image ne montre pas une recette lisible, mets lisible à false et laisse le reste vide.
+- si l'image ne montre pas une recette lisible, mets lisible à false et laisse le reste vide ;
+- si la page porte une photographie du plat terminé, donne son cadre dans le champ photo. Une illustration, un dessin d'ingrédient, une icône ou une photo d'ustensile ne compte pas : dans ce cas presente vaut false.
 
 Réponds en français, dans la langue de la page si elle est française.`
 
 /**
  * Modèles essayés dans l'ordre.
  *
- * Chaque modèle a son propre quota gratuit, et ils ne se ressemblent pas :
- * `gemini-3.8-flash`, le plus récent, n'en accorde que vingt, épuisés en une
- * séance d'essais et non rechargés à la minute. Un seul modèle rendait donc
- * la fonction inutilisable dès qu'on s'en servait un peu.
+ * Les quotas gratuits ne se devinent pas, et j'ai commencé par les lire de
+ * travers. Le tableau de bord d'AI Studio donne les vrais chiffres, par jour :
  *
- * Les quatre ci-dessous ont été essayés sur une vraie carte de recette :
- * tous rendent le même résultat juste, en dix à quinze secondes. Passer au
- * suivant quand l'un est à sec coûte une requête perdue et rien de plus.
+ *   Flash      (3.5, 3.6, 3.7, 3.8)   20 requêtes
+ *   Flash-Lite (3.1, 3.5)            500 requêtes
  *
- * `GEMINI_MODEL` permet d'en imposer un seul, pour un essai ou un
- * dépannage.
+ * Soit vingt-cinq fois plus pour les Lite. Ma première liste commençait par
+ * les Flash, donc par les deux modèles les plus avares : quarante lectures et
+ * la chaîne était à sec.
+ *
+ * Les deux Lite ont été essayés sur une vraie carte de recette à deux colonnes,
+ * dont le bloc des étapes porte un intertitre faux : ils la lisent aussi bien
+ * que les Flash, et en quatre secondes au lieu de onze. Ils passent donc
+ * devant, et les Flash restent en réserve pour les images difficiles, là où
+ * leur avance peut compter.
+ *
+ * Total : environ 1 040 lectures par jour, ce qui dépasse largement ce qu'un
+ * foyer numérise.
+ *
+ * `GEMINI_MODEL` impose un modèle unique, pour un essai ou un dépannage.
  */
-const MODELES = ['gemini-3.7-flash', 'gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-flash-lite-latest']
+const MODELES = [
+  'gemini-3.5-flash-lite',
+  'gemini-3.1-flash-lite',
+  'gemini-3.7-flash',
+  'gemini-3.5-flash',
+]
 
 /** Un corps trop gros vient d'une photo non redimensionnée : on le dit. */
 const TAILLE_MAX = 4 * 1024 * 1024

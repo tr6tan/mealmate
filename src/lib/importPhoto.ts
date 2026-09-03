@@ -23,6 +23,10 @@ export interface RecetteLue {
   portions: number
   ingredients: { nom: string; quantite: string }[]
   etapes: string[]
+  /** Cadre de la photographie du plat sur la page, si elle en porte une. */
+  photo?: { presente: boolean; boite: number[] }
+  /** Photo du plat déja recadrée, ajoutée après la lecture. */
+  photoPlat?: string
 }
 
 export class ErreurImport extends Error {
@@ -72,6 +76,59 @@ export function messageDErreur(code: string): string {
  */
 const LARGEUR = 1600
 const QUALITE = 0.85
+
+/**
+ * Découpe la photographie du plat dans la page.
+ *
+ * Le modèle rend un cadre en [ymin, xmin, ymax, xmax] rapporté à 0-1000, ce
+ * qui le rend indépendant de la taille : on recadre donc le fichier d'origine
+ * en pleine résolution, et non la version réduite envoyée pour la lecture.
+ *
+ * Deux cadres sont refusés. Celui qui couvre presque toute la page ne serait
+ * qu'une vignette de la fiche entière, illisible à 52px. Celui qui ne couvre
+ * presque rien est une erreur de détection, et donnerait une bouillie de
+ * pixels. Dans les deux cas mieux vaut aucune photo que celle-la : le sticker
+ * illustré prend alors le relais.
+ */
+async function recadrer(fichier: File, boite: number[]): Promise<string | undefined> {
+  if (boite.length !== 4) return undefined
+  const [ymin, xmin, ymax, xmax] = boite
+  const part = ((ymax - ymin) / 1000) * ((xmax - xmin) / 1000)
+  if (!(part > 0.02 && part < 0.85)) return undefined
+
+  const url = URL.createObjectURL(fichier)
+  try {
+    const img = await new Promise<HTMLImageElement>((ok, ko) => {
+      const i = new Image()
+      i.onload = () => ok(i)
+      i.onerror = ko
+      i.src = url
+    })
+
+    const x = (xmin / 1000) * img.width
+    const y = (ymin / 1000) * img.height
+    const l = ((xmax - xmin) / 1000) * img.width
+    const h = ((ymax - ymin) / 1000) * img.height
+    if (l < 40 || h < 40) return undefined
+
+    // Même gabarit que les photos prises dans le formulaire : la vignette est
+    // affichée en carré de 52px et en bandeau de 232px.
+    const cote = Math.min(720, Math.max(l, h))
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round((l / Math.max(l, h)) * cote)
+    canvas.height = Math.round((h / Math.max(l, h)) * cote)
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return undefined
+    ctx.drawImage(img, x, y, l, h, 0, 0, canvas.width, canvas.height)
+    return canvas.toDataURL('image/jpeg', 0.82)
+  } catch {
+    // Un recadrage raté ne doit pas faire échouer l'import : la recette est
+    // lue, c'est l'essentiel.
+    return undefined
+  } finally {
+    URL.revokeObjectURL(url)
+  }
+}
 
 /** Envoie la photo au serveur et rend ce qui a été lu. */
 export async function lirePhoto(fichier: File): Promise<RecetteLue> {
@@ -140,6 +197,10 @@ export async function lirePhoto(fichier: File): Promise<RecetteLue> {
   if (!lue?.lisible || !lue.nom?.trim()) {
     throw new ErreurImport('illisible', messageDErreur('illisible'))
   }
+
+  if (lue.photo?.presente) {
+    lue.photoPlat = await recadrer(fichier, lue.photo.boite ?? [])
+  }
   return lue
 }
 
@@ -178,7 +239,7 @@ export function versFormulaire(lue: RecetteLue): RecipeFormValues {
     period: devinerPeriode(nom),
     fav: false,
     rapide: minutes <= 20,
-    photo: undefined,
+    photo: lue.photoPlat,
     ingredients,
     steps: etapes.length ? etapes : [''],
     tags: devinerRegimes(ingredients, nom),

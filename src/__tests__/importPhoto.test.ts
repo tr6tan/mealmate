@@ -75,6 +75,18 @@ describe('versFormulaire', () => {
     expect(versFormulaire(lue({ etapes: [] })).steps).toEqual([''])
   })
 
+  it('reprend la photo du plat quand elle a été découpée', () => {
+    const v = versFormulaire(lue({ photoPlat: 'data:image/jpeg;base64,ZZZ' }))
+    expect(v.photo).toBe('data:image/jpeg;base64,ZZZ')
+  })
+
+  it('laisse la photo vide quand le découpage a échoué', () => {
+    // Un recadrage raté ne doit pas faire échouer l'import : la recette est
+    // lue, et le sticker illustré prend le relais.
+    expect(versFormulaire(lue({ photo: { presente: true, boite: [] } })).photo).toBeUndefined()
+    expect(versFormulaire(lue()).photo).toBeUndefined()
+  })
+
   it('marque rapide une recette de vingt minutes ou moins', () => {
     expect(versFormulaire(lue({ minutes: 15 })).rapide).toBe(true)
     expect(versFormulaire(lue({ minutes: 25 })).rapide).toBe(false)
