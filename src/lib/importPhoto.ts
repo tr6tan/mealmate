@@ -40,7 +40,8 @@ const MESSAGES: Record<string, string> = {
   'image-absente': 'Aucune photo reçue.',
   'reponse-vide': 'La lecture n’a rien rendu. Réessaie avec une photo plus nette.',
   fournisseur: 'La lecture a échoué. Réessaie dans un moment.',
-  reseau: 'Pas de connexion. La lecture d’une photo demande le réseau.',
+  reseau: 'Impossible de joindre le serveur. Vérifie ta connexion.',
+  'trop-long': 'La lecture a pris trop de temps. Réessaie, ou cadre la photo sur la seule recette.',
   illisible: 'Je ne reconnais pas une recette sur cette photo.',
   // Cette panne-la s'était déguisée en « la lecture a échoué » : la requête
   // n'atteignait pas la fonction, l'app recevait la page d'accueil avec un
@@ -66,15 +67,30 @@ export async function lirePhoto(fichier: File): Promise<RecetteLue> {
   // `resizeToBase64` rend une data URL ; l'API veut le base64 seul.
   const image = dataUrl.slice(dataUrl.indexOf(',') + 1)
 
+  /*
+   * Une lecture d'image prend couramment quinze à trente secondes. Le plan
+   * Vercel coupe à dix secondes par défaut, et la fonction déclare donc
+   * `maxDuration`. Côté client, on abandonne un peu avant la fin du plafond
+   * pour rendre un message qui dit ce qui s'est passé : sans lui, une coupure
+   * de la connexion par le serveur ressemble à une absence de réseau, et le
+   * message le disait à tort.
+   */
+  const abandon = new AbortController()
+  const minuterie = setTimeout(() => abandon.abort(), 55_000)
+
   let reponse: Response
   try {
     reponse = await fetch('/api/importer-recette', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ image, mimeType: 'image/jpeg' }),
+      signal: abandon.signal,
     })
-  } catch {
-    throw new ErreurImport('reseau', messageDErreur('reseau'))
+  } catch (e) {
+    const code = (e as Error)?.name === 'AbortError' ? 'trop-long' : 'reseau'
+    throw new ErreurImport(code, messageDErreur(code))
+  } finally {
+    clearTimeout(minuterie)
   }
 
   /*

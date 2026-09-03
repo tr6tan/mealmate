@@ -95,6 +95,21 @@ describe('messageDErreur', () => {
     expect(messageDErreur('reseau')).toMatch(/connexion/i)
   })
 
+  it('distingue un délai dépassé d’une absence de réseau', () => {
+    /*
+     * Régression : la fonction était coupée à dix secondes par le plan
+     * Vercel, la connexion tombait, et le seul message existant annonçait
+     * « Pas de connexion » alors que le réseau allait très bien. Un message
+     * qui accuse la mauvaise cause coûte plus cher que pas de message.
+     */
+    expect(messageDErreur('trop-long')).not.toBe(messageDErreur('reseau'))
+    expect(messageDErreur('trop-long')).toMatch(/temps/i)
+  })
+
+  it('dit que le serveur est injoignable, sans accuser le réseau seul', () => {
+    expect(messageDErreur('reseau')).toMatch(/serveur/i)
+  })
+
   it('retombe sur un message générique plutôt que sur un code', () => {
     expect(messageDErreur('inconnu-xyz')).toBe(messageDErreur('fournisseur'))
   })
