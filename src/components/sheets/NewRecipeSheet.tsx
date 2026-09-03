@@ -1,12 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import BottomSheet from '@/components/ui/BottomSheet'
 import { useAppStore } from '@/store/useAppStore'
 import { showToast } from '@/lib/toast'
 import { BASE_PORTIONS } from '@/lib/utils'
 import { getStickerSlug } from '@/lib/stickers'
 import RecipeFormFields from './RecipeFormFields'
-import { creerSetChamp,
-  nettoyerIngredients, type RecipeFormValues } from './recipeFormOptions'
+import {
+  creerSetChamp,
+  nettoyerIngredients,
+  type RecipeFormValues,
+} from './recipeFormOptions'
+import { ErreurImport, lirePhoto, messageDErreur, versFormulaire } from '@/lib/importPhoto'
 
 /**
  * Création d'une recette.
@@ -45,6 +49,9 @@ export default function NewRecipeSheet() {
   const venue  = sheetState.newRecipeContext
 
   const [valeurs, setValeurs] = useState<RecipeFormValues>(VIDE)
+  const [lecture, setLecture] = useState<'repos' | 'encours'>('repos')
+  const [venuDePhoto, setVenuDePhoto] = useState(false)
+  const champPhoto = useRef<HTMLInputElement>(null)
 
   const set = creerSetChamp(setValeurs)
 
@@ -56,7 +63,33 @@ export default function NewRecipeSheet() {
   useEffect(() => {
     if (!isOpen) return
     setValeurs({ ...VIDE, name: venue?.nomInitial ?? '' })
+    setVenuDePhoto(false)
   }, [isOpen, venue?.nomInitial])
+
+  /**
+   * Lit une recette photographiée et remplit le formulaire.
+   *
+   * Rien n'est enregistré : la personne relit avant de valider. Une quantité
+   * mal lue se corrige alors en un geste, au lieu de partir dans la liste de
+   * courses sans que personne l'ait vue.
+   */
+  const importerPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fichier = e.target.files?.[0]
+    // Le champ est vidé tout de suite : sans cela, reprendre la même photo
+    // après un échec ne déclenche aucun événement.
+    e.target.value = ''
+    if (!fichier) return
+
+    setLecture('encours')
+    try {
+      setValeurs(versFormulaire(await lirePhoto(fichier)))
+      setVenuDePhoto(true)
+    } catch (err) {
+      showToast(err instanceof ErreurImport ? err.message : messageDErreur('fournisseur'))
+    } finally {
+      setLecture('repos')
+    }
+  }
 
   const enregistrer = () => {
     const nom = valeurs.name.trim()
@@ -124,6 +157,48 @@ export default function NewRecipeSheet() {
         <p className="text-[13px] text-muted mb-5">
           {venue?.planifier ? 'Elle sera aussitôt mise au menu.' : 'Le nom suffit pour commencer.'}
         </p>
+
+        {/* Importer une photo.
+            Placé avant les champs : quand on a la page sous les yeux, on ne
+            veut pas la retaper, et l'action doit se voir sans défiler. */}
+        <button
+          type="button"
+          onClick={() => champPhoto.current?.click()}
+          disabled={lecture === 'encours'}
+          className="w-full h-12 mb-5 rounded-2xl bg-black/[0.045] flex items-center justify-center gap-2 text-[14px] font-semibold text-text1 active:scale-[0.98] transition-transform disabled:opacity-60"
+        >
+          {lecture === 'encours' ? (
+            <>
+              <span
+                className="w-4 h-4 rounded-full border-2 border-text2/30 border-t-terra animate-spin"
+                aria-hidden
+              />
+              Lecture de la photo…
+            </>
+          ) : (
+            <>
+              <svg className="w-[17px] h-[17px] text-text2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+              Importer depuis une photo
+            </>
+          )}
+        </button>
+        <input
+          ref={champPhoto}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={importerPhoto}
+        />
+
+        {venuDePhoto && (
+          <p className="-mt-3 mb-5 text-[13px] text-sage font-semibold">
+            Lu depuis une photo. Relis avant d’enregistrer.
+          </p>
+        )}
 
         <RecipeFormFields valeurs={valeurs} set={set} />
 
