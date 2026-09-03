@@ -39,18 +39,22 @@ export default function SettingsPage() {
               <p className="text-xs text-muted">Filtre les recettes affichées</p>
             </div>
           </div>
-          <div className="flex gap-2 mb-3">
+          {/* Les trois puces passaient hors de la carte : « Végé restreint »
+              était coupé au bord droit. Elles s'enroulent désormais, et les
+              libellés raccourcissent pour tenir à deux par ligne. */}
+          <div className="flex flex-wrap gap-2 mb-3">
             {(['all', 'vege', 'vegan'] as DietFilter[]).map(d => (
               <button
                 key={d}
                 onClick={() => updateSettings({ diet: d })}
-                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all active:scale-95 ${
+                aria-pressed={diet === d}
+                className={`px-4 min-h-[40px] rounded-full text-sm font-semibold whitespace-nowrap transition-all active:scale-95 ${
                   diet === d
                     ? 'bg-terra text-white shadow-[0_4px_12px_rgba(0,29,193,0.3)]'
                     : 'bg-fill/50 text-text2 border border-border'
                 }`}
               >
-                {d === 'all' ? 'Tout' : d === 'vege' ? 'Végétarien·ne' : 'Végé restreint'}
+                {d === 'all' ? 'Tout' : d === 'vege' ? 'Végétarien' : 'Vegan'}
               </button>
             ))}
           </div>

@@ -83,13 +83,14 @@ export default function PreferencesCard() {
         </button>
       </div>
 
-      {/* Nombre de convives */}
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-semibold text-text1">Nombre de personnes</p>
-          <p className="text-xs text-muted">Base des quantités de recettes</p>
-        </div>
-        <div className="flex items-center gap-1 bg-fill/50 border border-border rounded-full p-1 flex-shrink-0">
+      {/* Nombre de convives.
+          Le libellé et l'incrément se disputaient la ligne : « Nombre de
+          personnes » s'écrasait sur trois lignes de deux mots. Le titre passe
+          au-dessus, l'incrément a la largeur qu'il lui faut. */}
+      <div>
+        <p className="text-sm font-semibold text-text1">Nombre de personnes</p>
+        <p className="text-xs text-muted mb-2.5">Base des quantités de recettes</p>
+        <div className="flex items-center gap-1 bg-fill/50 border border-border rounded-full p-1 w-fit">
           <button
             onClick={() => updateSettings({ personnes: Math.max(1, personnes - 1) })}
             aria-label="Une personne de moins"
