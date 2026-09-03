@@ -177,7 +177,7 @@ export default function RecipeFormFields({ valeurs, set }: Props) {
           ref={fileInputRef}
           type="file"
           accept="image/*"
-          capture="environment"
+          /* Pas de `capture` : il ferme l'accès à la photothèque sur iOS. */
           className="hidden"
           onChange={handlePhotoChange}
         />

@@ -197,7 +197,12 @@ export default function NewRecipeSheet() {
           ref={champPhoto}
           type="file"
           accept="image/*"
-          capture="environment"
+          /*
+           * Pas de `capture` : sur iOS il ouvre l'appareil photo directement
+           * et supprime l'accès à la photothèque. Or la moitié des recettes
+           * qu'on veut importer sont des captures d'écran déja enregistrées.
+           * Sans cet attribut, iOS propose les deux.
+           */
           className="hidden"
           onChange={importerPhoto}
         />
