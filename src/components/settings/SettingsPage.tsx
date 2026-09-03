@@ -5,6 +5,8 @@ import CreditsPhotosCard from './CreditsPhotosCard'
 import type { DietFilter } from '@/types'
 
 export default function SettingsPage() {
+  const openSheet = useAppStore((st) => st.openSheet)
+
   const settings       = useAppStore((s) => s.settings)
   const updateSettings = useAppStore((s) => s.updateSettings)
   const recipes        = useAppStore((s) => s.recipes)
@@ -97,6 +99,16 @@ export default function SettingsPage() {
 
         {/* ── Foyer & partage ── */}
         <FoyerCard />
+
+        {/* ── Revoir l'accueil ──
+            Quatre écrans vus une fois au premier lancement ne se retiennent
+            pas, et on veut pouvoir les montrer à quelqu'un. */}
+        <button
+          onClick={() => openSheet({ sheet: 'accueil' })}
+          className="w-full h-12 rounded-2xl bg-black/[0.045] text-[14px] font-semibold text-text1 active:scale-[0.98] transition-transform"
+        >
+          Revoir la présentation
+        </button>
 
         {/* ── Crédits ── */}
         <p className="text-[10px] text-muted text-center px-4 leading-relaxed">

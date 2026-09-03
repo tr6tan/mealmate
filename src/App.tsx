@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import ErrorBoundary from '@/components/ui/ErrorBoundary'
 import { useAppStore } from '@/store/useAppStore'
 import { getTodayIndex, getWeekMonday } from '@/lib/utils'
@@ -6,6 +6,8 @@ import { useFoyerSync } from '@/hooks/useFoyerSync'
 import AppShell from '@/components/layout/AppShell'
 import Toast from '@/components/ui/Toast'
 import SyncBanner from '@/components/ui/SyncBanner'
+import Onboarding from '@/components/onboarding/Onboarding'
+import { accueilDejaVu } from '@/components/onboarding/etapes'
 // Pages : import statique → navigation instantanée (bundle PWA mis en cache de toute façon)
 import PlanningPage  from '@/components/planning/PlanningPage'
 import RecipesPage   from '@/components/recipes/RecipesPage'
@@ -22,6 +24,17 @@ const EditRecipeSheet   = lazy(() => import('@/components/sheets/EditRecipeSheet
 const CookingSheet      = lazy(() => import('@/components/sheets/CookingSheet'))
 
 export default function App() {
+  /*
+   * Accueil au premier lancement, décidé une fois au montage.
+   *
+   * Lu en initialisant l'état et non dans un effet : sinon l'app s'affiche une
+   * fraction de seconde avant que l'accueil ne la recouvre, ce qui ressemble à
+   * un défaut d'affichage.
+   */
+  const [accueil, setAccueil] = useState(() => !accueilDejaVu())
+  const ouvrirAccueil = useAppStore((s) => s.sheetState.sheet === 'accueil')
+  const closeSheet = useAppStore((s) => s.closeSheet)
+
   const activeTab = useAppStore((s) => s.activeTab)
   const setCurrentDayIdx = useAppStore((s) => s.setCurrentDayIdx)
   const darkMode = useAppStore((s) => s.settings.darkMode)
@@ -80,6 +93,16 @@ export default function App() {
       <Toast />
       <SyncBanner />
     </AppShell>
+
+    {(accueil || ouvrirAccueil) && (
+      <Onboarding
+        relecture={!accueil}
+        onFermer={() => {
+          setAccueil(false)
+          if (ouvrirAccueil) closeSheet()
+        }}
+      />
+    )}
     </>
     </ErrorBoundary>
   )

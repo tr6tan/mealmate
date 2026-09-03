@@ -104,7 +104,7 @@ export type SheetName =
   | 'new-recipe'
   | 'edit-recipe'
   | 'cook-mode'
-  | null
+  | null | 'accueil'
 
 export interface SheetState {
   sheet: SheetName
