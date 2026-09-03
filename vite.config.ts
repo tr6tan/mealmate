@@ -1,5 +1,5 @@
 /// <reference types="vitest/config" />
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
@@ -7,7 +7,78 @@ import { readFileSync } from 'fs'
 
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
-export default defineConfig({
+/**
+ * Sert le dossier `api/` pendant le développement.
+ *
+ * Ces fonctions tournent sur Vercel en production, mais Vite ne les connaît
+ * pas : en local, `/api/importer-recette` tombait sur l'app elle-même et
+ * l'import par photo ne pouvait pas être essayé sans déployer. Ce plugin
+ * charge le module et lui donne la même forme de requête et de réponse que
+ * Vercel, pour que le code testé soit celui qui part en production.
+ *
+ * Uniquement en développement : `apply: 'serve'`.
+ */
+function fonctionsApi(): Plugin {
+  return {
+    name: 'fonctions-api-en-dev',
+    apply: 'serve',
+    configureServer(serveur) {
+      serveur.middlewares.use(async (req, res, suite) => {
+        const chemin = (req.url ?? '').split('?')[0]
+        if (!chemin.startsWith('/api/')) return suite()
+
+        const reponse = {
+          status(code: number) {
+            res.statusCode = code
+            return this
+          },
+          json(corps: unknown) {
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify(corps))
+          },
+        }
+
+        try {
+          const morceaux: Buffer[] = []
+          for await (const m of req) morceaux.push(m as Buffer)
+          const brut = Buffer.concat(morceaux).toString('utf-8')
+
+          let corps: unknown
+          try {
+            corps = brut ? JSON.parse(brut) : undefined
+          } catch {
+            reponse.status(400).json({ erreur: 'json-invalide', message: 'Corps illisible.' })
+            return
+          }
+
+          const module = await serveur.ssrLoadModule(`/api/${chemin.slice(5)}.ts`)
+          await (module.default as (r: unknown, s: unknown) => Promise<void>)(
+            { method: req.method, body: corps },
+            reponse,
+          )
+        } catch (e) {
+          // Sans ce filet, une erreur laisse la requête ouverte et le
+          // navigateur attend jusqu'au bout de son propre délai.
+          reponse.status(500).json({
+            erreur: 'fonction',
+            message: e instanceof Error ? e.message : 'Échec du chargement de la fonction',
+          })
+        }
+      })
+    },
+  }
+}
+
+export default defineConfig(({ mode }) => {
+  /*
+   * Vite n'expose au navigateur que les variables préfixées `VITE_`, ce qui
+   * est la bonne règle : une clé d'API ne doit jamais y arriver. Mais les
+   * fonctions du dossier `api/` tournent dans ce processus Node et les
+   * cherchent dans `process.env` : on les y met, sans les exposer au client.
+   */
+  Object.assign(process.env, loadEnv(mode, process.cwd(), ''))
+
+  return {
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
     // Fuseau explicite : les serveurs de build tournent en UTC, le badge
@@ -25,6 +96,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    fonctionsApi(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icons/*.png'],
@@ -118,7 +190,8 @@ export default defineConfig({
     },
   },
   test: {
-    environment: 'jsdom',
-    include: ['src/**/*.test.ts'],
-  },
+      environment: 'jsdom',
+      include: ['src/**/*.test.ts'],
+    },
+  }
 })
